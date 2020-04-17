@@ -3,7 +3,7 @@
 [![Latest release](https://img.shields.io/github/v/release/eizedev/AirConnect-Synology)](https://github.com/eizedev/AirConnect-Synology/releases/latest)
 
 A minimal Synology package for [AirConnect](https://github.com/philippe44/AirConnect).  
-It allows you to use AirPlay to stream to UPnP/Sonos & Chromecast devices.
+It allows you to use AirPlay to stream to UPnP/Sonos & Chromecast devices that do not natively support AirPlay.
 
 - [AirConnect package for Synology NAS and Synology Router](#airconnect-package-for-synology-nas-and-synology-router)
   - [Information](#information)
@@ -41,19 +41,19 @@ You can find the available packages under [Releases](https://github.com/eizedev/
 
 You can check which architecture you have [here](https://www.synology.com/en-us/knowledgebase/DSM/tutorial/Compatibility_Peripherals/What_kind_of_CPU_does_my_NAS_have).
 
-For the Synology Routers you should use the ARM version.
+For the Synology **Routers** you should use the **ARM** version.
 
 ### Install via GUI (Package Center)
 
-Open the Package Center app.
-
-As this package is not an official Synology package you may have to **allow packages from any publisher**. Go to **Settings** and set the **Trust Level** to "**Any publisher**".
-
-Click on **Manual Install** and upload the package you just downloaded.
+- Open the Package Center app.
+- As this package is not an official Synology package you may have to
+  - **Allow packages from any publisher**
+    - Go to **Settings** and set the **Trust Level** to "**Any publisher**".
+- Click on **Manual Install** and upload the package you just downloaded.
 
 Don't forget to **change back** the **Trust level** to "Synology Inc." for additional security.
 
-You can see the error logs by clicking on **View Log** on the package's page.  
+You can see the logs by clicking on **View Log** on the packages page, or, if not available on your device, by using the [command line](#install-via-command-line).  
 
 ### Install via command line
 
@@ -63,25 +63,28 @@ You can see the error logs by clicking on **View Log** on the package's page.
   - Example: `sudo synopkg install AirConnect-arm-0.2.24.7-20200417.spk`
 - Start the **AirConnect** package with `/usr/syno/bin/synopkg start AirConnect` or trough the Package Center
 - Check the status of AirConnect with `/usr/syno/bin/synopkg status AirConnect`
-- You can find the logfile with `/usr/syno/bin/synopkg log AirConnect` (Default: `/tmp/airconnect.log`)
 
-You could also clone this repository on your synology device and build your package for your distribution locally, check [Build](#build) for more details.
+You can find the logfile with `/usr/syno/bin/synopkg log AirConnect` (Default: `/tmp/airconnect.log`)
+
+You could also clone this repository on your synology device and build your package for your architecture locally, check [Build](#build) for more details.
 
 ## How it works
 
-It runs the AirConnect processes with the following options:
+It runs the AirConnect processes with the following options tuned for sonos:
 
 ```bash
-airupnp -b [router local ip]:49154 -z -l 1000:2000 -f /tmp/airupnp.log -d all=error -d main=info
+airupnp -b [synology device local ip]:49154 -z -l 1000:2000 -f /tmp/airupnp.log -d all=error -d main=info
 
-aircast -b [router local ip] -z -l 1000:2000 -f /tmp/aircast.log -d all=error -d main=info
+aircast -b [synology device local ip] -z -l 1000:2000 -f /tmp/aircast.log -d all=error -d main=info
 ```
 
 The process is running with a low-privilege user.
 
 The processes will only recognise your devices if they are bound to the appropriate local network IP, but this is not trivial as there are various Synology devices and network setups.  
-The start script will check all your local network interfaces (with ip 192.168.* or 10.* or 172.16.* - 172.31.*) and checks if the airupnp/aircast processes add any devices (based on the logs).  
-It there are no devices added in 5 seconds it will try the next interface. For the automatic IP discovery to work you should have at least one UPnP/Sonos/Chromecast device on your network.
+The start script will check all your local network interfaces (with ip 192.168.* or 10.* or 172.16.* - 172.31.*) and checks if the airupnp/aircast processes add any devices (based on the logs).
+
+It there are no devices added in 5 seconds it will try the next interface.  
+For the automatic IP discovery to work you should have at least one UPnP/Sonos/Chromecast device on your network.
 
 If the start script is not able to find the right IP automatically you can fix it in `scripts/start-stop-status` by setting your own local IP (of your nas/router) and building your own package.
 
@@ -95,9 +98,16 @@ Look for the following lines:
 # return  0
 ```
 
-Alternatively you can open an issue and include your network interface list and your local IP.
+Alternatively you can open an issue and include your network interface list and your local IP and i will extend the default network interfaces filter with your list.
 
 ## Build
+
+You need to install the following packages on your distribution:
+
+- make
+- shellcheck
+
+After that you can start by running the shellcheck or directly with the build.
 
 ### Run shellcheck (optional)
 
