@@ -1,6 +1,6 @@
 # AirConnect package for Synology NAS and Synology Router
 
-[![Latest release](https://img.shields.io/github/release/eizedev/AirConnect-Synology.svg)](https://github.com/eizedev/AirConnect-Synology/releases/latest)
+[![Latest release](https://img.shields.io/github/v/release/eizedev/AirConnect-Synology)](https://github.com/eizedev/AirConnect-Synology/releases/latest)
 
 A minimal Synology package for [AirConnect](https://github.com/philippe44/AirConnect).  
 It allows you to use AirPlay to stream to UPnP/Sonos & Chromecast devices.
