@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Ensure user 'airconnect' exists before doing anything
+
+if ! synouser --get airconnect > /dev/null 2>&1
+then
+    # create user with random password
+    echo Creating AirConnect user.
+    synouser --add airconnect "$(uuidgen | cut -c-8)" 'AirConnect User' 0 '' ''
+else
+    echo Securing existing AirConnect user
+    synouser --modify airconnect 'AirConnect User' 0 ''
+fi
+
+exit 0

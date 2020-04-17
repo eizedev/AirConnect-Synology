@@ -1,0 +1,127 @@
+#!/bin/sh
+
+set -eu
+
+AIRCONNECT_DIR="/var/packages/AirConnect/target"
+
+CONFIG_UPNP_FILE="/volume1/development/workspace/AirConnect-Synology/dist/config.xml"
+CONFIG_CAST_FILE="/volume1/development/workspace/AirConnect-Synology/dist/config-cast.xml"
+
+logfile="/tmp/airconnect.log"
+
+start_airconnect_on_ip ()
+{
+    ip="$1"
+    port=49154
+    {
+        echo "[$(date +'%T')] Starting airupnp on ${ip}:${port}"
+    } >> ${logfile}
+    su airconnect -s /bin/sh -c "${AIRCONNECT_DIR}/airupnp -b ${ip}:${port} -x \"${CONFIG_UPNP_FILE}\" -z -f ${logfile}" >> ${logfile} 2>&1
+
+
+    {
+        echo "[$(date +'%T')] Starting aircast on ${ip}"
+    } >> ${logfile}
+    su airconnect -s /bin/sh -c "${AIRCONNECT_DIR}/aircast -b ${ip} -x \"${CONFIG_CAST_FILE}\" -z -f ${logfile}" >> ${logfile} 2>&1
+
+    cnt=0
+    while [ $cnt -lt 5 ]; do
+        if grep -q "adding renderer" ${logfile}; then
+            return 0
+        fi
+        cnt=$((cnt + 1))
+        sleep 1
+    done
+    return 1
+}
+
+start_airconnect ()
+{
+    rm -f "${logfile}"
+    touch "${logfile}"
+    chown airconnect:users "${logfile}"
+
+    # If you want to start the airconnect processes on a specific IP please uncomment the following lines
+    # and set your own local IP address:
+    #
+    # start_airconnect_on_ip "1.2.3.4" || true
+    # return 0
+
+    interfaces=$(ifconfig -a | grep 'Ethernet' -A 1 | grep -E 'inet (addr:)?(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[01])\.)' -B 1 | grep 'Ethernet' | grep -v "lbr0" | grep -v "docker" | cut -d ' ' -f 1)
+
+    if [ -z "$interfaces" ]; then
+        echo "Failed to get local Ethernet interfaces" > "${SYNOPKG_TEMP_LOGFILE}"
+        exit 1
+    fi
+
+    # Try lbr0 interface first if exists
+    interfaces="lbr0 $interfaces"
+
+    for interface in $interfaces; do
+        ip=$(/sbin/ifconfig "$interface" 2> /dev/null | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')
+        if [ -n "$ip" ]; then
+            if start_airconnect_on_ip "$ip"; then
+                return 0
+            else
+                stop_airconnect
+            fi
+        fi
+    done
+
+    echo "Failed to start AirConnect on any of the local interfaces, please make sure you have at least one UPnP/Sonos/Chromecast device on your network" > "${SYNOPKG_TEMP_LOGFILE}"
+    exit 1
+}
+
+stop_airconnect ()
+{
+    killall -16 airupnp
+    killall -16 aircast
+}
+
+airconnect_status ()
+{
+    # Check if ps has ax options
+    if ps ax >/dev/null 2>&1; then
+        # shellcheck disable=SC2009
+        if ! ps ax | grep -E 'airupnp|aircast' | grep -v -q grep; then
+            return 1
+        fi
+    else
+        # shellcheck disable=SC2009
+        if ! ps | grep -E 'airupnp|aircast' | grep -v -q grep; then
+            return 1
+        fi
+    fi
+
+    return 0
+}
+
+case $1 in
+    start)
+        echo Starting AirConnect ...
+        start_airconnect
+        exit $?
+        ;;
+    stop)
+        echo Stopping AirConnect ...
+        stop_airconnect
+        exit $?
+        ;;
+    status)
+        if airconnect_status
+        then
+            echo AirConnect is running
+            exit 0
+        else
+            echo AirConnect is not running
+            exit 1
+        fi
+        ;;
+    log)
+        echo "${logfile}"
+        exit 0
+        ;;
+    *)
+        exit 1
+        ;;
+esac
