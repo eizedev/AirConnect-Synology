@@ -1,4 +1,5 @@
-#Git commit SHA
+# Syno package structure: https://help.synology.com/developer-guide/synology_package/package_structure.html
+#Git commit SHA from https://github.com/philippe44/AirConnect/commits/master/bin
 REPO_REVISION=cb731dce032268ea93e5a7e6d5b3dc73c95b6c88
 VERSION=0.2.24.7-$(shell date '+%Y%m%d')
 
