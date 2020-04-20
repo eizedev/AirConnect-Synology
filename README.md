@@ -194,7 +194,7 @@ You can find the built packages in the **dist** directory.
 
 ## Debugging
 
-If you want to see more logs then change the `-d all=error` parameter in `scripts/start-stop-status` and rebuild the package, then [install it again](#install-via-command-line).
+If you want to see more logs then change the `-d all=info` parameter in `scripts/start-stop-status` to `-d all=debug` and rebuild the package, then [install it again](#install-via-command-line).
 
 ## License
 
