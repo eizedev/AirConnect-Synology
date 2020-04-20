@@ -1,15 +1,23 @@
 #!/bin/sh
 
-# Ensure user 'airconnect' exists before doing anything
-
-if ! synouser --get airconnect > /dev/null 2>&1
-then
-    # create user with random password
-    echo Creating AirConnect user.
-    synouser --add airconnect "$(uuidgen | cut -c-8)" 'AirConnect User' 0 '' ''
-else
-    echo Securing existing AirConnect user
-    synouser --modify airconnect 'AirConnect User' 0 ''
+AIRCONNECT_USER="$(echo ${SYNOPKG_PKGNAME} | awk {'print tolower($_)'})"
+LOG="/var/log/${AIRCONNECT_USER}.log"
+if [ ! -e "${LOG}" ]; then
+    touch ${LOG}
 fi
+echo "#### Start postinst...####" >>$LOG
+echo "$(date +%Y-%m-%d:%H:%M:%S)" >>$LOG
+echo "" >>$LOG
 
+# Ensure user 'airconnect' exists before doing anything
+if ! synouser --get ${AIRCONNECT_USER} >/dev/null 2>&1; then
+    # create user with random password
+    echo "[$(date +'%T')] Creating ${AIRCONNECT_USER} user." >>$LOG
+    synouser --add ${AIRCONNECT_USER} "$(uuidgen | cut -c-8)" 'AirConnect User' 0 '' ''
+else
+    echo "[$(date +'%T')] Securing existing ${AIRCONNECT_USER} user." >>$LOG
+    synouser --modify ${AIRCONNECT_USER} 'AirConnect User' 0 ''
+fi
+sleep 3
+echo "[$(date +'%T')] postinst done" >>$LOG
 exit 0
