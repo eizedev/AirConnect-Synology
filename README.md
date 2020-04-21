@@ -92,7 +92,7 @@ The process is running with a low-privilege user.
 The processes will only recognise your devices if they are bound to the appropriate local network IP, but this is not trivial as there are various Synology devices and network setups.  
 The start script will check all your local network interfaces (with ip 192.168.* or 10.* or 172.16.* - 172.31.*) and checks if the airupnp/aircast processes add any devices (based on the logs).
 
-It there are no devices added in 5 seconds it will try the next interface.  
+It there are no devices added in **10 seconds** it will try the next interface.  
 For the automatic IP discovery to work you should have at least one UPnP/Sonos/Chromecast device on your network.
 
 If the start script is not able to find the right IP automatically you can fix it in `scripts/start-stop-status` by setting your own local IP (of your nas/router) and building your own package.
