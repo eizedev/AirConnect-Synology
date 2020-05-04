@@ -1,14 +1,15 @@
 #!/bin/bash
 
-echo
-echo "Build Start"
+echo "#### BUILD start...####"
+echo "[$(date +%Y-%m-%d:%H:%M:%S)]"
+echo ""
 
 rm -r -f dist
 
 set -euo pipefail
 
 ARCH_LIST="arm aarch64 x86 x86-64"
-MAKE=`which make`
+MAKE=$(which make)
 
 for arch in ${ARCH_LIST}; do
   export ARCH=${arch}
