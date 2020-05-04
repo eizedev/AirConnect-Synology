@@ -1,34 +1,38 @@
 #!/bin/sh
 
-AIRCONNECT_USER="$(echo ${SYNOPKG_PKGNAME} | awk {'print tolower($_)'})"
+AIRCONNECT_USER="$(echo "${SYNOPKG_PKGNAME}" | awk '{print tolower($_)}')"
 LOG="/var/log/${AIRCONNECT_USER}.log"
 if [ ! -e "${LOG}" ]; then
-    touch ${LOG}
+    touch "${LOG}"
 fi
-echo "#### Start postuninst...####" >>$LOG
-echo "$(date +%Y-%m-%d:%H:%M:%S)" >>$LOG
-echo "" >>$LOG
+
+{
+    echo "#### Start preuninst...####"
+    echo "[$(date +%Y-%m-%d:%H:%M:%S)]"
+    echo ""
+} >>"$LOG"
+
 # Determine folder before deleting user
-AIRCONNECT_HOME="$(synouser --get ${AIRCONNECT_USER} | grep "User Dir" | awk -F[ '{print $2}' | awk -F] '{print $1}')"
+AIRCONNECT_HOME="$(synouser --get "${AIRCONNECT_USER}" | grep "User Dir" | awk -F[ '{print $2}' | awk -F] '{print $1}')"
 
 # Remove airconnect user if existing
-if ! synouser --get ${AIRCONNECT_USER} >/dev/null 2>&1; then
+if ! synouser --get "${AIRCONNECT_USER}" >/dev/null 2>&1; then
     # create user with random password
-    echo "[$(date +'%T')] ${AIRCONNECT_USER} user not found - nothing deleted" >>$LOG
+    echo "[$(date +'%T')] \"${AIRCONNECT_USER}\" user not found - nothing deleted" >>"$LOG"
 else
-    echo "[$(date +'%T')] User ${AIRCONNECT_USER} found - deleting it" >>$LOG
-    synouser --del ${AIRCONNECT_USER}
+    echo "[$(date +'%T')] User \"${AIRCONNECT_USER}\" found - deleting it" >>"$LOG"
+    synouser --del "${AIRCONNECT_USER}"
     sleep 3
 fi
 
 # Sanity check user had valid folder
 if [ -e "${AIRCONNECT_HOME}" ]; then
-    echo "[$(date +'%T')] ${AIRCONNECT_USER} user folder '${AIRCONNECT_HOME}' found - deleting it" >>$LOG
-    rm -r ${AIRCONNECT_HOME}
+    echo "[$(date +'%T')] \"${AIRCONNECT_USER}\" user folder \"${AIRCONNECT_HOME}\" found - deleting it" >>"$LOG"
+    rm -r "${AIRCONNECT_HOME}"
 else
-    echo "[$(date +'%T')] ${AIRCONNECT_USER} user folder '${AIRCONNECT_HOME}' not found - nothing deleted" >>$LOG
+    echo "[$(date +'%T')] \"${AIRCONNECT_USER}\" user folder \"${AIRCONNECT_HOME}\" not found - nothing deleted" >>"$LOG"
 fi
 
-echo "[$(date +'%T')] postuninst done" >>$LOG
+echo "[$(date +'%T')] postuninst done" >>"$LOG"
 
 exit 0

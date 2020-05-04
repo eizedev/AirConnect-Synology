@@ -2,43 +2,43 @@
 
 set -eu
 
-AIRCONNECT_USER="$(echo ${SYNOPKG_PKGNAME} | awk {'print tolower($_)'})"
+AIRCONNECT_USER="$(echo "${SYNOPKG_PKGNAME}" | awk '{print tolower($_)}')"
 CONFIG_UPNP_FILE="${SYNOPKG_PKGDEST}/config.xml"
 CONFIG_CAST_FILE="${SYNOPKG_PKGDEST}/config-cast.xml"
 
 LOG="/var/log/${AIRCONNECT_USER}.log"
 # Delete Log if older than 1 day
-find ${LOG} -mtime +1 -type f -delete >/dev/null 2>&1
+find "${LOG}" -mtime +1 -type f -delete >/dev/null 2>&1
 if [ -e "${LOG}" ]; then
-    chown ${AIRCONNECT_USER}:users ${LOG}
+    chown "${AIRCONNECT_USER}":users "${LOG}"
 else
-    touch ${LOG}
-    chown ${AIRCONNECT_USER}:users ${LOG}
+    touch "${LOG}"
+    chown "${AIRCONNECT_USER}":users "${LOG}"
 fi
 
 start_airconnect_on_ip() {
     ip="$1"
     port=49154
-    if [ ! -z "${port}" ]; then
+    if [ -n "${port}" ]; then
         if netstat -tlpn | grep :${port}; then
-            echo "[$(date +'%T')] Your selected port ${port} is already in use." >>$LOG
-            echo "[$(date +'%T')] Please check what is running on the port and try again." >>$LOG
-            echo "[$(date +'%T')] Port ${port} already in use. Please check what is running on the port and try again." >>$SYNOPKG_TEMP_LOGFILE
+            echo "[$(date +'%T')] Your selected port ${port} is already in use." >>"$LOG"
+            echo "[$(date +'%T')] Please check what is running on the port and try again." >>"$LOG"
+            echo "[$(date +'%T')] Port ${port} already in use. Please check what is running on the port and try again." >>"$SYNOPKG_TEMP_LOGFILE"
             exit 1
         fi
     fi
-    echo "[$(date +'%T')] Starting airupnp on ${ip}:${port}" >>$LOG
-    su airconnect -s /bin/sh -c "${SYNOPKG_PKGDEST}/airupnp -b ${ip}:${port} -l 1000:2000 -x \"${CONFIG_UPNP_FILE}\" -z -f ${LOG} -d all=info -d main=info" >>${LOG} 2>&1
+    echo "[$(date +'%T')] Starting airupnp on ${ip}:${port}" >>"$LOG"
+    su airconnect -s /bin/sh -c "${SYNOPKG_PKGDEST}/airupnp -b ${ip}:${port} -l 1000:2000 -x \"${CONFIG_UPNP_FILE}\" -z -f \"${LOG}\" -d all=info -d main=info" >>"${LOG}" 2>&1
 
-    echo "[$(date +'%T')] Starting aircast on ${ip}" >>$LOG
-    su airconnect -s /bin/sh -c "${SYNOPKG_PKGDEST}/aircast -b ${ip} -l 1000:2000 -x \"${CONFIG_CAST_FILE}\" -z -f ${LOG} -d all=info -d main=info" >>${LOG} 2>&1
+    echo "[$(date +'%T')] Starting aircast on ${ip}" >>"$LOG"
+    su airconnect -s /bin/sh -c "${SYNOPKG_PKGDEST}/aircast -b ${ip} -l 1000:2000 -x \"${CONFIG_CAST_FILE}\" -z -f \"${LOG}\" -d all=info -d main=info" >>"${LOG}" 2>&1
 
     # search for 10 seconds "adding renderer" in the logfile to check if speakers are found, if not return 1 rom the function
     cnt=0
-    echo "[$(date +'%T')] Searching if renderer were added (for 10 seconds)..." >>$LOG
+    echo "[$(date +'%T')] Searching if renderer were added (for 10 seconds)..." >>"$LOG"
     while [ $cnt -lt 10 ]; do
-        if grep -q "adding renderer" ${LOG}; then
-            echo "[$(date +'%T')] At least one renderer successfully discovered!" >>$LOG
+        if grep -q "adding renderer" "${LOG}"; then
+            echo "[$(date +'%T')] At least one renderer successfully discovered!" >>"$LOG"
             return 0
         fi
         cnt=$((cnt + 1))
@@ -57,8 +57,8 @@ start_airconnect() {
     interfaces=$(/sbin/ifconfig -a | grep 'Ethernet' -A 1 | grep -E 'inet (addr:)?(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[01])\.)' -B 1 | grep 'Ethernet' | grep -v "lbr0" | grep -v "docker" | cut -d ' ' -f 1)
 
     if [ -z "$interfaces" ]; then
-        echo "[$(date +'%T')] Failed to get local Ethernet interfaces" >>$LOG
-        echo "[$(date +'%T')] Failed to get local Ethernet interfaces" >>$SYNOPKG_TEMP_LOGFILE
+        echo "[$(date +'%T')] Failed to get local Ethernet interfaces" >>"$LOG"
+        echo "[$(date +'%T')] Failed to get local Ethernet interfaces" >>"$SYNOPKG_TEMP_LOGFILE"
         exit 1
     fi
 
@@ -69,17 +69,17 @@ start_airconnect() {
         ip=$(/sbin/ifconfig "$interface" 2>/dev/null | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')
         if [ -n "$ip" ]; then
             if start_airconnect_on_ip "$ip"; then
-                echo "[$(date +'%T')] AirConnect successfully started on ip \"${ip}\"!" >>$LOG
+                echo "[$(date +'%T')] AirConnect successfully started on ip \"${ip}\"!" >>"$LOG"
                 return 0
             else
-                echo "[$(date +'%T')] Failed to start AirConnect on ip \"${ip}\", stopping it..." >>$LOG
-                echo "[$(date +'%T')] Failed to start AirConnect on ip \"${ip}\", stopping it..." >>$SYNOPKG_TEMP_LOGFILE
+                echo "[$(date +'%T')] Failed to start AirConnect on ip \"${ip}\", stopping it..." >>"$LOG"
+                echo "[$(date +'%T')] Failed to start AirConnect on ip \"${ip}\", stopping it..." >>"$SYNOPKG_TEMP_LOGFILE"
                 stop_airconnect
             fi
         fi
     done
-    echo "[$(date +'%T')] Failed to start AirConnect on any of the local interfaces, please make sure you have at least one UPnP/Sonos/Chromecast device on your network" >>$LOG
-    echo "[$(date +'%T')] Failed to start AirConnect on any of the local interfaces, please make sure you have at least one UPnP/Sonos/Chromecast device on your network" >>$SYNOPKG_TEMP_LOGFILE
+    echo "[$(date +'%T')] Failed to start AirConnect on any of the local interfaces, please make sure you have at least one UPnP/Sonos/Chromecast device on your network" >>"$LOG"
+    echo "[$(date +'%T')] Failed to start AirConnect on any of the local interfaces, please make sure you have at least one UPnP/Sonos/Chromecast device on your network" >>"$SYNOPKG_TEMP_LOGFILE"
     exit 1
 }
 
@@ -107,12 +107,12 @@ airconnect_status() {
 
 case $1 in
 start)
-    echo "[$(date +'%T')] Starting AirConnect ..." >>$LOG
+    echo "[$(date +'%T')] Starting AirConnect ..." >>"$LOG"
     start_airconnect
     exit $?
     ;;
 stop)
-    echo "[$(date +'%T')] Stopping AirConnect ..." >>$LOG
+    echo "[$(date +'%T')] Stopping AirConnect ..." >>"$LOG"
     stop_airconnect
     exit $?
     ;;
