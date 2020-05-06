@@ -38,16 +38,20 @@ The credit goes of course still to [@bandesz](https://github.com/bandesz) for th
 
 ### Download the pre-built Synology package
 
-You can find the available packages under [Releases](https://github.com/eizedev/AirConnect-Synology/releases) for four different architecture groups:
+You can find the available packages under [Releases](https://github.com/eizedev/AirConnect-Synology/releases) for six different architecture groups:
 
+- **ARMv5**: 88f6282 88f6281 mv6282
 - **ARMv7**: ipq806x armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k
-- **ARMv8**: rtd1296
+- **ARMv8**: rtd1296 aarch64
+- **PowerPC**: ppc qoriq
 - **Intel - 32-bit**: x86 cedarview bromolow evansport avoton braswell broadwell apollolake
 - **Intel - 64-bit (DSM 6.0+)**: x86_64
 
+Additionally to this specific architecture packages, one **static** package is also available. If none of the above packages will work on your device, please download the latest static package. The static package includes "static" binaries, that means, it includes binaries that have no external library dependencies.
+ 
 You can check which architecture you have [here](https://www.synology.com/en-us/knowledgebase/DSM/tutorial/Compatibility_Peripherals/What_kind_of_CPU_does_my_NAS_have).
 
-For the Synology **Routers** you should use the **ARM** version.
+For the Synology **Routers** you should use the **ARM** (ARMv7) version.
 
 ### Install via GUI (Package Center)
 
