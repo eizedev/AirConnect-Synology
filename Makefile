@@ -1,5 +1,5 @@
 # Syno package structure: https://help.synology.com/developer-guide/synology_package/package_structure.html
-#Git commit SHA from https://github.com/philippe44/AirConnect/commits/master/bin
+# Git commit SHA from https://github.com/philippe44/AirConnect/commits/master/bin
 REPO_REVISION=862d96f93c09acaaa86016ef4493e2c91779c20e
 VERSION=0.2.25.0-$(shell date '+%Y%m%d')
 
@@ -13,11 +13,18 @@ dist:
 	mkdir -p dist
 
 target/package.tgz: target
-	$(if ${ARCH},,$(error Must specify ARCH))
-	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/bin/airupnp-${ARCH} -o target/airupnp
-	chmod +x target/airupnp
-	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/bin/aircast-${ARCH} -o target/aircast
-	chmod +x target/aircast
+	$(if ${ARCH},$(info Arch: ${ARCH}),$(error Must specify ARCH))
+	if [ "${ARCH}" = "static" ]; then \
+		curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/bin/${ARCH_STATIC_AIRUPNP} -o target/airupnp; \
+		chmod +x target/airupnp; \
+		curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/bin/${ARCH_STATIC_AIRCAST} -o target/aircast; \
+		chmod +x target/aircast; \
+	else \
+		curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/bin/airupnp-${ARCH} -o target/airupnp; \
+		chmod +x target/airupnp; \
+		curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/bin/aircast-${ARCH} -o target/aircast; \
+		chmod +x target/aircast; \
+	fi
 	cd target && tar czf package.tgz airupnp aircast
 	rm target/airupnp target/aircast
 
@@ -31,8 +38,8 @@ target/PACKAGE_ICON.PNG: target
 	cp PACKAGE_ICON.PNG target/PACKAGE_ICON.PNG
 
 target/INFO: target
-	$(if ${INFO_ARCH},,$(error Must specify INFO_ARCH))
-	$(if ${INFO_FIRMWARE},,$(error Must specify INFO_FIRMWARE))
+	$(if ${INFO_ARCH},$(info INFO_ARCH: ${INFO_ARCH}),$(error Must specify INFO_ARCH))
+	$(if ${INFO_FIRMWARE},$(info INFO_FIRMWARE: ${INFO_FIRMWARE}),$(error Must specify INFO_FIRMWARE))
 	cp INFO target/INFO
 	sed -i.bak -e 's/#VERSION#/${VERSION}/' target/INFO
 	sed -i.bak -e 's/#INFO_ARCH#/${INFO_ARCH}/' target/INFO
@@ -40,7 +47,7 @@ target/INFO: target
 	rm target/INFO.bak
 
 dist/AirConnect-${ARCH}-${VERSION}.spk: target/package.tgz target/scripts target/LICENSE target/INFO target/PACKAGE_ICON.PNG dist
-	$(if ${ARCH},,$(error Must specify ARCH))
+	$(if ${ARCH},$(info dist - Arch: ${ARCH}),$(error dist - Must specify ARCH))
 	cd target && tar -czf AirConnect-${ARCH}-${VERSION}.spk *
 	mv target/AirConnect-${ARCH}-${VERSION}.spk dist/
 
@@ -50,9 +57,27 @@ arm:
 	$(eval export INFO_FIRMWARE=5.0-4458)
 	@true
 
+.PHONY: arm5
+arm5:
+	$(eval export INFO_ARCH=mv6282)
+	$(eval export INFO_FIRMWARE=5.0-4458)
+	@true
+
 .PHONY: aarch64
 aarch64:
 	$(eval export INFO_ARCH=rtd1296)
+	$(eval export INFO_FIRMWARE=5.0-4458)
+	@true
+
+.PHONY: ppc
+ppc:
+	$(eval export INFO_ARCH=qoriq e500)
+	$(eval export INFO_FIRMWARE=5.0-4458)
+	@true
+
+.PHONY: static
+static:
+	$(eval export INFO_ARCH=static)
 	$(eval export INFO_FIRMWARE=5.0-4458)
 	@true
 

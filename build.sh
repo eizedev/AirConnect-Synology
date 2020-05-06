@@ -8,11 +8,15 @@ rm -r -f dist
 
 set -euo pipefail
 
-ARCH_LIST="arm aarch64 x86 x86-64"
+ARCH_LIST="arm arm5 aarch64 x86 x86-64 ppc static"
+ARCH_STATIC_AIRCAST="aircast-bsd-x64-static"
+ARCH_STATIC_AIRUPNP="airupnp-x86-64-static"
 MAKE=$(which make)
 
 for arch in ${ARCH_LIST}; do
   export ARCH=${arch}
+  export ARCH_STATIC_AIRCAST=${ARCH_STATIC_AIRCAST}
+  export ARCH_STATIC_AIRUPNP=${ARCH_STATIC_AIRUPNP}
   $MAKE clean build
 done
 
