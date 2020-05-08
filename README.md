@@ -50,7 +50,7 @@ You can find the available packages under [Releases](https://github.com/eizedev/
   - Please download: `AirConnect-ppc-${VERSION}`
 - **PowerPC Static**: noarch qoriq Ppc853x
   - Please download: `AirConnect-ppc-static-${VERSION}`
-  - If the above **PowerPC** package will work on your device, please download the latest ppc-static package.
+  - If the above **PowerPC** package will not work on your device, please download the latest ppc-static package.
     - The static package includes "static" binaries, that means, it includes binaries that have no external library dependencies.
 - **Intel - 32-bit**: x86 cedarview bromolow evansport avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap
   - Please download: `AirConnect-x86-${VERSION}`
