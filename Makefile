@@ -53,7 +53,7 @@ dist/AirConnect-${ARCH}-${VERSION}.spk: target/package.tgz target/scripts target
 
 .PHONY: arm
 arm:
-	$(eval export INFO_ARCH=ipq806x armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k hi3535)
+	$(eval export INFO_ARCH=ipq806x armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k hi3535 dakota ipq806x northstarplus)
 	$(eval export INFO_FIRMWARE=5.0-4458)
 	@true
 
