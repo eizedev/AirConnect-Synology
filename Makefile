@@ -59,7 +59,7 @@ arm:
 
 .PHONY: arm5
 arm5:
-	$(eval export INFO_ARCH=88f6282 mv6282 88f6281 mv6281)
+	$(eval export INFO_ARCH=88f6282 mv6282 88f6281 mv6281 88f628x)
 	$(eval export INFO_FIRMWARE=5.0-4458)
 	@true
 
@@ -71,25 +71,25 @@ aarch64:
 
 .PHONY: ppc
 ppc:
-	$(eval export INFO_ARCH=qoriq)
+	$(eval export INFO_ARCH=qoriq Ppc853x)
 	$(eval export INFO_FIRMWARE=5.0-4458)
 	@true
 
 .PHONY: static
 static:
-	$(eval export INFO_ARCH=qoriq noarch)
+	$(eval export INFO_ARCH=qoriq Ppc853x noarch)
 	$(eval export INFO_FIRMWARE=5.0-4458)
 	@true
 
 .PHONY: x86
 x86:
-	$(eval export INFO_ARCH=x86 cedarview bromolow evansport avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk)
+	$(eval export INFO_ARCH=x86 cedarview bromolow evansport avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap)
 	$(eval export INFO_FIRMWARE=5.0-4458)
 	@true
 
 .PHONY: x86-64
 x86-64:
-	$(eval export INFO_ARCH=x86_64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk)
+	$(eval export INFO_ARCH=x86_64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap)
 	$(eval export INFO_FIRMWARE=6.0-7321)
 	@true
 
