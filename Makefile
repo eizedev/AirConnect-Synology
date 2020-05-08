@@ -59,7 +59,7 @@ arm:
 
 .PHONY: arm5
 arm5:
-	$(eval export INFO_ARCH=88f6282 mv6282 88f6281 mv6281 88f628x)
+	$(eval export INFO_ARCH=88f6282 88f6281 88f628x)
 	$(eval export INFO_FIRMWARE=5.0-4458)
 	@true
 
