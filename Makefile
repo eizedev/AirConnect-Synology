@@ -14,10 +14,10 @@ dist:
 
 target/package.tgz: target
 	$(if ${ARCH},$(info Arch: ${ARCH}),$(error Must specify ARCH))
-	if [ "${ARCH}" = "static" ]; then \
-		curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/bin/${ARCH_STATIC_AIRUPNP} -o target/airupnp; \
+	if [ "${ARCH}" = "ppc-static" ]; then \
+		curl -s -L https://github.com/philippe44/AirConnect/raw/${REVISION_STATIC_AIRUPNP}/bin/airupnp-${ARCH} -o target/airupnp; \
 		chmod +x target/airupnp; \
-		curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/bin/${ARCH_STATIC_AIRCAST} -o target/aircast; \
+		curl -s -L https://github.com/philippe44/AirConnect/raw/${REVISION_STATIC_AIRCAST}/bin/aircast-${ARCH} -o target/aircast; \
 		chmod +x target/aircast; \
 	else \
 		curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/bin/airupnp-${ARCH} -o target/airupnp; \
@@ -75,8 +75,8 @@ ppc:
 	$(eval export INFO_FIRMWARE=5.0-4458)
 	@true
 
-.PHONY: static
-static:
+.PHONY: ppc-static
+ppc-static:
 	$(eval export INFO_ARCH=qoriq Ppc853x noarch)
 	$(eval export INFO_FIRMWARE=5.0-4458)
 	@true
