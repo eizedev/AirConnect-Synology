@@ -38,7 +38,7 @@ The credit goes of course still to [@bandesz](https://github.com/bandesz) for th
 
 ### Download the pre-built Synology package
 
-You can find the available packages under [Releases](https://github.com/eizedev/AirConnect-Synology/releases) for six (seven with noarch) different architecture groups:
+You can find the available packages under [Releases](https://github.com/eizedev/AirConnect-Synology/releases) for six different architecture groups:
 
 - **ARMv5**: 88f6282 88f6281 88f628x
   - Please download: `AirConnect-arm5-${VERSION}`
@@ -48,15 +48,15 @@ You can find the available packages under [Releases](https://github.com/eizedev/
   - Please download: `AirConnect-aarch64-${VERSION}`
 - **PowerPC**: qoriq Ppc853x
   - Please download: `AirConnect-ppc-${VERSION}`
+- **PowerPC Static**: noarch qoriq Ppc853x
+  - Please download: `AirConnect-ppc-static-${VERSION}`
+  - If the above **PowerPC** package will work on your device, please download the latest ppc-static package.
+    - The static package includes "static" binaries, that means, it includes binaries that have no external library dependencies.
 - **Intel - 32-bit**: x86 cedarview bromolow evansport avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap
   - Please download: `AirConnect-x86-${VERSION}`
 - **Intel - 64-bit (DSM 6.0+)**: x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap
   - Please download: `AirConnect-x86-64-${VERSION}`
-- **Static**: noarch qoriq Ppc853x
-  - Please download: `AirConnect-static-${VERSION}`
-  - If none of the above packages will work on your device, please download the latest static package.
-    - The static package includes "static" binaries, that means, it includes binaries that have no external library dependencies.
-  - Also the static package spk uses `noarch` as architecture, so it should be possible to install this package on any device
+
 
 You can check which architecture you have [here](https://www.synology.com/en-us/knowledgebase/DSM/tutorial/Compatibility_Peripherals/What_kind_of_CPU_does_my_NAS_have).
 
