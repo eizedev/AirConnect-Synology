@@ -201,7 +201,7 @@ make clean build-all
 ARCH=arm make clean build
 ```
 
-Possible values for **ARCH**: `arm, aarch64, x86, x86-64`
+Possible values for **ARCH**: `arm, aarch64, arm5, ppc, x86, x86-64`
 
 You can find the built packages in the **dist** directory.
 
