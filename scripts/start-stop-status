@@ -8,7 +8,13 @@ CONFIG_CAST_FILE="${SYNOPKG_PKGDEST}/config-cast.xml"
 
 LOG="/var/log/${AIRCONNECT_USER}.log"
 # Delete Log if older than 1 day
-find "${LOG}" -mtime +1 -type f -delete >/dev/null 2>&1
+find "${LOG}" -size +50M -type f -delete >/dev/null 2>&1
+# Ensure user 'airconnect' exists before doing anything
+if ! synouser --get "${AIRCONNECT_USER}" >/dev/null 2>&1; then
+    # create user with random password
+    echo "[$(date +'%T')] start-stop-status - Creating \"${AIRCONNECT_USER}\" user." >>"$LOG"
+    synouser --add "${AIRCONNECT_USER}" "$(uuidgen | cut -c-8)" 'AirConnect User' 0 '' ''
+fi
 if [ -e "${LOG}" ]; then
     chown "${AIRCONNECT_USER}":users "${LOG}"
 else
@@ -93,12 +99,12 @@ airconnect_status() {
     if ps ax >/dev/null 2>&1; then
         # shellcheck disable=SC2009
         if ! ps ax | grep -E 'airupnp|aircast' | grep -v -q grep; then
-            return 1
+            return 3
         fi
     else
         # shellcheck disable=SC2009
         if ! ps | grep -E 'airupnp|aircast' | grep -v -q grep; then
-            return 1
+            return 3
         fi
     fi
 
@@ -122,7 +128,7 @@ status)
         exit 0
     else
         echo "[$(date +'%T')] AirConnect is not running"
-        exit 1
+        exit 3
     fi
     ;;
 log)

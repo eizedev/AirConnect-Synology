@@ -6,21 +6,15 @@ if [ ! -e "${LOG}" ]; then
     touch "${LOG}"
 fi
 
-{
-    echo "#### Start preuninst...####"
-    echo "[$(date +%Y-%m-%d:%H:%M:%S)]"
-    echo ""
-} >>"$LOG"
-
-# Determine folder before deleting user
-AIRCONNECT_HOME="$(synouser --get "${AIRCONNECT_USER}" | grep "User Dir" | awk -F[ '{print $2}' | awk -F] '{print $1}')"
+echo "[$(date +%Y-%m-%d" "%H:%M:%S)] #### Start postuninst... ####" >>"$LOG"
 
 # Remove airconnect user if existing
 if ! synouser --get "${AIRCONNECT_USER}" >/dev/null 2>&1; then
-    # create user with random password
     echo "[$(date +'%T')] \"${AIRCONNECT_USER}\" user not found - nothing deleted" >>"$LOG"
 else
     echo "[$(date +'%T')] User \"${AIRCONNECT_USER}\" found - deleting it" >>"$LOG"
+    # Determine folder before deleting user
+    AIRCONNECT_HOME="$(synouser --get "${AIRCONNECT_USER}" | grep "User Dir" | awk -F[ '{print $2}' | awk -F] '{print $1}')"
     synouser --del "${AIRCONNECT_USER}"
     sleep 3
 fi
@@ -32,7 +26,6 @@ if [ -e "${AIRCONNECT_HOME}" ]; then
 else
     echo "[$(date +'%T')] \"${AIRCONNECT_USER}\" user folder \"${AIRCONNECT_HOME}\" not found - nothing deleted" >>"$LOG"
 fi
-
-echo "[$(date +'%T')] postuninst done" >>"$LOG"
-
+sleep 3
+echo "[$(date +%Y-%m-%d" "%H:%M:%S)] #### Done postuninst ####" >>"$LOG"
 exit 0
