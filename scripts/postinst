@@ -5,12 +5,8 @@ LOG="/var/log/${AIRCONNECT_USER}.log"
 if [ ! -e "${LOG}" ]; then
     touch "${LOG}"
 fi
-{
-    echo "#### Start preuninst...####"
-    echo "[$(date +%Y-%m-%d:%H:%M:%S)]"
-    echo ""
-} >>"$LOG"
 
+echo "[$(date +%Y-%m-%d" "%H:%M:%S)] #### Start postinst... ####" >>"$LOG"
 # Ensure user 'airconnect' exists before doing anything
 if ! synouser --get "${AIRCONNECT_USER}" >/dev/null 2>&1; then
     # create user with random password
@@ -21,5 +17,5 @@ else
     synouser --modify "${AIRCONNECT_USER}" 'AirConnect User' 0 ''
 fi
 sleep 3
-echo "[$(date +'%T')] postinst done" >>"$LOG"
+echo "[$(date +%Y-%m-%d" "%H:%M:%S)] #### Done postinst ####" >>"$LOG"
 exit 0

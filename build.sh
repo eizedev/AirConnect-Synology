@@ -1,8 +1,6 @@
 #!/bin/bash
 
-echo "#### BUILD start...####"
-echo "[$(date +%Y-%m-%d:%H:%M:%S)]"
-echo ""
+echo "[$(date +%Y-%m-%d" "%H:%M:%S)] #### Start BUILD... ####"
 
 rm -r -f dist
 
@@ -23,7 +21,7 @@ done
 rm -r -f target
 
 echo
-echo "Build complete, you can find the packages under the dist directory"
+echo "$(date +%Y-%m-%d" "%H:%M:%S)] #### Build complete, you can find the packages under the dist directory"
 
 echo "how to install new package on synology x86 devices via commandline:"
 echo "sudo synopkg install dist/AirConnect-x86-64-XXX.spk"
