@@ -1,7 +1,7 @@
 # Syno package structure: https://help.synology.com/developer-guide/synology_package/package_structure.html
 # Git commit SHA from https://github.com/philippe44/AirConnect/commits/master/bin
-REPO_REVISION=862d96f93c09acaaa86016ef4493e2c91779c20e
-VERSION=0.2.25.0-$(shell date '+%Y%m%d')
+REPO_REVISION=3f7aa0b05568cc1b50b4b3df206317e1e0828dd3
+VERSION=0.2.26.0-$(shell date '+%Y%m%d')
 
 LICENSE:
 	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/LICENSE -O
@@ -14,17 +14,10 @@ dist:
 
 target/package.tgz: target
 	$(if ${ARCH},$(info Arch: ${ARCH}),$(error Must specify ARCH))
-	if [ "${ARCH}" = "ppc-static" ]; then \
-		curl -s -L https://github.com/philippe44/AirConnect/raw/${REVISION_STATIC_AIRUPNP}/bin/airupnp-${ARCH} -o target/airupnp; \
-		chmod +x target/airupnp; \
-		curl -s -L https://github.com/philippe44/AirConnect/raw/${REVISION_STATIC_AIRCAST}/bin/aircast-${ARCH} -o target/aircast; \
-		chmod +x target/aircast; \
-	else \
-		curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/bin/airupnp-${ARCH} -o target/airupnp; \
-		chmod +x target/airupnp; \
-		curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/bin/aircast-${ARCH} -o target/aircast; \
-		chmod +x target/aircast; \
-	fi
+	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/bin/airupnp-${ARCH} -o target/airupnp
+	chmod +x target/airupnp
+	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/bin/aircast-${ARCH} -o target/aircast
+	chmod +x target/aircast
 	cd target && tar czf package.tgz airupnp aircast
 	rm target/airupnp target/aircast
 
