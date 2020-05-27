@@ -91,29 +91,38 @@ start_airconnect() {
 
 stop_airconnect() {
     killall -16 airupnp >/dev/null 2>&1
+    sleep 1
     killall -16 aircast >/dev/null 2>&1
     sleep 10
 
     # Check if ps has ax options
     if ps ax >/dev/null 2>&1; then
         # shellcheck disable=SC2009
-        if ! ps ax | grep -E 'airupnp' | grep -v -q grep; then
-            echo "[$(date +'%T')] Stop Status: AirUpnp already stopped!" >>"$LOG"
+        if ! ps ax | grep -E 'airupnp' | grep -v -q grep && ! ps ax | grep -E 'aircast' | grep -v -q grep; then
             return 0
-        fi
-        if ! ps ax | grep -E 'aircast' | grep -v -q grep; then
-            echo "[$(date +'%T')] Stop Status: AirCast already stopped!" >>"$LOG"
-            return 0
+        elif ps ax | grep -E 'airupnp' | grep -v -q grep && ps ax | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Stop: airupnp & aircast are still running!" >>"$LOG"
+            return 1
+        elif ! ps ax | grep -E 'airupnp' | grep -v -q grep && ps ax | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Stop: aircast is still running!" >>"$LOG"
+            return 1
+        elif ps ax | grep -E 'airupnp' | grep -v -q grep && ! ps ax | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Stop: airupnp is still running!" >>"$LOG"
+            return 1
         fi
     else
         # shellcheck disable=SC2009
-        if ! ps | grep -E 'airupnp' | grep -v -q grep; then
-            echo "[$(date +'%T')] Stop Status: AirUpnp already stopped!" >>"$LOG"
+        if ! ps | grep -E 'airupnp' | grep -v -q grep && ! ps | grep -E 'aircast' | grep -v -q grep; then
             return 0
-        fi
-        if ! ps | grep -E 'aircast' | grep -v -q grep; then
-            echo "[$(date +'%T')] Stop Status: AirCast already stopped!" >>"$LOG"
-            return 0
+        elif ps | grep -E 'airupnp' | grep -v -q grep && ps | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Stop: airupnp & aircast are still running!" >>"$LOG"
+            return 1
+        elif ! ps | grep -E 'airupnp' | grep -v -q grep && ps | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Stop: aircast is still running!" >>"$LOG"
+            return 1
+        elif ps | grep -E 'airupnp' | grep -v -q grep && ! ps | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Stop: airupnp is still running!" >>"$LOG"
+            return 1
         fi
     fi
     return 1
@@ -123,26 +132,37 @@ airconnect_status() {
     # Check if ps has ax options
     if ps ax >/dev/null 2>&1; then
         # shellcheck disable=SC2009
-        if ! ps ax | grep -E 'airupnp' | grep -v -q grep; then
-            echo "[$(date +'%T')] Status: AirUpnp not running!" >>"$LOG"
+        if ps ax | grep -E 'airupnp' | grep -v -q grep && ps ax | grep -E 'aircast' | grep -v -q grep; then
+            return 0
+        elif ! ps ax | grep -E 'airupnp' | grep -v -q grep && ! ps ax | grep -E 'aircast' | grep -v -q grep; then
             return 3
-        fi
-        if ! ps ax | grep -E 'aircast' | grep -v -q grep; then
-            echo "[$(date +'%T')] Status: AirCast not running!" >>"$LOG"
+        elif ! ps ax | grep -E 'airupnp' | grep -v -q grep && ps ax | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Status: airupnp not running!" >>"$LOG"
             return 3
+        elif ps ax | grep -E 'airupnp' | grep -v -q grep && ! ps ax | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Status: aircast not running!" >>"$LOG"
+            return 3
+        else
+            return 4
         fi
     else
         # shellcheck disable=SC2009
-        if ! ps | grep -E 'airupnp' | grep -v -q grep; then
-            echo "[$(date +'%T')] Status: AirUpnp not running!" >>"$LOG"
+        if ps | grep -E 'airupnp' | grep -v -q grep && ps | grep -E 'aircast' | grep -v -q grep; then
+            return 0
+        elif ! ps | grep -E 'airupnp' | grep -v -q grep && ! ps | grep -E 'aircast' | grep -v -q grep; then
             return 3
-        fi
-        if ! ps | grep -E 'aircast' | grep -v -q grep; then
-            echo "[$(date +'%T')] Status: AirCast not running!" >>"$LOG"
+        elif ! ps | grep -E 'airupnp' | grep -v -q grep && ps | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Status: airupnp not running!" >>"$LOG"
             return 3
+        elif ps | grep -E 'airupnp' | grep -v -q grep && ! ps | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Status: aircast not running!" >>"$LOG"
+            return 3
+        else
+            return 4
         fi
     fi
-    return 0
+    # return unknown if nothing matched
+    return 4
 }
 
 case $1 in
