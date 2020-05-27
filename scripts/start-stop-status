@@ -65,7 +65,7 @@ start_airconnect() {
     if [ -z "$interfaces" ]; then
         echo "[$(date +'%T')] Failed to get local Ethernet interfaces" >>"$LOG"
         echo "[$(date +'%T')] Failed to get local Ethernet interfaces" >>"$SYNOPKG_TEMP_LOGFILE"
-        exit 1
+        return 1
     fi
 
     # Try lbr0 interface first if exists
@@ -86,7 +86,7 @@ start_airconnect() {
     done
     echo "[$(date +'%T')] Failed to start AirConnect on any of the local interfaces, please make sure you have at least one UPnP/Sonos/Chromecast device on your network" >>"$LOG"
     echo "[$(date +'%T')] Failed to start AirConnect on any of the local interfaces, please make sure you have at least one UPnP/Sonos/Chromecast device on your network" >>"$SYNOPKG_TEMP_LOGFILE"
-    exit 1
+    return 1
 }
 
 stop_airconnect() {
