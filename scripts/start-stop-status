@@ -30,7 +30,7 @@ start_airconnect_on_ip() {
             echo "[$(date +'%T')] Your selected port ${port} is already in use." >>"$LOG"
             echo "[$(date +'%T')] Please check what is running on the port and try again." >>"$LOG"
             echo "[$(date +'%T')] Port ${port} already in use. Please check what is running on the port and try again." >>"$SYNOPKG_TEMP_LOGFILE"
-            exit 1
+            return 1
         fi
     fi
     echo "[$(date +'%T')] Starting airupnp on ${ip}:${port}" >>"$LOG"
@@ -90,8 +90,8 @@ start_airconnect() {
 }
 
 stop_airconnect() {
-    killall -16 airupnp
-    killall -16 aircast
+    killall -16 airupnp >/dev/null 2>&1
+    killall -16 aircast >/dev/null 2>&1
 }
 
 airconnect_status() {
