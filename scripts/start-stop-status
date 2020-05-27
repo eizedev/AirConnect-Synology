@@ -92,22 +92,56 @@ start_airconnect() {
 stop_airconnect() {
     killall -16 airupnp >/dev/null 2>&1
     killall -16 aircast >/dev/null 2>&1
+    sleep 10
+
+    # Check if ps has ax options
+    if ps ax >/dev/null 2>&1; then
+        # shellcheck disable=SC2009
+        if ! ps ax | grep -E 'airupnp' | grep -v -q grep; then
+            echo "[$(date +'%T')] Stop Status: AirUpnp already stopped!" >>"$LOG"
+            return 0
+        fi
+        if ! ps ax | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Stop Status: AirCast already stopped!" >>"$LOG"
+            return 0
+        fi
+    else
+        # shellcheck disable=SC2009
+        if ! ps | grep -E 'airupnp' | grep -v -q grep; then
+            echo "[$(date +'%T')] Stop Status: AirUpnp already stopped!" >>"$LOG"
+            return 0
+        fi
+        if ! ps | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Stop Status: AirCast already stopped!" >>"$LOG"
+            return 0
+        fi
+    fi
+    return 1
 }
 
 airconnect_status() {
     # Check if ps has ax options
     if ps ax >/dev/null 2>&1; then
         # shellcheck disable=SC2009
-        if ! ps ax | grep -E 'airupnp|aircast' | grep -v -q grep; then
+        if ! ps ax | grep -E 'airupnp' | grep -v -q grep; then
+            echo "[$(date +'%T')] Status: AirUpnp not running!" >>"$LOG"
+            return 3
+        fi
+        if ! ps ax | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Status: AirCast not running!" >>"$LOG"
             return 3
         fi
     else
         # shellcheck disable=SC2009
-        if ! ps | grep -E 'airupnp|aircast' | grep -v -q grep; then
+        if ! ps | grep -E 'airupnp' | grep -v -q grep; then
+            echo "[$(date +'%T')] Status: AirUpnp not running!" >>"$LOG"
+            return 3
+        fi
+        if ! ps | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Status: AirCast not running!" >>"$LOG"
             return 3
         fi
     fi
-
     return 0
 }
 
