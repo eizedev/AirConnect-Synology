@@ -11,8 +11,6 @@ MAKE=$(which make)
 
 for arch in ${ARCH_LIST}; do
   export ARCH=${arch}
-  export REVISION_STATIC_AIRCAST=${REVISION_STATIC_AIRCAST}
-  export REVISION_STATIC_AIRUPNP=${REVISION_STATIC_AIRUPNP}
   $MAKE clean build
 done
 
