@@ -34,10 +34,10 @@ start_airconnect_on_ip() {
         fi
     fi
     echo "[$(date +'%T')] Starting airupnp on ${ip}:${port}" >>"$LOG"
-    su airconnect -s /bin/sh -c "${SYNOPKG_PKGDEST}/airupnp -b ${ip}:${port} -l 1000:2000 -x \"${CONFIG_UPNP_FILE}\" -z -f \"${LOG}\" -d all=info -d main=info" >>"${LOG}" 2>&1
+    su airconnect -s /bin/sh -c "${SYNOPKG_PKGDEST}/airupnp -b ${ip}:${port} -l 1000:2000 -x \"${CONFIG_UPNP_FILE}\" -z -f \"${LOG}\" -d all=info" >>"${LOG}" 2>&1
 
     echo "[$(date +'%T')] Starting aircast on ${ip}" >>"$LOG"
-    su airconnect -s /bin/sh -c "${SYNOPKG_PKGDEST}/aircast -b ${ip} -l 1000:2000 -x \"${CONFIG_CAST_FILE}\" -z -f \"${LOG}\" -d all=info -d main=info" >>"${LOG}" 2>&1
+    su airconnect -s /bin/sh -c "${SYNOPKG_PKGDEST}/aircast -b ${ip} -l 1000:2000 -x \"${CONFIG_CAST_FILE}\" -z -f \"${LOG}\" -d all=info" >>"${LOG}" 2>&1
 
     # search for 10 seconds "adding renderer" in the logfile to check if speakers are found, if not return 1 rom the function
     cnt=0
