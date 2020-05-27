@@ -114,9 +114,8 @@ You could also clone this repository on your synology device and build your pack
 It runs the AirConnect processes with the following options tuned for sonos:
 
 ```bash
-/volume1/@appstore/AirConnect/airupnp -b [synology device local ip]:49154 -l 1000:2000 -x /volume1/@appstore/AirConnect/config.xml -z -f /var/log/airconnect.log -d all info -d main info
-
-/volume1/@appstore/AirConnect/aircast -b [synology device local ip] -l 1000:2000 -x /volume1/@appstore/AirConnect/config-cast.xml -z -f /var/log/airconnect.log -d all info -d main info
+/volume1/@appstore/AirConnect/airupnp -b [synology device local ip]:49154 -l 1000:2000 -x "/volume1/@appstore/AirConnect/config.xml" -z -f "/var/log/airconnect.log" -d all=info  
+/volume1/@appstore/AirConnect/aircast -b [synology device local ip] -l 1000:2000 -x "/volume1/@appstore/AirConnect/config-cast.xml" -z -f "/var/log/airconnect.log" -d all=info
 ```
 
 The process is running with a low-privilege user.
