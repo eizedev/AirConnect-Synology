@@ -5,7 +5,7 @@
 ![AirConnect-Synology Logo](images/header.png)
 
 A minimal Synology package for [AirConnect](https://github.com/philippe44/AirConnect).  
-It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream to UPnP/Sonos & Chromecast devices that do not natively support AirPlay.
+It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream to **UPnP/Sonos** & **Chromecast** devices that do not natively support AirPlay.  
 
 - [AirConnect package for Synology NAS and Synology Router](#airconnect-package-for-synology-nas-and-synology-router)
   - [Information](#information)
@@ -50,9 +50,18 @@ The credit goes of course still to [@bandesz](https://github.com/bandesz) for th
 
 ## How to install
 
+Every pre-build synology package in the [releases](https://github.com/eizedev/AirConnect-Synology/releases) section are including these two programs:
+
+- `airupnp`
+  - For **UPnP/Sonos players**
+- `aircast`
+  - For **Chromecast**
+
+So you only need one package to support **UPnP**, **Sonos** and **Chromcast** devices.
+
 ### Download the pre-build Synology package
 
-You can find the available packages under [Releases](https://github.com/eizedev/AirConnect-Synology/releases) for six different architecture groups:
+You can find the available packages under [releases](https://github.com/eizedev/AirConnect-Synology/releases) for these different architecture groups:
 
 - **ARMv5**: 88f6282 88f6281 88f628x
   - Please download: `AirConnect-arm5-${VERSION}`
