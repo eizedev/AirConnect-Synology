@@ -127,13 +127,17 @@ It runs the AirConnect processes with the following options tuned for sonos:
 /volume1/@appstore/AirConnect/aircast -b [synology device local ip] -l 1000:2000 -x "/volume1/@appstore/AirConnect/config-cast.xml" -z -f "/var/log/airconnect.log" -d all=info
 ```
 
-The process is running with a low-privilege user.
+These default options should work for most of you but can also be changed by using a [configuration file](#configuration).
 
-The processes will only recognise your devices if they are bound to the appropriate local network IP, but this is not trivial as there are various Synology devices and network setups.  
-The start script will check all your local network interfaces (with ip 192.168.* or 10.* or 172.16.* - 172.31.*) and checks if the airupnp/aircast processes add any devices (based on the logs).
+Both processes are running with the low-privilege user `airconnect`.
 
-It there are no devices added in **10 seconds** it will try the next interface (if more interfaces are available).  
-For the automatic IP discovery to work you should have at least one UPnP/Sonos/Chromecast device on your network.
+The processes will only recognise your devices if they are bound to the appropriate local network IP, but this is not trivial as there are various Synology devices and network setups out there.  
+The start script will check all your local network interfaces for private ip addresses (Ranges: `192.168.*` or `10.*` or `172.16.* - 172.31.*`).
+
+After startup of airupnp/aircast the processes will check if any device (Sonos/UPnP/Chromcast) was discovered (based on some log entries).  
+It there are no devices added in the first **10 seconds** after startup, it will try the next interface (if more interfaces are available).  
+For the automatic IP discovery to work you should have at least **one UPnP/Sonos/Chromecast** device that is online in your local network.  
+If no device was discovered, the processes will be stopped automatically.
 
 If the start script is not able to find the right IP automatically you can fix it in `scripts/start-stop-status` by setting your own local IP (of your nas/router) and building your own package.
 
@@ -147,18 +151,18 @@ Look for the following lines:
 # return  0
 ```
 
-Alternatively you can open an issue and include your network interface list and your local IP and i will extend the default network interfaces filter with your list.
+Alternatively you can open an [issue](https://github.com/eizedev/AirConnect-Synology/issues) and include your network interface list and your local IP and i will extend the default network interfaces filter with your list.
 
 ### Configuration
 
 If you would like to tweak the AirConnect configuration you can also use the AirConnect configuration file.
-> Before continuing please check [official readme](https://github.com/philippe44/AirConnect#config-file-parameters) for more information. I'm not going to explain how it generally works here.
+> Before continuing please check the [official readme](https://github.com/philippe44/AirConnect#config-file-parameters) for more information. I'm not going to explain how it generally works here.
 
-By default the config file will **not** being used as long as the file is not created. The file is **not** created by default.  
+By default the config file will **not** being used as long as the file is not created (And you are not running on debug log level). The file is **not** created by default.  
 
-- Config File for airupnp
+- Config File location for airupnp
   - `/volume1/@appstore/AirConnect/config.xml`
-- Config File for aircast
+- Config File location for aircast
   - `/volume1/@appstore/AirConnect/config-cast.xml`
 
 You can create each of these files manually or a reference version can be generated using the `-i [config file name]` command line parameter.
@@ -169,14 +173,14 @@ Change the ip and parameters for your needs:
 Example:
 
 ```bash
-/volume1/@appstore/AirConnect/airupnp -b 192.168.1.249:49154 -l 1000:2000 -i /volume1/@appstore/AirConnect/config.xml -z -f /var/log/airconnect.log -d all info -d main info
+/volume1/@appstore/AirConnect/airupnp -b 192.168.1.249:49154 -l 1000:2000 -i "/volume1/@appstore/AirConnect/config.xml" -z -f "/var/log/airconnect.log" -d all info -d main=info
 ```
 
 After running this command, airupnp will be started until all needed information and devices are gathered, stopped and the resulted configuration will be written to the defined config file.
 
 ### Player specific settings, hints and tips
 
-See the original [Player specific hints and tips](https://github.com/philippe44/AirConnect#player-specific-hints-and-tips) from [philippe44](https://github.com/philippe44) for more information.
+> Please check the original [Player specific hints and tips](https://github.com/philippe44/AirConnect#player-specific-hints-and-tips) from [philippe44](https://github.com/philippe44) for more information.
 
 #### Sonos
 
@@ -229,7 +233,7 @@ make clean build-all
 ARCH=arm make clean build
 ```
 
-Possible values for **ARCH**: `arm, aarch64, arm5, ppc, x86, x86-64`
+Possible values for **ARCH**: `arm, aarch64, arm5, ppc, ppc-static, x86, x86-64`
 
 You can find the built packages in the **dist** directory.
 
@@ -237,8 +241,10 @@ You can find the built packages in the **dist** directory.
 
 ### Issues
 
-If you have a problem installing or using one of these package and/or are stuck, please open an [issue](https://github.com/eizedev/AirConnect-Synology/issues).  
-It would be very helpful if you tell me the synology device you are using, the package you have downloaded and upload the two logfiles mentioned in the [Logfiles](#logfiles) section or include the important parts from the logfiles in the issue.
+If you have a problem installing or using one of these packages and/or are stuck, please open an [issue](https://github.com/eizedev/AirConnect-Synology/issues).  
+It would be very helpful forme if you tell me the synology device you are using, the package you have downloaded and upload the two logfiles mentioned in the [Logfiles](#logfiles) section or include the important parts from the logfiles in the issue.
+
+If the package was installed successfully and `airupnp` and `aircast` are running and no strange problems will be shown in the logfile but for you it is not working as excpeted, please consider opening an [issue](https://github.com/philippe44/AirConnect/issues) at the officiall AirConnect Repository.
 
 ### Debugging
 
