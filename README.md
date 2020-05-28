@@ -242,7 +242,7 @@ You can find the built packages in the **dist** directory.
 ### Issues
 
 If you have a problem installing or using one of these packages and/or are stuck, please open an [issue](https://github.com/eizedev/AirConnect-Synology/issues).  
-It would be very helpful forme if you tell me the synology device you are using, the package you have downloaded and upload the two logfiles mentioned in the [Logfiles](#logfiles) section or include the important parts from the logfiles in the issue.
+It would be very helpful for me if you tell me the synology device you are using, the package you have downloaded and upload the two logfiles mentioned in the [Logfiles](#logfiles) section or include the important parts from the logfiles in the issue.
 
 If the package was installed successfully and `airupnp` and `aircast` are running and no strange problems will be shown in the logfile but for you it is not working as excpeted, please consider opening an [issue](https://github.com/philippe44/AirConnect/issues) at the officiall AirConnect Repository.
 
