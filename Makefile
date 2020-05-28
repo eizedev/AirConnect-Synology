@@ -1,7 +1,8 @@
 # Syno package structure: https://help.synology.com/developer-guide/synology_package/package_structure.html
 # Git commit SHA from https://github.com/philippe44/AirConnect/commits/master/bin
 REPO_REVISION=3f7aa0b05568cc1b50b4b3df206317e1e0828dd3
-VERSION=0.2.26.0-$(shell date '+%Y%m%d')
+REPO_REVISION2=bcf66562eed9927d962699ff0312a829366f987c
+VERSION=0.2.26.1-$(shell date '+%Y%m%d')
 
 LICENSE:
 	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/LICENSE -O
@@ -14,7 +15,7 @@ dist:
 
 target/package.tgz: target
 	$(if ${ARCH},$(info Arch: ${ARCH}),$(error Must specify ARCH))
-	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/bin/airupnp-${ARCH} -o target/airupnp
+	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION2}/bin/airupnp-${ARCH} -o target/airupnp
 	chmod +x target/airupnp
 	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/bin/aircast-${ARCH} -o target/aircast
 	chmod +x target/aircast
