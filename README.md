@@ -39,7 +39,7 @@ Since the [original repository](https://github.com/bandesz/AirConnect-Synology) 
 - Added new releases to fit the current AirConnect versions.
   - AirConnect-Synology releases will use the official AirConnect version + the current build date as tag/version (f.e. `0.2.25.0-20200511`)
 - Added new pre-build synology packages that includes all current supported architectures and platforms
-  - New pre-build: `ppc, ppc-static, arm`
+  - New pre-build: `ppc, ppc-static, arm, arm-static, armv8-static/aarch64-static`
   - Updated `armv7, armv8, x86` and `x86-64` to also support the newer (and older) synology hardware
   - Check [Download the pre-built Synology package](#download-the-pre-built-synology-package) for more information.  
 
@@ -67,14 +67,22 @@ You can find the available packages under [releases](https://github.com/eizedev/
   - Please download: `AirConnect-arm5-${VERSION}`
 - **ARMv7**: ipq806x ipq806x armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k hi3535 dakota ipq806x northstarplus
   - Please download: `AirConnect-arm-${VERSION}`
+- **ARMv7 Static**: noarch ipq806x ipq806x armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k hi3535 dakota ipq806x northstarplus
+  - Please download: `AirConnect-arm-static-${VERSION}`
+  - If the above **ARMv7** package will not work on your device, please download the latest arm-static package.
+    - The static package includes "static" binaries, that means, it includes binaries that have no external library dependencies and **should** be run on your ARMv7 device if the normal ARMv7 package fails.
 - **ARMv8**: rtd1296 armada37xx
   - Please download: `AirConnect-aarch64-${VERSION}`
+- **ARMv8 Static**: noarch rtd1296 armada37xx
+  - Please download: `AirConnect-aarch64-static-${VERSION}`
+  - If the above **ARMv8** package will not work on your device, please download the latest aarch64-static package.
+    - The static package includes "static" binaries, that means, it includes binaries that have no external library dependencies and **should** be run on your ARMv8 device if the normal ARMv8 package fails.
 - **PowerPC**: qoriq Ppc853x
   - Please download: `AirConnect-ppc-${VERSION}`
 - **PowerPC Static**: noarch qoriq Ppc853x
   - Please download: `AirConnect-ppc-static-${VERSION}`
   - If the above **PowerPC** package will not work on your device, please download the latest ppc-static package.
-    - The static package includes "static" binaries, that means, it includes binaries that have no external library dependencies.
+    - The static package includes "static" binaries, that means, it includes binaries that have no external library dependencies and **should** be run on your PPC device if the normal PPC package fails.
 - **Intel - 32-bit**: x86 cedarview bromolow evansport avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap
   - Please download: `AirConnect-x86-${VERSION}`
 - **Intel - 64-bit (DSM 6.0+)**: x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap
@@ -82,7 +90,7 @@ You can find the available packages under [releases](https://github.com/eizedev/
 
 You can check which architecture you have [here](https://www.synology.com/en-us/knowledgebase/DSM/tutorial/Compatibility_Peripherals/What_kind_of_CPU_does_my_NAS_have).
 
-For the Synology **Routers** you should use the **ARM** (ARMv7 - dakota, ipq806x, northstarplus) version.
+For the Synology **Routers** you should use the **ARM** (ARMv7 - dakota, ipq806x, northstarplus) version. If the normal ARM package is not working on your device, please try **ARM Static** instead.
 
 ### Install via GUI (Package Center)
 
