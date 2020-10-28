@@ -1,8 +1,8 @@
 # Syno package structure: https://help.synology.com/developer-guide/synology_package/package_structure.html
 # Git commit SHA from https://github.com/philippe44/AirConnect/commits/master/bin
-REPO_REVISION=81280aab64db1d9662a97576b8d67df747e15ac5
-REPO_REVISION2=ba623f7f8b93a060c3af54d35fee9b28eeddb1fe
-VERSION=0.2.27.0-$(shell date '+%Y%m%d')
+REPO_REVISION=a5620b56f3dca43f326cdcfbf58f7accfcd8c0c3
+#REPO_REVISION2=ba623f7f8b93a060c3af54d35fee9b28eeddb1fe
+VERSION=0.2.28.3-$(shell date '+%Y%m%d')
 
 LICENSE:
 	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/LICENSE -O
@@ -15,7 +15,7 @@ dist:
 
 target/package.tgz: target
 	$(if ${ARCH},$(info Arch: ${ARCH}),$(error Must specify ARCH))
-	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION2}/bin/airupnp-${ARCH} -o target/airupnp
+	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/bin/airupnp-${ARCH} -o target/airupnp
 	chmod +x target/airupnp
 	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/bin/aircast-${ARCH} -o target/aircast
 	chmod +x target/aircast
@@ -51,6 +51,12 @@ arm:
 	$(eval export INFO_FIRMWARE=5.0-4458)
 	@true
 
+.PHONY: arm-static
+arm-static:
+	$(eval export INFO_ARCH=ipq806x armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k hi3535 dakota ipq806x northstarplus noarch)
+	$(eval export INFO_FIRMWARE=5.0-4458)
+	@true
+
 .PHONY: arm5
 arm5:
 	$(eval export INFO_ARCH=88f6282 88f6281 88f628x)
@@ -60,6 +66,12 @@ arm5:
 .PHONY: aarch64
 aarch64:
 	$(eval export INFO_ARCH=rtd1296 armada37xx)
+	$(eval export INFO_FIRMWARE=5.0-4458)
+	@true
+
+.PHONY: aarch64-static
+aarch64-static:
+	$(eval export INFO_ARCH=rtd1296 armada37xx noarch)
 	$(eval export INFO_FIRMWARE=5.0-4458)
 	@true
 
