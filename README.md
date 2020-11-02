@@ -26,7 +26,7 @@ It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream 
     - [Build a package for a specific architecture](#build-a-package-for-a-specific-architecture)
   - [Troubleshooting](#troubleshooting)
     - [Issues](#issues)
-  - [Multicast and IGMP Snooping/Proxy](#multicast-and-igmp-snoopingproxy)
+    - [Multicast and IGMP Snooping/Proxy](#multicast-and-igmp-snoopingproxy)
     - [Debugging](#debugging)
   - [License](#license)
 
@@ -255,7 +255,7 @@ It would be very helpful for me if you tell me the synology device you are using
 
 If the package was installed successfully and `airupnp` and `aircast` are running and no strange problems will be shown in the logfile but for you it is not working as excpeted, please consider opening an [issue](https://github.com/philippe44/AirConnect/issues) at the officiall AirConnect Repository.
 
-## Multicast and IGMP Snooping/Proxy
+### Multicast and IGMP Snooping/Proxy
 
 Most of the problems with AirConnect are related to the local network configuration.
 AirConnect (and therefore Sonos/Chromecast) require **Multicast** to function properly. You must ensure that the communication within your network supports multicast. Especially important is the communication:
