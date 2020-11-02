@@ -254,6 +254,27 @@ It would be very helpful for me if you tell me the synology device you are using
 
 If the package was installed successfully and `airupnp` and `aircast` are running and no strange problems will be shown in the logfile but for you it is not working as excpeted, please consider opening an [issue](https://github.com/philippe44/AirConnect/issues) at the officiall AirConnect Repository.
 
+## Multicast and IGMP Snooping/Proxy
+
+Most of the problems with AirConnect are related to the local network configuration.
+AirConnect (and therefore Sonos/Chromecast) require **Multicast** to function properly. You must ensure that the communication within your network supports multicast. Especially important is the communication:
+
+**Chromecast/Sonos speakers <-> (WLAN)-Router <-> (Switch/Firewall <->) Smartphone which is used**
+
+So make sure that multicast is allowed on your router, your switches and your firewall and configure settings like IGMP snooping + IGMP proxy so that the communication is guaranteed. For testing, please deactive igmp snooping everywhere if you have activated it.  
+I have activated but properly configured igmp snooping and igmp proxy + different VLANs. It will work with AirConnect, if properly configured.
+
+- When players disappear regularly, it might be that your router is filtering out multicast packets. For example and testing, for a Asus AC-RT68U, you have to login by ssh and run `echo 0 > /sys/class/net/br0/bridge/multicast_snooping` but it does not stay after a reboot.
+- Lots of users seems to have problems with Unify and broadcasting / finding players. Here is a guide https://www.neilgrogan.com/ubnt-sonos/ made by somebody who fixes the issue for his Sonos environment
+
+For additional information, please check the following issues in the official AirConnect Repository:
+
+- [Best Practises for getting AirUPnP working in networks?](https://github.com/philippe44/AirConnect/issues/270)
+- [Troubleshooting Steps for airupnp AirPlay Devices not Appearing?](https://github.com/philippe44/AirConnect/issues/217)
+- [Devices disappear after ~1-2 Minutes](https://github.com/philippe44/AirConnect/issues/189)
+- [Devices found, but not being added](https://github.com/philippe44/AirConnect/issues/160)
+- [Unable to Connect to "device"](https://github.com/philippe44/AirConnect/issues/246)
+
 ### Debugging
 
 If you want to see more logs then change the `-d all=info` parameter in `scripts/start-stop-status` to `-d all=debug` and rebuild the package, then [install it again](#install-via-command-line).
