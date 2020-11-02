@@ -26,6 +26,7 @@ It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream 
     - [Build a package for a specific architecture](#build-a-package-for-a-specific-architecture)
   - [Troubleshooting](#troubleshooting)
     - [Issues](#issues)
+  - [Multicast and IGMP Snooping/Proxy](#multicast-and-igmp-snoopingproxy)
     - [Debugging](#debugging)
   - [License](#license)
 
@@ -259,7 +260,7 @@ If the package was installed successfully and `airupnp` and `aircast` are runnin
 Most of the problems with AirConnect are related to the local network configuration.
 AirConnect (and therefore Sonos/Chromecast) require **Multicast** to function properly. You must ensure that the communication within your network supports multicast. Especially important is the communication:
 
-**Chromecast/Sonos speakers <-> (WLAN)-Router <-> (Switch/Firewall <->) Smartphone which is used**
+> Chromecast/Sonos speakers <-> (WLAN)-Router <-> (Switch/Firewall <->) Smartphone which is used
 
 So make sure that multicast is allowed on your router, your switches and your firewall and configure settings like IGMP snooping + IGMP proxy so that the communication is guaranteed. For testing, please deactive igmp snooping everywhere if you have activated it.  
 I have activated but properly configured igmp snooping and igmp proxy + different VLANs. It will work with AirConnect, if properly configured.
