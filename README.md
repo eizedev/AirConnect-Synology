@@ -120,12 +120,18 @@ You can view the logs by clicking on **View Log** on the packages page, or, if n
 - The default installation directory is located here: `/var/packages/AirConnect/`
   - The binaries can be found in: `/var/packages/AirConnect/target/`
 
+You could also clone this repository on your synology device and build your package for your architecture locally, check [Build](#build) for more details.
+
 #### Logfiles
 
-You can find the **synology dsm package logfile** at `/var/log/packages/AirConnect.log` (This logfile is used  from DSM/Synology for all installation/uninstallation/update purposes).  
-You can find the **AirConnect application logfile** with `sudo /usr/syno/bin/synopkg log AirConnect` (Default: `/var/log/airconnect.log`).
-
-You could also clone this repository on your synology device and build your package for your architecture locally, check [Build](#build) for more details.
+- **Synology Service Log File**
+  - The *synology dsm package logfile* ist located at `/var/log/packages/AirConnect.log`
+  - This logfile is used from DSM/Synology for all installation/uninstallation/update purposes  
+- **AirConnect-Synology and AirConnect Log File**
+  - The *AirConnect application logfile* is located at `/var/log/airconnect.log` (default location)
+  - You can open it after login with ssh to your NAS/Router: `sudo /usr/syno/bin/synopkg log AirConnect` or by using a command line utility like `more` (`more /var/log/airconnect`) `tail` (`tail -100 /var/log/airconnect`) etc. 
+  - This log file is written by the AirConnect synology package. All log entries of the AirConnect application (airupnp + aircast) are also written into this log file.
+  - This is the first place to look for errors.
 
 ## How it works
 
