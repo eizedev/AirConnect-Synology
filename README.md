@@ -17,6 +17,8 @@ It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream 
   - [How it works](#how-it-works)
     - [Configuration](#configuration)
     - [Command-Line Arguemts](#command-line-arguemts)
+    - [airupnp](#airupnp)
+      - [aircast](#aircast)
     - [Config File](#config-file)
     - [Player specific settings, hints and tips](#player-specific-settings-hints-and-tips)
       - [Sonos](#sonos)
@@ -181,6 +183,8 @@ If you would like to tweak the AirConnect configuration you can also use the Air
 
 ### Command-Line Arguemts
 
+### airupnp
+
 ```bash
 v0.2.41.0 (Dec  8 2020 @ 18:43:14)
 See -t for license terms
@@ -201,6 +205,30 @@ Usage: [options]
   -n <m1,m2,...>        exclude devices whose name includes tokens
   -o <m1,m2,...>        include only listed models; overrides -m and -n (use <NULL> if player don't return a model)
   -d <log>=<level>      Set logging level, logs: all|raop|main|util|upnp, level: error|warn|info|debug|sdebug
+  -z                    Daemonize
+  -Z                    NOT interactive
+  -k                    Immediate exit on SIGQUIT and SIGTERM
+  -t                    License terms
+```
+
+#### aircast
+
+```bash
+v0.2.41.0 (Dec  8 2020 @ 18:41:57)
+See -t for license terms
+Usage: [options]
+  -b <address>          network address to bind to
+  -a <port>[:<count>]   set inbound port and range for RTP and HTTP
+  -c <mp3[:<rate>]|flc[:0..9]|wav>      audio format send to player
+  -v <0..1>              group MediaVolume factor
+  -x <config file>      read config from file (default is ./config.xml)
+  -i <config file>      discover players, save <config file> and exit
+  -I                    auto save config at every network scan
+  -l <[rtp][:http][:f]> RTP and HTTP latency (ms), ':f' forces silence fill
+  -r                    let timing reference drift (no click)
+  -f <logfile>          Write debug to logfile
+  -p <pid file>         write PID in file
+  -d <log>=<level>      Set logging level, logs: all|raop|main|util|cast, level: error|warn|info|debug|sdebug
   -z                    Daemonize
   -Z                    NOT interactive
   -k                    Immediate exit on SIGQUIT and SIGTERM
