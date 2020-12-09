@@ -16,6 +16,8 @@ It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream 
       - [Logfiles](#logfiles)
   - [How it works](#how-it-works)
     - [Configuration](#configuration)
+    - [Command-Line Arguemts](#command-line-arguemts)
+    - [Config File](#config-file)
     - [Player specific settings, hints and tips](#player-specific-settings-hints-and-tips)
       - [Sonos](#sonos)
       - [Bose SoundTouch](#bose-soundtouch)
@@ -142,7 +144,9 @@ It runs the AirConnect processes with the following options tuned for sonos:
 /volume1/@appstore/AirConnect/aircast -b [synology device local ip] -l 1000:2000 -x "/volume1/@appstore/AirConnect/config-cast.xml" -z -f "/var/log/airconnect.log" -d all=info
 ```
 
-> With `-o S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120` the sonos speakers that are natively supporting AirPlay or AirPlay2 will be ignored from AirConnect/airupnp. So they will be not displayed twice in the list.
+> With `-o S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120` the sonos speakers that are natively supporting AirPlay or AirPlay2 will be ignored from AirConnect/airupnp and only the ones listed in the `-o` will be used. Since no new "non airplay" speakers will be released in the future, that should work in any case. So they will be not displayed twice in the list.
+
+See [Command-Line Arguemts](#command-line-arguemts) for more information about these arguments.
 
 These default options should work for most of you but can also be changed by using a [configuration file](#configuration).
 
@@ -175,6 +179,36 @@ Alternatively you can open an [issue](https://github.com/eizedev/AirConnect-Syno
 If you would like to tweak the AirConnect configuration you can also use the AirConnect configuration file.
 > Before continuing please check the [official readme](https://github.com/philippe44/AirConnect#config-file-parameters) for more information. I'm not going to explain how it generally works here.
 
+### Command-Line Arguemts
+
+```bash
+v0.2.41.0 (Dec  8 2020 @ 18:43:14)
+See -t for license terms
+Usage: [options]
+  -b <server>[:<port>]  network interface and UPnP port to use
+  -a <port>[:<count>]   set inbound port and range for RTP and HTTP
+  -c <mp3[:<rate>]|flc[:0..9]|wav|pcm>  audio format send to player
+  -g <-3|-1|0>          HTTP content-length mode (-3:chunked, -1:none, 0:fixed)
+  -u <version>  set the maximum UPnP version for search (default 1)
+  -x <config file>      read config from file (default is ./config.xml)
+  -i <config file>      discover players, save <config file> and exit
+  -I                    auto save config at every network scan
+  -l <[rtp][:http][:f]> RTP and HTTP latency (ms), ':f' forces silence fill
+  -r                    let timing reference drift (no click)
+  -f <logfile>          write debug to logfile
+  -p <pid file>         write PID in file
+  -m <n1,n2...>         exclude devices whose model include tokens
+  -n <m1,m2,...>        exclude devices whose name includes tokens
+  -o <m1,m2,...>        include only listed models; overrides -m and -n (use <NULL> if player don't return a model)
+  -d <log>=<level>      Set logging level, logs: all|raop|main|util|upnp, level: error|warn|info|debug|sdebug
+  -z                    Daemonize
+  -Z                    NOT interactive
+  -k                    Immediate exit on SIGQUIT and SIGTERM
+  -t                    License terms
+```
+
+### Config File
+
 By default the config file will **not** being used as long as the file is not created (And you are not running on debug log level). The file is **not** created by default.  
 
 - Config File location for airupnp
@@ -190,7 +224,7 @@ Change the ip and parameters for your needs:
 Example:
 
 ```bash
-/volume1/@appstore/AirConnect/airupnp -b 192.168.1.249:49154 -l 1000:2000 -i "/volume1/@appstore/AirConnect/config.xml" -z -f "/var/log/airconnect.log" -d all info -d main=info
+/volume1/@appstore/AirConnect/airupnp -b 192.168.1.249:49154 -l 1000:2000 -i "/volume1/@appstore/AirConnect/config.xml" -o "S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120" -z -f "/var/log/airconnect.log" -d all info -d main=info
 ```
 
 After running this command, airupnp will be started until all needed information and devices are gathered, stopped and the resulted configuration will be written to the defined config file.
