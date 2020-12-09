@@ -17,7 +17,7 @@ It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream 
   - [How it works](#how-it-works)
     - [Configuration](#configuration)
     - [Command-Line Arguemts](#command-line-arguemts)
-    - [airupnp](#airupnp)
+      - [airupnp](#airupnp)
       - [aircast](#aircast)
     - [Config File](#config-file)
     - [Player specific settings, hints and tips](#player-specific-settings-hints-and-tips)
@@ -139,7 +139,7 @@ You could also clone this repository on your synology device and build your pack
 
 ## How it works
 
-It runs the AirConnect processes with the following options tuned for sonos:
+It runs the AirConnect processes with the following options by default tuned for sonos:
 
 ```bash
 /volume1/@appstore/AirConnect/airupnp -b [synology device local ip]:49154 -l 1000:2000 -x "/volume1/@appstore/AirConnect/config.xml" -o "S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120" -z -f "/var/log/airconnect.log" -d all=info  
@@ -183,7 +183,7 @@ If you would like to tweak the AirConnect configuration you can also use the Air
 
 ### Command-Line Arguemts
 
-### airupnp
+#### airupnp
 
 ```bash
 v0.2.41.0 (Dec  8 2020 @ 18:43:14)
