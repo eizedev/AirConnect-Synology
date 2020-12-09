@@ -5,6 +5,7 @@ set -eu
 AIRCONNECT_USER="$(echo "${SYNOPKG_PKGNAME}" | awk '{print tolower($_)}')"
 CONFIG_UPNP_FILE="${SYNOPKG_PKGDEST}/config.xml"
 CONFIG_CAST_FILE="${SYNOPKG_PKGDEST}/config-cast.xml"
+FILTER_AIRPLAY2_DEVICES="S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120"
 
 LOG="/var/log/${AIRCONNECT_USER}.log"
 # Delete Log if older than 1 day
@@ -34,7 +35,7 @@ start_airconnect_on_ip() {
         fi
     fi
     echo "[$(date +'%T')] Starting airupnp on ${ip}:${port}" >>"$LOG"
-    su airconnect -s /bin/sh -c "${SYNOPKG_PKGDEST}/airupnp -b ${ip}:${port} -l 1000:2000 -x \"${CONFIG_UPNP_FILE}\" -z -f \"${LOG}\" -d all=info" >>"${LOG}" 2>&1
+    su airconnect -s /bin/sh -c "${SYNOPKG_PKGDEST}/airupnp -b ${ip}:${port} -l 1000:2000 -x \"${CONFIG_UPNP_FILE}\" -o \"${FILTER_AIRPLAY2_DEVICES}\" -z -f \"${LOG}\" -d all=info" >>"${LOG}" 2>&1
 
     echo "[$(date +'%T')] Starting aircast on ${ip}" >>"$LOG"
     su airconnect -s /bin/sh -c "${SYNOPKG_PKGDEST}/aircast -b ${ip} -l 1000:2000 -x \"${CONFIG_CAST_FILE}\" -z -f \"${LOG}\" -d all=info" >>"${LOG}" 2>&1
