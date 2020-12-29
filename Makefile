@@ -1,8 +1,8 @@
 # Syno package structure: https://help.synology.com/developer-guide/synology_package/package_structure.html
 # Git commit SHA from https://github.com/philippe44/AirConnect/commits/master/bin
-REPO_REVISION=fe7b1866c3b0d982805e40dcf247a2bafcbd5186
+REPO_REVISION=9f1b0ef7e9882a034b5504136ea208c8ac6329ea
 #REPO_REVISION2=ba623f7f8b93a060c3af54d35fee9b28eeddb1fe
-VERSION=0.2.42.1-$(shell date '+%Y%m%d')
+VERSION=0.2.43.0-$(shell date '+%Y%m%d')
 
 LICENSE:
 	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/LICENSE -O
