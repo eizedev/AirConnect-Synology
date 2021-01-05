@@ -166,9 +166,9 @@ To speed up the detection of Sonos/UPnP/DLNA speakers and to do not discover spe
 | S9            | Sonos Playbar                       | A100                           |
 | S12           | Sonos Play:1                        | A200                           |
 | S15           | Sonos Connect                       | S100                           |
-| ZP80          | Sonos Connect (Vorgänger)           | C100                           |
+| ZP80          | Sonos Connect (Previous)            | C100                           |
 | ZP90          | Sonos Connect                       | C100                           |
-| ZP100         | Sonos Connect:Amp (Vorgänger)       | P100                           |
+| ZP100         | Sonos Connect:Amp (Previous)        | P100                           |
 | ZP120         | Sonos Connect:Amp                   | P100                           |
 | 1.0           | LibreWireless based Speakers        | LibreSyncDMR                   |
 | LibreWireless | LibreWireless based Speakers        | LibreSyncDMR                   |
