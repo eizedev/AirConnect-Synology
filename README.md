@@ -90,7 +90,7 @@ You can find the available packages under [releases](https://github.com/eizedev/
     - The static package includes "static" binaries, that means, it includes binaries that have no external library dependencies and **should** be run on your PPC device if the normal PPC package fails.
 - **Intel - 32-bit**: x86 cedarview bromolow evansport avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap
   - Please download: `AirConnect-x86-${VERSION}`
-- **Intel - 64-bit (DSM 6.0+)**: x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap
+- **Intel/AMD - 64-bit (DSM 6.0+)**: x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap v1000
   - Please download: `AirConnect-x86-64-${VERSION}`
 
 You can check which architecture you have [here](https://www.synology.com/en-us/knowledgebase/DSM/tutorial/Compatibility_Peripherals/What_kind_of_CPU_does_my_NAS_have).
