@@ -68,19 +68,21 @@ So you only need one package to support **UPnP**, **Sonos** and **Chromcast** de
 
 ### Download the pre-build Synology package
 
-You can find the available packages under [releases](https://github.com/eizedev/AirConnect-Synology/releases) for these different architecture groups:
+You can find the available packages under [releases](https://github.com/eizedev/AirConnect-Synology/releases) for the follow different architecture groups.
 
-| Architecture Group                | Architecture                                                                                                                            | Package to download                    |
-| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| **ARMv5**                         | 88f6282 88f6281 88f628x                                                                                                                 | `AirConnect-arm5-${VERSION}`           |
-| **ARMv7**                         | ipq806x ipq806x armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k hi3535 dakota ipq806x northstarplus            | `AirConnect-arm-${VERSION}`            |
-| **ARMv7 Static**                  | noarch ipq806x ipq806x armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k hi3535 dakota ipq806x northstarplus     | `AirConnect-arm-static-${VERSION}`     |
-| **ARMv8**                         | rtd1296 armada37xx                                                                                                                      | `AirConnect-aarch64-${VERSION}`        |
-| **ARMv8 Static**                  | noarch rtd1296 armada37xx                                                                                                               | `AirConnect-aarch64-static-${VERSION}` |
-| **PowerPC**                       | qoriq Ppc853x                                                                                                                           | `AirConnect-ppc-${VERSION}`            |
-| **PowerPC Static**                | noarch qoriq Ppc853x                                                                                                                    | `AirConnect-ppc-static-${VERSION}`     |
-| **Intel - 32-bit**                | x86 cedarview bromolow evansport avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap    | `AirConnect-x86-${VERSION}`            |
-| **Intel/AMD - 64-bit (DSM 6.0+)** | x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap v1000 | `AirConnect-x86-64-${VERSION}`         |
+The minimum firmware version for the x86_64 package `AirConnect-x86-64-${VERSION}` is **DSM 6.0-7321**. For **all** other package the minimum firmware version is DSM **5.0-4458**:  
+
+| Architecture Group                | Architecture                                                                                                                                          | Package to download                    |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| **ARMv5**                         | 88f6282, 88f6281, 88f628x                                                                                                                             | `AirConnect-arm5-${VERSION}`           |
+| **ARMv7**                         | ipq806x, ipq806x, armada370, armadaxp, armada375, armada38x, alpine, alpine4k, monaco, comcerto2k, hi3535, dakota, ipq806x, northstarplus             | `AirConnect-arm-${VERSION}`            |
+| **ARMv7 Static**                  | noarch, ipq806x, ipq806x, armada370, armadaxp, armada375, armada38x, alpine, alpine4k, monaco, comcerto2k, hi3535, dakota, ipq806x, northstarplus     | `AirConnect-arm-static-${VERSION}`     |
+| **ARMv8**                         | rtd1296, armada37xx                                                                                                                                   | `AirConnect-aarch64-${VERSION}`        |
+| **ARMv8 Static**                  | noarch, rtd1296, armada37xx                                                                                                                           | `AirConnect-aarch64-static-${VERSION}` |
+| **PowerPC**                       | qoriq, Ppc853x                                                                                                                                        | `AirConnect-ppc-${VERSION}`            |
+| **PowerPC Static**                | noarch, qoriq, Ppc853x                                                                                                                                | `AirConnect-ppc-static-${VERSION}`     |
+| **Intel - 32-bit**                | x86, cedarview, bromolow, evansport, avoton, braswell, broadwell, apollolake, dockerx64, kvmx64, denverton, grantley, broadwellnk, Broadwellntbap     | `AirConnect-x86-${VERSION}`            |
+| **Intel/AMD - 64-bit (DSM 6.0+)** | x86_64, x64, cedarview, bromolow, avoton, braswell, broadwell, apollolake, dockerx64, kvmx64, denverton, grantley, broadwellnk, Broadwellntbap, v1000 | `AirConnect-x86-64-${VERSION}`         |
 
 You can check which architecture you have in the `Package Arch` column on the Synology [What kind of CPU does my Synology NAS have?](https://www.synology.com/en-us/knowledgebase/DSM/tutorial/Compatibility_Peripherals/What_kind_of_CPU_does_my_NAS_have) site.
 
