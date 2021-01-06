@@ -1,6 +1,6 @@
 # AirConnect package for Synology NAS and Synology Router
 
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/eizedev/AirConnect-Synology)](https://github.com/eizedev/AirConnect-Synology/releases/latest) [![GitHub All Releases](https://img.shields.io/github/downloads/eizedev/AirConnect-Synology/total)](https://github.com/eizedev/AirConnect-Synology/releases) [![GitHub issues](https://img.shields.io/github/issues-raw/eizedev/AirConnect-Synology)](https://github.com/eizedev/AirConnect-Synology/issues)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/eizedev/AirConnect-Synology)](https://github.com/eizedev/AirConnect-Synology/releases/latest) [![GitHub discussions](https://img.shields.io/badge/Discussions-Check%20latest%20community%20posts-lightgrey)](https://github.com/eizedev/AirConnect-Synology/discussions) [![GitHub All Releases](https://img.shields.io/github/downloads/eizedev/AirConnect-Synology/total)](https://github.com/eizedev/AirConnect-Synology/releases) [![GitHub issues](https://img.shields.io/github/issues-raw/eizedev/AirConnect-Synology)](https://github.com/eizedev/AirConnect-Synology/issues)
 
 ![AirConnect-Synology Logo](images/header.png)
 
@@ -15,6 +15,8 @@ It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream 
     - [Install via command line](#install-via-command-line)
       - [Logfiles](#logfiles)
   - [How it works](#how-it-works)
+    - [Supported UPnP Speakers](#supported-upnp-speakers)
+      - [List of supported UPnP Speakers](#list-of-supported-upnp-speakers)
     - [Configuration](#configuration)
     - [Command-Line Arguemts](#command-line-arguemts)
       - [airupnp](#airupnp)
@@ -142,11 +144,35 @@ You could also clone this repository on your synology device and build your pack
 It runs the AirConnect processes with the following options by default tuned for sonos:
 
 ```bash
-/volume1/@appstore/AirConnect/airupnp -b [synology device local ip]:49154 -l 1000:2000 -x "/volume1/@appstore/AirConnect/config.xml" -o "S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120" -z -f "/var/log/airconnect.log" -d all=info  
+/volume1/@appstore/AirConnect/airupnp -b [synology device local ip]:49154 -l 1000:2000 -x "/volume1/@appstore/AirConnect/config.xml" -o "<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless" -z -f "/var/log/airconnect.log" -d all=info  
 /volume1/@appstore/AirConnect/aircast -b [synology device local ip] -l 1000:2000 -x "/volume1/@appstore/AirConnect/config-cast.xml" -z -f "/var/log/airconnect.log" -d all=info
 ```
 
-> With `-o S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120` the sonos speakers that are natively supporting AirPlay or AirPlay2 will be ignored from AirConnect/airupnp and only the ones listed in the `-o` will be used. Since no new "non airplay" speakers will be released in the future, that should work in any case. So they will be not displayed twice in the list.
+### Supported UPnP Speakers
+
+To speed up the detection of Sonos/UPnP/DLNA speakers and to do not discover speakers which natively supports airplay, this synology package will only include the devices mentioned in the table below.
+
+> If you have another UPnP based speaker that you want to be supported by this package which is not in the list below, please open an [issue](https://github.com/eizedev/AirConnect-Synology/issues) and let me know (Please tell me the product name (**model name**, **model number** etc.))
+  
+> With `-o <NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless` the sonos/UPnP speakers that are natively supporting AirPlay or AirPlay2 will be ignored from AirConnect/airupnp and only the ones listed with `-o` will be used. Since no new "non airplay" speakers (from sonos) will be released in the future, that should work in any case. So they will be not displayed twice in the list.  
+
+#### List of supported UPnP Speakers
+
+| Model Number  | Friendly Name                       | Comment (Sonos seriesid, etc.) |
+| ------------- | ----------------------------------- | ------------------------------ |
+| S1            | Sonos Play:1 (old model)            | A101                           |
+| S3            | Sonos Play:3                        | A100                           |
+| S5            | Sonos Play:5                        | P100                           |
+| S9            | Sonos Playbar                       | A100                           |
+| S12           | Sonos Play:1                        | A200                           |
+| S15           | Sonos Connect                       | S100                           |
+| ZP80          | Sonos Connect (old model)           | C100                           |
+| ZP90          | Sonos Connect                       | C100                           |
+| ZP100         | Sonos Connect:Amp (old model)       | P100                           |
+| ZP120         | Sonos Connect:Amp                   | P100                           |
+| 1.0           | LibreWireless based Speakers        | LibreSyncDMR                   |
+| LibreWireless | LibreWireless based Speakers        | LibreSyncDMR                   |
+| `<NULL>`      | All speakers without a model number |                                |
 
 See [Command-Line Arguemts](#command-line-arguemts) for more information about these arguments.
 
