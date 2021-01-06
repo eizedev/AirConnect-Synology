@@ -70,32 +70,23 @@ So you only need one package to support **UPnP**, **Sonos** and **Chromcast** de
 
 You can find the available packages under [releases](https://github.com/eizedev/AirConnect-Synology/releases) for these different architecture groups:
 
-- **ARMv5**: 88f6282 88f6281 88f628x
-  - Please download: `AirConnect-arm5-${VERSION}`
-- **ARMv7**: ipq806x ipq806x armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k hi3535 dakota ipq806x northstarplus
-  - Please download: `AirConnect-arm-${VERSION}`
-- **ARMv7 Static**: noarch ipq806x ipq806x armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k hi3535 dakota ipq806x northstarplus
-  - Please download: `AirConnect-arm-static-${VERSION}`
-  - If the above **ARMv7** package will not work on your device, please download the latest arm-static package.
-    - The static package includes "static" binaries, that means, it includes binaries that have no external library dependencies and **should** be run on your ARMv7 device if the normal ARMv7 package fails.
-- **ARMv8**: rtd1296 armada37xx
-  - Please download: `AirConnect-aarch64-${VERSION}`
-- **ARMv8 Static**: noarch rtd1296 armada37xx
-  - Please download: `AirConnect-aarch64-static-${VERSION}`
-  - If the above **ARMv8** package will not work on your device, please download the latest aarch64-static package.
-    - The static package includes "static" binaries, that means, it includes binaries that have no external library dependencies and **should** be run on your ARMv8 device if the normal ARMv8 package fails.
-- **PowerPC**: qoriq Ppc853x
-  - Please download: `AirConnect-ppc-${VERSION}`
-- **PowerPC Static**: noarch qoriq Ppc853x
-  - Please download: `AirConnect-ppc-static-${VERSION}`
-  - If the above **PowerPC** package will not work on your device, please download the latest ppc-static package.
-    - The static package includes "static" binaries, that means, it includes binaries that have no external library dependencies and **should** be run on your PPC device if the normal PPC package fails.
-- **Intel - 32-bit**: x86 cedarview bromolow evansport avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap
-  - Please download: `AirConnect-x86-${VERSION}`
-- **Intel/AMD - 64-bit (DSM 6.0+)**: x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap v1000
-  - Please download: `AirConnect-x86-64-${VERSION}`
+| Architecture Group                | Architecture                                                                                                                            | Package to download                    |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| **ARMv5**                         | 88f6282 88f6281 88f628x                                                                                                                 | `AirConnect-arm5-${VERSION}`           |
+| **ARMv7**                         | ipq806x ipq806x armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k hi3535 dakota ipq806x northstarplus            | `AirConnect-arm-${VERSION}`            |
+| **ARMv7 Static**                  | noarch ipq806x ipq806x armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k hi3535 dakota ipq806x northstarplus     | `AirConnect-arm-static-${VERSION}`     |
+| **ARMv8**                         | rtd1296 armada37xx                                                                                                                      | `AirConnect-aarch64-${VERSION}`        |
+| **ARMv8 Static**                  | noarch rtd1296 armada37xx                                                                                                               | `AirConnect-aarch64-static-${VERSION}` |
+| **PowerPC**                       | qoriq Ppc853x                                                                                                                           | `AirConnect-ppc-${VERSION}`            |
+| **PowerPC Static**                | noarch qoriq Ppc853x                                                                                                                    | `AirConnect-ppc-static-${VERSION}`     |
+| **Intel - 32-bit**                | x86 cedarview bromolow evansport avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap    | `AirConnect-x86-${VERSION}`            |
+| **Intel/AMD - 64-bit (DSM 6.0+)** | x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap v1000 | `AirConnect-x86-64-${VERSION}`         |
 
-You can check which architecture you have [here](https://www.synology.com/en-us/knowledgebase/DSM/tutorial/Compatibility_Peripherals/What_kind_of_CPU_does_my_NAS_have).
+You can check which architecture you have in the `Package Arch` column on the Synology [What kind of CPU does my Synology NAS have?](https://www.synology.com/en-us/knowledgebase/DSM/tutorial/Compatibility_Peripherals/What_kind_of_CPU_does_my_NAS_have) site.
+
+> If the above **ARMv7** package will not work on your device, please download the latest `arm-static` package. The static package includes "static" binaries, that means, it includes binaries that have no external library dependencies and **should** be run on your ARMv7 device if the normal ARMv7 package fails.
+
+> If the above **PowerPC** package will not work on your device, please download the latest `ppc-static` package. The static package includes "static" binaries, that means, it includes binaries that have no external library dependencies and **should** be run on your PPC device if the normal PPC package fails.
 
 For the Synology **Routers** you should use the **ARM** (ARMv7 - dakota, ipq806x, northstarplus) version. If the normal ARM package is not working on your device, please try **ARM Static** instead.
 
@@ -153,7 +144,7 @@ It runs the AirConnect processes with the following options by default tuned for
 To speed up the detection of Sonos/UPnP/DLNA speakers and to do not discover speakers which natively supports airplay, this synology package will only include the devices mentioned in the table below.
 
 > If you have another UPnP based speaker that you want to be supported by this package which is not in the list below, please open an [issue](https://github.com/eizedev/AirConnect-Synology/issues) and let me know (Please tell me the product name (**model name**, **model number** etc.))
-  
+
 > With `-o <NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless` the sonos/UPnP speakers that are natively supporting AirPlay or AirPlay2 will be ignored from AirConnect/airupnp and only the ones listed with `-o` will be used. Since no new "non airplay" speakers (from sonos) will be released in the future, that should work in any case. So they will be not displayed twice in the list.  
 
 #### List of supported UPnP Speakers
