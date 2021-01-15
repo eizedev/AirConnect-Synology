@@ -41,17 +41,18 @@ start_airconnect_on_ip() {
     su airconnect -s /bin/sh -c "${SYNOPKG_PKGDEST}/aircast -b ${ip} -l 1000:2000 -x \"${CONFIG_CAST_FILE}\" -z -f \"${LOG}\" -d all=info" >>"${LOG}" 2>&1
 
     # search for 10 seconds "adding renderer" in the logfile to check if speakers are found, if not return 1 rom the function
-    cnt=0
-    echo "[$(date +'%T')] Searching if renderer were added (for 10 seconds)..." >>"$LOG"
-    while [ $cnt -lt 10 ]; do
-        if grep -q "adding renderer" "${LOG}"; then
-            echo "[$(date +'%T')] At least one renderer successfully discovered!" >>"$LOG"
-            return 0
-        fi
-        cnt=$((cnt + 1))
-        sleep 1
-    done
-    return 1
+    #cnt=0
+    #echo "[$(date +'%T')] Searching if renderer were added (for 10 seconds)..." >>"$LOG"
+    #while [ $cnt -lt 10 ]; do
+    #    if grep -q "adding renderer" "${LOG}"; then
+    #        echo "[$(date +'%T')] At least one renderer successfully discovered!" >>"$LOG"
+    #        return 0
+    #    fi
+    #    cnt=$((cnt + 1))
+    #    sleep 1
+    #done
+    #return 1
+    return 0
 }
 
 start_airconnect() {
@@ -61,8 +62,7 @@ start_airconnect() {
     # start_airconnect_on_ip "1.2.3.4" || true
     # return 0
 
-    interfaces=$(/sbin/ifconfig -a | grep 'Ethernet' -A 1 | grep -E 'inet (addr:)?(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[01])\.)' -B 1 | grep 'Ethernet' | grep -v "lbr0" | grep -v "docker" | cut -d ' ' -f 1)
-
+    interfaces=$(/sbin/ifconfig -a | grep 'Ethernet' -A 1 | grep -E 'inet (addr:)?(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[01])\.|17\.0\.(6[4-9]|[7-9][0-9]|1[1-2][0-7])\.)' -B 1 | grep 'Ethernet' | grep -v "lbr0" | grep -v "docker" | cut -d ' ' -f 1)
     if [ -z "$interfaces" ]; then
         echo "[$(date +'%T')] Failed to get local Ethernet interfaces" >>"$LOG"
         echo "[$(date +'%T')] Failed to get local Ethernet interfaces" >>"$SYNOPKG_TEMP_LOGFILE"
