@@ -174,7 +174,7 @@ These default options should work for most of you but can also be changed by usi
 Both processes are running with the low-privilege user `airconnect`.
 
 The processes will only recognise your devices if they are bound to the appropriate local network IP, but this is not trivial as there are various Synology devices and network setups out there.  
-The start script will check all your local network interfaces for private ip addresses (Ranges: `192.168.*` or `10.*` or `172.16.* - 172.31.*`).
+The start script will check all your local network interfaces for private ip addresses (Ranges: `192.168.*` or `10.*` or `172.16.* - 172.31.*` or `17.0.64.* - 17.0.127.*`).
 
 >The startup check if new speakers were discovered is currently disabled due to a bug:
 
