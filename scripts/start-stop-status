@@ -9,7 +9,7 @@ FILTER_AIRPLAY2_DEVICES="<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,Li
 
 LOG="/var/log/${AIRCONNECT_USER}.log"
 # Delete Log if older than 1 day
-find "${LOG}" -size +50M -type f -delete >/dev/null 2>&1
+find "${LOG}" -size +10M -type f -delete >/dev/null 2>&1
 # Ensure user 'airconnect' exists before doing anything
 if ! synouser --get "${AIRCONNECT_USER}" >/dev/null 2>&1; then
     # create user with random password
