@@ -72,7 +72,7 @@ You can find the available packages under [releases](https://github.com/eizedev/
 
 The minimum firmware version for the x86_64 package `AirConnect-x86-64-${VERSION}` is **DSM 6.0-7321**. For **all** other package the minimum firmware version is DSM **5.0-4458**.
 
-If the `x86` package is not working on your device, please download the `x86-64` package instead.
+If the `x86` (32-bit) package is not working on your device, please download the `x86-64` (64-bit) package instead.
 
 | Architecture Group                | Architecture                                                                                                                                                              | Package to download                    |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
