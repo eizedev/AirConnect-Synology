@@ -62,7 +62,7 @@ start_airconnect() {
     # start_airconnect_on_ip "1.2.3.4" || true
     # return 0
 
-    interfaces=$(/sbin/ifconfig -a | grep 'Ethernet' -A 1 | grep -E 'inet (addr:)?(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[01])\.|17\.0\.(6[4-9]|[7-9][0-9]|1[1-2][0-7])\.)' -B 1 | grep 'Ethernet' | grep -v "lbr0" | grep -v "docker" | cut -d ' ' -f 1)
+    interfaces=$(/sbin/ifconfig -a | grep 'Ethernet' -A 1 | grep -E 'inet (addr:)?(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[01])\.|17\.0\.(6[4-9]|[7-9][0-9]|1[0-2][0-7])\.)' -B 1 | grep 'Ethernet' | grep -v "lbr0" | grep -v "docker" | cut -d ' ' -f 1)
     if [ -z "$interfaces" ]; then
         echo "[$(date +'%T')] Failed to get local Ethernet interfaces" >>"$LOG"
         echo "[$(date +'%T')] Failed to get local Ethernet interfaces" >>"$SYNOPKG_TEMP_LOGFILE"
