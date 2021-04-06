@@ -341,6 +341,10 @@ You can find the built packages in the **dist** directory.
 
 ## Troubleshooting
 
+### Cannot be installed
+
+If you get an error message that the package **cannot be installed** or **updated** when updating AirConnect-Synology, please **uninstall the old version** first (`Package Center -> AirConnect -> Uninstall`) and then install the new version. Uninstalling also removes the old scripts, references and configurations (only the logfile remains). Sometimes it can happen that the problem is already fixed with this.  
+
 ### Issues
 
 If you have a problem installing or using one of these packages and/or are stuck, please open an [issue](https://github.com/eizedev/AirConnect-Synology/issues).  
