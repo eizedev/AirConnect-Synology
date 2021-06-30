@@ -25,6 +25,9 @@ target/package.tgz: target
 target/scripts: target
 	cp -a scripts target
 
+target/conf: target
+	cp -a conf target
+
 target/LICENSE: target
 	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/LICENSE -o target/LICENSE
 
@@ -40,7 +43,7 @@ target/INFO: target
 	sed -i.bak -e 's/#INFO_FIRMWARE#/${INFO_FIRMWARE}/' target/INFO
 	rm target/INFO.bak
 
-dist/AirConnect-${ARCH}-${VERSION}.spk: target/package.tgz target/scripts target/LICENSE target/INFO target/PACKAGE_ICON.PNG dist
+dist/AirConnect-${ARCH}-${VERSION}.spk: target/package.tgz target/scripts target/conf target/LICENSE target/INFO target/PACKAGE_ICON.PNG dist
 	$(if ${ARCH},$(info dist - Arch: ${ARCH}),$(error dist - Must specify ARCH))
 	cd target && tar -czf AirConnect-${ARCH}-${VERSION}.spk *
 	mv target/AirConnect-${ARCH}-${VERSION}.spk dist/
