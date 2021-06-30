@@ -1,0 +1,29 @@
+{
+    "defaults": {
+        "run-as": "package"
+    },
+    "ctrl-script": [
+        {
+            "action": "start",
+            "run-as": "airconnect"
+        },
+        {
+            "action": "stop",
+            "run-as": "airconnect"
+        },
+        {
+            "action": "status",
+            "run-as": "airconnect"
+        }
+    ],
+    "executable": [
+        {
+            "relpath": "target/airupnp",
+            "run-as": "airconnect"
+        },
+        {
+            "relpath": "target/aircast",
+            "run-as": "airconnect"
+        }
+    ]
+}

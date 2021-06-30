@@ -98,6 +98,10 @@ x86-64:
 	$(eval export INFO_ARCH=x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap v1000 geminilake purley)
 	$(eval export INFO_FIRMWARE=6.0-7321)
 	@true
+x86-64-dsm7:
+	$(eval export INFO_ARCH=x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap v1000 geminilake purley)
+	$(eval export INFO_FIRMWARE=7.0-40000)
+	@true
 
 .PHONY: build
 build: ${ARCH} dist/AirConnect-${ARCH}-${VERSION}.spk
