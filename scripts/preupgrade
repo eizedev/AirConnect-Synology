@@ -20,3 +20,5 @@ fi
 sleep 3
 echo "[$(date +%Y-%m-%d" "%H:%M:%S)] #### Done preupgrade ####" >>"$LOG"
 exit 0
+#!/bin/sh
+exit 0

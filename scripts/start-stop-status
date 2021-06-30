@@ -10,17 +10,9 @@ FILTER_AIRPLAY2_DEVICES="<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,Li
 LOG="/var/log/${AIRCONNECT_USER}.log"
 # Delete Log if older than 1 day
 find "${LOG}" -size +10M -type f -delete >/dev/null 2>&1
-# Ensure user 'airconnect' exists before doing anything
-if ! synouser --get "${AIRCONNECT_USER}" >/dev/null 2>&1; then
-    # create user with random password
-    echo "[$(date +'%T')] start-stop-status - Creating \"${AIRCONNECT_USER}\" user." >>"$LOG"
-    synouser --add "${AIRCONNECT_USER}" "$(uuidgen | cut -c-8)" 'AirConnect User' 0 '' ''
-fi
 if [ -e "${LOG}" ]; then
-    chown "${AIRCONNECT_USER}":users "${LOG}"
 else
     touch "${LOG}"
-    chown "${AIRCONNECT_USER}":users "${LOG}"
 fi
 
 start_airconnect_on_ip() {
@@ -35,10 +27,10 @@ start_airconnect_on_ip() {
         fi
     fi
     echo "[$(date +'%T')] Starting airupnp on ${ip}:${port}" >>"$LOG"
-    su airconnect -s /bin/sh -c "${SYNOPKG_PKGDEST}/airupnp -b ${ip}:${port} -l 1000:2000 -x \"${CONFIG_UPNP_FILE}\" -o \"${FILTER_AIRPLAY2_DEVICES}\" -z -f \"${LOG}\" -d all=info" >>"${LOG}" 2>&1
+    /bin/sh -c "${SYNOPKG_PKGDEST}/airupnp -b ${ip}:${port} -l 1000:2000 -x \"${CONFIG_UPNP_FILE}\" -o \"${FILTER_AIRPLAY2_DEVICES}\" -z -f \"${LOG}\" -d all=info" >>"${LOG}" 2>&1
 
     echo "[$(date +'%T')] Starting aircast on ${ip}" >>"$LOG"
-    su airconnect -s /bin/sh -c "${SYNOPKG_PKGDEST}/aircast -b ${ip} -l 1000:2000 -x \"${CONFIG_CAST_FILE}\" -z -f \"${LOG}\" -d all=info" >>"${LOG}" 2>&1
+    /bin/sh -c "${SYNOPKG_PKGDEST}/aircast -b ${ip} -l 1000:2000 -x \"${CONFIG_CAST_FILE}\" -z -f \"${LOG}\" -d all=info" >>"${LOG}" 2>&1
 
     # search for 10 seconds "adding renderer" in the logfile to check if speakers are found, if not return 1 rom the function
     #cnt=0

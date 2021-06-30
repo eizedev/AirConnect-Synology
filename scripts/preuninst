@@ -10,7 +10,7 @@ echo "[$(date +%Y-%m-%d" "%H:%M:%S)] #### Start preuninst... ####" >>"$LOG"
 #make sure airconnect is stopped
 killall -16 airupnp >/dev/null 2>&1
 killall -16 aircast >/dev/null 2>&1
-sleep 10
+sleep 5
 
 echo "[$(date +%Y-%m-%d" "%H:%M:%S)] #### Done preuninst ####" >>"$LOG"
 exit 0
