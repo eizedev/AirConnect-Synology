@@ -2,9 +2,9 @@
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/eizedev/AirConnect-Synology)](https://github.com/eizedev/AirConnect-Synology/releases/latest) [![GitHub discussions](https://img.shields.io/badge/Discussions-Check%20latest%20community%20posts-lightgrey)](https://github.com/eizedev/AirConnect-Synology/discussions) [![GitHub All Releases](https://img.shields.io/github/downloads/eizedev/AirConnect-Synology/total)](https://github.com/eizedev/AirConnect-Synology/releases) [![GitHub issues](https://img.shields.io/github/issues-raw/eizedev/AirConnect-Synology)](https://github.com/eizedev/AirConnect-Synology/issues)
 
-![AirConnect-Synology Logo](images/header.png)
+![AirConnect-Synology Logo](doc/res/header.png)
 
-> 2021-06-30: Not yet compatible with **DSM 7** since the package architecture has changed and the build process needs to be changed. Working on it!
+> 2021-07-04: **DSM7**: First testing release for DSM7 can be found here (BETA): [https://github.com/eizedev/AirConnect-Synology/releases/tag/dsm7-0.2.50.5](Pre-Release for DSM7). Please report any issues (also if it is working for you) here: #12
 
 A minimal Synology package for [AirConnect](https://github.com/philippe44/AirConnect).  
 It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream to **UPnP/Sonos** & **Chromecast** devices that do not natively support AirPlay.  

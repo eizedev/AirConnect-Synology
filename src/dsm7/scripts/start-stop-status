@@ -1,0 +1,174 @@
+#!/bin/sh
+
+set -eu
+
+AIRCONNECT_USER="$(echo "${SYNOPKG_PKGNAME}" | awk '{print tolower($_)}')"
+CONFIG_UPNP_FILE="${SYNOPKG_PKGDEST}/config.xml"
+CONFIG_CAST_FILE="${SYNOPKG_PKGDEST}/config-cast.xml"
+AIRCONNECT_DESTINATION="${SYNOPKG_PKGDEST}/../../airconnect/"
+
+FILTER_AIRPLAY2_DEVICES="<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless"
+LOG="${SYNOPKG_PKGDEST}/log/${AIRCONNECT_USER}.log"
+
+get_pid() {
+    PID=$(ps aux | egrep 'airupnp|aircast' | grep -v grep | awk '{print $2}')
+}
+
+start_airconnect_on_ip() {
+    ip="$1"
+    port=49154
+    if [ -n "${port}" ]; then
+        if netstat -tlpn | grep :${port}; then
+            echo "[$(date +'%T')] Your selected port ${port} is already in use." >>"$LOG"
+            echo "[$(date +'%T')] Please check what is running on the port and try again." >>"$LOG"
+            echo "[$(date +'%T')] Port ${port} already in use. Please check what is running on the port and try again." >>"$SYNOPKG_TEMP_LOGFILE"
+            return 1
+        fi
+    fi
+    echo "[$(date +'%T')] Linking airupnp configuration to \"${AIRCONNECT_DESTINATION}\"." >>"$LOG"
+    ln -s "${AIRCONNECT_DESTINATION}" "${CONFIG_UPNP_FILE}"
+    echo "[$(date +'%T')] Starting airupnp on ${ip}:${port}" >>"$LOG"
+    ${SYNOPKG_PKGDEST}/airupnp -b "${ip}":"${port}" -l 1000:2000 -x "${CONFIG_UPNP_FILE}" -o "${FILTER_AIRPLAY2_DEVICES}" -z -f "${LOG}" -d "all=info" 2>&1
+
+    echo "[$(date +'%T')] Linking aircast configuration to \"${AIRCONNECT_DESTINATION}\"." >>"$LOG"
+    ln -s "${AIRCONNECT_DESTINATION}" "${CONFIG_CAST_FILE}"
+    echo "[$(date +'%T')] Starting aircast on ${ip}" >>"$LOG"
+    ${SYNOPKG_PKGDEST}/aircast -b "${ip}" -l 1000:2000 -x "${CONFIG_CAST_FILE}" -z -f "${LOG}" -d "all=info" 2>&1
+
+    return 0
+}
+
+start_airconnect() {
+    # If you want to start the airconnect processes on a specific IP please uncomment the following lines
+    # and set your own local IP address:
+    #
+    # start_airconnect_on_ip "1.2.3.4" || true
+    # return 0
+
+    interface=$(awk '$2 == 00000000 { print $1 }' /proc/net/route)
+    if [ -z "$interface" ]; then
+        echo "[$(date +'%T')] Failed to get local default Ethernet interface" >>"$LOG"
+        echo "[$(date +'%T')] Failed to get local default Ethernet interface" >>"$SYNOPKG_TEMP_LOGFILE"
+        return 1
+    fi
+
+    ip=$(ip addr show dev "$interface" | awk '$1 == "inet" { sub("/.*", "", $2); print $2 }')
+
+    if [ -n "$ip" ]; then
+        if start_airconnect_on_ip "$ip"; then
+            echo "[$(date +'%T')] AirConnect successfully started on ip \"${ip}\"!" >>"$LOG"
+            return 0
+        else
+            echo "[$(date +'%T')] Failed to start AirConnect on ip \"${ip}\", stopping it..." >>"$LOG"
+            echo "[$(date +'%T')] Failed to start AirConnect on ip \"${ip}\", stopping it..." >>"$SYNOPKG_TEMP_LOGFILE"
+            stop_airconnect
+        fi
+    fi
+    echo "[$(date +'%T')] Failed to start AirConnect on the local interface \"${interface}\", please make sure this is the correct interface you have at least one UPnP/Sonos/Chromecast device on your network" >>"$LOG"
+    echo "[$(date +'%T')] Failed to start AirConnect on the local interface \"${interface}\", please make sure this is the correct interface you have at least one UPnP/Sonos/Chromecast device on your network" >>"$SYNOPKG_TEMP_LOGFILE"
+    return 1
+}
+
+stop_airconnect() {
+    get_pid
+    kill $PID
+    sleep 10
+
+    # Check if ps has ax options
+    if ps ax >/dev/null 2>&1; then
+        # shellcheck disable=SC2009
+        if ! ps ax | grep -E 'airupnp' | grep -v -q grep && ! ps ax | grep -E 'aircast' | grep -v -q grep; then
+            return 0
+        elif ps ax | grep -E 'airupnp' | grep -v -q grep && ps ax | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Stop: airupnp & aircast are still running!" >>"$LOG"
+            return 1
+        elif ! ps ax | grep -E 'airupnp' | grep -v -q grep && ps ax | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Stop: aircast is still running!" >>"$LOG"
+            return 1
+        elif ps ax | grep -E 'airupnp' | grep -v -q grep && ! ps ax | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Stop: airupnp is still running!" >>"$LOG"
+            return 1
+        fi
+    else
+        # shellcheck disable=SC2009
+        if ! ps | grep -E 'airupnp' | grep -v -q grep && ! ps | grep -E 'aircast' | grep -v -q grep; then
+            return 0
+        elif ps | grep -E 'airupnp' | grep -v -q grep && ps | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Stop: airupnp & aircast are still running!" >>"$LOG"
+            return 1
+        elif ! ps | grep -E 'airupnp' | grep -v -q grep && ps | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Stop: aircast is still running!" >>"$LOG"
+            return 1
+        elif ps | grep -E 'airupnp' | grep -v -q grep && ! ps | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Stop: airupnp is still running!" >>"$LOG"
+            return 1
+        fi
+    fi
+    return 1
+}
+
+airconnect_status() {
+    # Check if ps has ax options
+    if ps ax >/dev/null 2>&1; then
+        # shellcheck disable=SC2009
+        if ps ax | grep -E 'airupnp' | grep -v -q grep && ps ax | grep -E 'aircast' | grep -v -q grep; then
+            return 0
+        elif ! ps ax | grep -E 'airupnp' | grep -v -q grep && ! ps ax | grep -E 'aircast' | grep -v -q grep; then
+            return 3
+        elif ! ps ax | grep -E 'airupnp' | grep -v -q grep && ps ax | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Status: airupnp not running!" >>"$LOG"
+            return 3
+        elif ps ax | grep -E 'airupnp' | grep -v -q grep && ! ps ax | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Status: aircast not running!" >>"$LOG"
+            return 3
+        else
+            return 4
+        fi
+    else
+        # shellcheck disable=SC2009
+        if ps | grep -E 'airupnp' | grep -v -q grep && ps | grep -E 'aircast' | grep -v -q grep; then
+            return 0
+        elif ! ps | grep -E 'airupnp' | grep -v -q grep && ! ps | grep -E 'aircast' | grep -v -q grep; then
+            return 3
+        elif ! ps | grep -E 'airupnp' | grep -v -q grep && ps | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Status: airupnp not running!" >>"$LOG"
+            return 3
+        elif ps | grep -E 'airupnp' | grep -v -q grep && ! ps | grep -E 'aircast' | grep -v -q grep; then
+            echo "[$(date +'%T')] Status: aircast not running!" >>"$LOG"
+            return 3
+        else
+            return 4
+        fi
+    fi
+    # return unknown if nothing matched
+    return 4
+}
+
+case $1 in
+start)
+    echo "[$(date +'%T')] Starting AirConnect ..." >>"$LOG"
+    start_airconnect
+    exit $?
+    ;;
+stop)
+    echo "[$(date +'%T')] Stopping AirConnect ..." >>"$LOG"
+    stop_airconnect
+    exit $?
+    ;;
+status)
+    if airconnect_status; then
+        echo "[$(date +'%T')] AirConnect is running"
+        exit 0
+    else
+        echo "[$(date +'%T')] AirConnect is not running"
+        exit 3
+    fi
+    ;;
+log)
+    echo "${LOG}"
+    exit 0
+    ;;
+*)
+    exit 1
+    ;;
+esac
