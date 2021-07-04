@@ -1,0 +1,23 @@
+{
+    "usr-local-linker": {
+        "bin": [
+            "airupnp",
+            "aircast"
+        ]
+    },
+    "data-share": {
+        "shares": [
+            {
+                "name": "airconnect",
+                "permission": {
+                    "rw": [
+                        "airconnect"
+                    ]
+                }
+            }
+        ]
+    },
+    "syslog-config": {
+        "patterndb-relpath": "etc/airconnect.conf"
+    }
+}

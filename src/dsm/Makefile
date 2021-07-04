@@ -19,8 +19,10 @@ target/package.tgz: target
 	chmod +x target/airupnp
 	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/bin/aircast-${ARCH} -o target/aircast
 	chmod +x target/aircast
-	cd target && tar czf package.tgz airupnp aircast
-	rm target/airupnp target/aircast
+	cp -a etc target/etc
+	cp -a log target/log
+	cd target && tar czf package.tgz airupnp aircast etc/ log/
+	rm -r target/airupnp target/aircast target/etc target/log
 
 target/scripts: target
 	cp -a scripts target
@@ -33,6 +35,7 @@ target/LICENSE: target
 
 target/PACKAGE_ICON.PNG: target
 	cp PACKAGE_ICON.PNG target/PACKAGE_ICON.PNG
+	cp PACKAGE_ICON_256.PNG target/PACKAGE_ICON_256.PNG
 
 target/INFO: target
 	$(if ${INFO_ARCH},$(info INFO_ARCH: ${INFO_ARCH}),$(error Must specify INFO_ARCH))
@@ -45,7 +48,7 @@ target/INFO: target
 
 dist/AirConnect-${ARCH}-${VERSION}.spk: target/package.tgz target/scripts target/conf target/LICENSE target/INFO target/PACKAGE_ICON.PNG dist
 	$(if ${ARCH},$(info dist - Arch: ${ARCH}),$(error dist - Must specify ARCH))
-	cd target && tar -czf AirConnect-${ARCH}-${VERSION}.spk *
+	cd target && tar -cf AirConnect-${ARCH}-${VERSION}.spk *
 	mv target/AirConnect-${ARCH}-${VERSION}.spk dist/
 
 .PHONY: arm
@@ -101,10 +104,6 @@ x86-64:
 	$(eval export INFO_ARCH=x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap v1000 geminilake purley)
 	$(eval export INFO_FIRMWARE=6.0-7321)
 	@true
-x86-64-dsm7:
-	$(eval export INFO_ARCH=x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap v1000 geminilake purley)
-	$(eval export INFO_FIRMWARE=7.0-40000)
-	@true
 
 .PHONY: build
 build: ${ARCH} dist/AirConnect-${ARCH}-${VERSION}.spk
@@ -123,4 +122,4 @@ build-all: clean-dist
 
 .PHONY: shellcheck
 shellcheck:
-	shellcheck -s sh scripts/*
+	shellcheck -s sh scripts/* build.sh

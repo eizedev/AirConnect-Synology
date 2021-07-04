@@ -1,0 +1,11 @@
+package="AirConnect"
+version=#VERSION#
+description="Use AirPlay to stream to UPnP/Sonos & Chromecast devices"
+maintainer="philippe44"
+maintainer_url="https://github.com/philippe44/AirConnect"
+distributor="eizedev"
+distributor_url="https://github.com/eizedev/AirConnect-Synology"
+helpurl="https://eizedev.github.io/AirConnect-Synology/"
+support_url="https://eizedev.github.io/AirConnect-Synology/"
+arch="#INFO_ARCH#"
+os_min_ver="#INFO_FIRMWARE#"
