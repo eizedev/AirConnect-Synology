@@ -4,7 +4,7 @@
 
 ![AirConnect-Synology Logo](doc/res/header.png)
 
-> 2021-07-04: **DSM7**: First testing release for DSM7 can be found here (BETA): 
+> 2021-07-04: **DSM7**: First testing release for DSM7 can be found here (BETA): [https://github.com/eizedev/AirConnect-Synology/releases/tag/dsm7-0.2.50.5](Pre-Release for DSM7). Please report any issues (also if it is working for you) here: #12
 
 A minimal Synology package for [AirConnect](https://github.com/philippe44/AirConnect).  
 It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream to **UPnP/Sonos** & **Chromecast** devices that do not natively support AirPlay.  

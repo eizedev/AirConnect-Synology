@@ -25,12 +25,12 @@ start_airconnect_on_ip() {
             return 1
         fi
     fi
-    echo "[$(date +'%T')] Linking airupnp configuration to \"${AIRCONNECT_DESTINATION}\"..." >>"$LOG"
+    echo "[$(date +'%T')] Linking airupnp configuration to \"${AIRCONNECT_DESTINATION}\"." >>"$LOG"
     ln -s "${AIRCONNECT_DESTINATION}" "${CONFIG_UPNP_FILE}"
     echo "[$(date +'%T')] Starting airupnp on ${ip}:${port}" >>"$LOG"
     ${SYNOPKG_PKGDEST}/airupnp -b "${ip}":"${port}" -l 1000:2000 -x "${CONFIG_UPNP_FILE}" -o "${FILTER_AIRPLAY2_DEVICES}" -z -f "${LOG}" -d "all=info" 2>&1
 
-    echo "[$(date +'%T')] Linking aircast configuration to \"${AIRCONNECT_DESTINATION}\"..." >>"$LOG"
+    echo "[$(date +'%T')] Linking aircast configuration to \"${AIRCONNECT_DESTINATION}\"." >>"$LOG"
     ln -s "${AIRCONNECT_DESTINATION}" "${CONFIG_CAST_FILE}"
     echo "[$(date +'%T')] Starting aircast on ${ip}" >>"$LOG"
     ${SYNOPKG_PKGDEST}/aircast -b "${ip}" -l 1000:2000 -x "${CONFIG_CAST_FILE}" -z -f "${LOG}" -d "all=info" 2>&1
