@@ -16,7 +16,7 @@ It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream 
     - [Upgrade from DSM6 to DSM7](#upgrade-from-dsm6-to-dsm7)
     - [Install via GUI (Package Center)](#install-via-gui-package-center)
     - [Install via command line](#install-via-command-line)
-      - [Logfiles](#logfiles)
+    - [Logfiles](#logfiles)
   - [How it works](#how-it-works)
     - [Supported UPnP Speakers](#supported-upnp-speakers)
       - [How to detect UPnP speakers on your network](#how-to-detect-upnp-speakers-on-your-network)
@@ -133,7 +133,7 @@ Don't forget to **change back** the **Trust level** to "Synology Inc." for addit
 
 You could also clone this repository on your synology device and build your package for your architecture locally, check [Build](#build) for more details.
 
-#### Logfiles
+### Logfiles
 
 - **AirConnect-Synology and AirConnect Log File**
   - The *AirConnect application logfile* is located at `/volume1/airconnect/log/airconnect.log` (default location)
