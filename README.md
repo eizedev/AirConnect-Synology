@@ -49,6 +49,7 @@ Here is some more information to get you started.
 - AirConnect-Synology is a package for your synology devices to automate the installation and usage of [AirConnect](https://github.com/philippe44/AirConnect).
   - AirConnect-Synology releases will use the official AirConnect version + the current build date as tag/version (f.e. `0.2.25.0-20200511`)
   - AirConnect-Synology is compatible for almost all synology devices starting from DSM 5.0-4458 up to the newest and latest release of DSM 7
+- Starting with DSM7 AirConnect, so both programs, `aircast` and `airupnp` will now run under the airconnect user (no root anymore!). And the complete package will now fully managed from DSM (Before some parts were managed in the startup scripts).
 
 I own multiple Synology NAS devices and the current Synology Router. As long as that is the case, I will also update the releases regularly.  
 If a release is missing or does not work on your device, please open an [issue](https://github.com/eizedev/AirConnect-Synology/issues), then I will check this and deliver it to.
