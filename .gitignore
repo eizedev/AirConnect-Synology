@@ -1,6 +1,5 @@
 .DS_Store
 package.tgz
 *.spk
-LICENSE
 /target
 /dist

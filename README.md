@@ -4,7 +4,7 @@
 
 ![AirConnect-Synology Logo](doc/res/header.png)
 
-> 2021-07-04: **DSM7**: First testing release for DSM7 can be found here (BETA): [Pre-Release for DSM7](https://github.com/eizedev/AirConnect-Synology/releases/tag/dsm7-0.2.50.5). Please report any issues (also if it is working for you) here: [DSM7 Compatibility](https://github.com/eizedev/AirConnect-Synology/issues/12)
+> Compatible with DSM 7! Please download package with name beginning with `AirConnect-dsm7-`.
 
 A minimal Synology package for [AirConnect](https://github.com/philippe44/AirConnect).  
 It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream to **UPnP/Sonos** & **Chromecast** devices that do not natively support AirPlay.  
@@ -13,11 +13,13 @@ It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream 
   - [Information](#information)
   - [How to install](#how-to-install)
     - [Download the pre-build Synology package](#download-the-pre-build-synology-package)
+    - [Upgrade from DSM6 to DSM7](#upgrade-from-dsm6-to-dsm7)
     - [Install via GUI (Package Center)](#install-via-gui-package-center)
     - [Install via command line](#install-via-command-line)
       - [Logfiles](#logfiles)
   - [How it works](#how-it-works)
     - [Supported UPnP Speakers](#supported-upnp-speakers)
+      - [How to detect UPnP speakers on your network](#how-to-detect-upnp-speakers-on-your-network)
       - [List of supported UPnP Speakers](#list-of-supported-upnp-speakers)
     - [Configuration](#configuration)
     - [Command-Line Arguemts](#command-line-arguemts)
@@ -33,30 +35,23 @@ It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream 
     - [Build packages for all architectures](#build-packages-for-all-architectures)
     - [Build a package for a specific architecture](#build-a-package-for-a-specific-architecture)
   - [Troubleshooting](#troubleshooting)
-    - [Cannot be installed](#cannot-be-installed)
+    - [Cannot be installed or pgrade from an older version](#cannot-be-installed-or-pgrade-from-an-older-version)
     - [Issues](#issues)
     - [Multicast and IGMP Snooping/Proxy](#multicast-and-igmp-snoopingproxy)
     - [Debugging](#debugging)
   - [License](#license)
+  - [Credits](#credits)
 
 ## Information
 
-Since the [original repository](https://github.com/bandesz/AirConnect-Synology) from [@bandesz](https://github.com/bandesz) was archived, I will try to provide the latest (and new) releases here regularly.  
+Here is some more information to get you started.
 
-- Updated the installation scripts to make them more robust to certain problems and also fixed a few bugs.
-  - Also changed the build process and installation scripts with more validation and error handling.
-- Adapted the documentation (this readme for now) to make it easier for new users to get started and to make everything a bit more understandable.
-- Added new releases to fit the current AirConnect versions.
+- AirConnect-Synology is a package for your synology devices to automate the installation and usage of [AirConnect](https://github.com/philippe44/AirConnect).
   - AirConnect-Synology releases will use the official AirConnect version + the current build date as tag/version (f.e. `0.2.25.0-20200511`)
-- Added new pre-build synology packages that includes all current supported architectures and platforms
-  - New pre-build: `ppc, ppc-static, arm, arm-static, armv8-static/aarch64-static`
-  - Updated `armv7, armv8, x86` and `x86-64` to also support the newer (and older) synology hardware
-  - Check [Download the pre-built Synology package](#download-the-pre-built-synology-package) for more information.  
+  - AirConnect-Synology is compatible for almost all synology devices starting from DSM 5.0-4458 up to the newest and latest release of DSM 7
 
-I own multiple Synology NAS devices and the current Synology Router, as long as that is the case, I will also update the releases regularly.  
+I own multiple Synology NAS devices and the current Synology Router. As long as that is the case, I will also update the releases regularly.  
 If a release is missing or does not work on your device, please open an [issue](https://github.com/eizedev/AirConnect-Synology/issues), then I will check this and deliver it to.
-
-The credit goes of course still to [@bandesz](https://github.com/bandesz) for the initial work and [philippe44](https://github.com/philippe44) for the AirConnect application.  
 
 ## How to install
 
@@ -73,21 +68,28 @@ So you only need one package to support **UPnP**, **Sonos** and **Chromcast** de
 
 You can find the available packages under [releases](https://github.com/eizedev/AirConnect-Synology/releases) for the follow different architecture groups.
 
-The minimum firmware version for the x86_64 package `AirConnect-x86-64-${VERSION}` is **DSM 6.0-7321**. For **all** other package the minimum firmware version is DSM **5.0-4458**.
+| DSM Firmware Version                              | Package Naming                                                                         |
+| ------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| DSM 5.0-xxxx AND DSM 6.0-xxxx (f.e. DSM 6.0-7321) | `AirConnect-x86-64-${VERSION}` (f.e. AirConnect-x86-64-0.2.50.5-20210630.spk)          |
+| DSM 7.0-xxxx (f.e. DSM 7.0-40000)                 | `AirConnect-dsm7-x86-64-${VERSION}` (f.e. AirConnect-dsm7-86-64-0.2.50.5-20210630.spk) |
+
+The minimum firmware version for the DSM7 packages is **DSM 7.0-40000)**.  
+The minimum firmware version for the x86_64 package `AirConnect-x86-64-${VERSION}` is **DSM 6.0-7321**.  
+For **all** other package the minimum firmware version is DSM **5.0-4458**.
 
 If the `x86` (32-bit) package is not working on your device, please download the `x86-64` (64-bit) package instead.
 
-| Architecture Group                | Architecture                                                                                                                                                              | Package to download                    |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| **ARMv5**                         | 88f6282, 88f6281, 88f628x                                                                                                                                                 | `AirConnect-arm5-${VERSION}`           |
-| **ARMv7**                         | ipq806x, ipq806x, armada370, armadaxp, armada375, armada38x, alpine, alpine4k, monaco, comcerto2k, hi3535, dakota, ipq806x, northstarplus                                 | `AirConnect-arm-${VERSION}`            |
-| **ARMv7 Static**                  | noarch, ipq806x, ipq806x, armada370, armadaxp, armada375, armada38x, alpine, alpine4k, monaco, comcerto2k, hi3535, dakota, ipq806x, northstarplus                         | `AirConnect-arm-static-${VERSION}`     |
-| **ARMv8**                         | rtd1296, armada37xx                                                                                                                                                       | `AirConnect-aarch64-${VERSION}`        |
-| **ARMv8 Static**                  | noarch, rtd1296, armada37xx                                                                                                                                               | `AirConnect-aarch64-static-${VERSION}` |
-| **PowerPC**                       | qoriq, Ppc853x                                                                                                                                                            | `AirConnect-ppc-${VERSION}`            |
-| **PowerPC Static**                | noarch, qoriq, Ppc853x                                                                                                                                                    | `AirConnect-ppc-static-${VERSION}`     |
-| **Intel - 32-bit**                | x86, cedarview, bromolow, evansport, braswell, broadwell, dockerx64, kvmx64, denverton, grantley, broadwellnk, Broadwellntbap                                             | `AirConnect-x86-${VERSION}`            |
-| **Intel/AMD - 64-bit (DSM 6.0+)** | x86_64, x64, cedarview, bromolow, avoton, braswell, broadwell, apollolake, dockerx64, kvmx64, denverton, grantley, broadwellnk, Broadwellntbap, v1000, geminilake, purley | `AirConnect-x86-64-${VERSION}`         |
+| Architecture Group                | Architecture                                                                                                                                                              | Package to download                           |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| **ARMv5**                         | 88f6282, 88f6281, 88f628x                                                                                                                                                 | `AirConnect-(dsm7-)arm5-${VERSION}`           |
+| **ARMv7**                         | ipq806x, ipq806x, armada370, armadaxp, armada375, armada38x, alpine, alpine4k, monaco, comcerto2k, hi3535, dakota, ipq806x, northstarplus                                 | `AirConnect-(dsm7-)arm-${VERSION}`            |
+| **ARMv7 Static**                  | noarch, ipq806x, ipq806x, armada370, armadaxp, armada375, armada38x, alpine, alpine4k, monaco, comcerto2k, hi3535, dakota, ipq806x, northstarplus                         | `AirConnect-a(dsm7-)rm-static-${VERSION}`     |
+| **ARMv8**                         | rtd1296, armada37xx                                                                                                                                                       | `AirConnect-(dsm7-)aarch64-${VERSION}`        |
+| **ARMv8 Static**                  | noarch, rtd1296, armada37xx                                                                                                                                               | `AirConnect-(dsm7-)aarch64-static-${VERSION}` |
+| **PowerPC**                       | qoriq, Ppc853x                                                                                                                                                            | `AirConnect-(dsm7-)ppc-${VERSION}`            |
+| **PowerPC Static**                | noarch, qoriq, Ppc853x                                                                                                                                                    | `AirConnect-(dsm7-)ppc-static-${VERSION}`     |
+| **Intel - 32-bit**                | x86, cedarview, bromolow, evansport, braswell, broadwell, dockerx64, kvmx64, denverton, grantley, broadwellnk, Broadwellntbap                                             | `AirConnect-(dsm7-)x86-${VERSION}`            |
+| **Intel/AMD - 64-bit (DSM 6.0+)** | x86_64, x64, cedarview, bromolow, avoton, braswell, broadwell, apollolake, dockerx64, kvmx64, denverton, grantley, broadwellnk, Broadwellntbap, v1000, geminilake, purley | `AirConnect-(dsm7-)x86-64-${VERSION}`         |
 
 You can check which architecture you have in the `Package Arch` column on the Synology [What kind of CPU does my Synology NAS have?](https://www.synology.com/en-us/knowledgebase/DSM/tutorial/Compatibility_Peripherals/What_kind_of_CPU_does_my_NAS_have) site.
 
@@ -97,17 +99,22 @@ You can check which architecture you have in the `Package Arch` column on the Sy
 
 For the Synology **Routers** you should use the **ARM** (ARMv7 - dakota, ipq806x, northstarplus) version. If the normal ARM package is not working on your device, please try **ARM Static** instead.
 
+### Upgrade from DSM6 to DSM7
+
+If you upgrade your NAS from DSM6 to DSM7, you should just download the new dsm7 package for your device. The old package and new DSM6 packages will not work anymore, since DSM7 changes a lot under the hood (no more root permissions for packages, minimum package version 7.0, etc.).  
+Just download the DSM7 package and install it from the Package Center as usual.
+
+If you encounter any problems, please read the [troubleshooting](#troubleshooting) section first.
+
 ### Install via GUI (Package Center)
 
 - Open the Package Center app.
-- As this package is not an official Synology package you may have to
+- (On DSM5 and some DSM6 Devices) As this package is not an official Synology package you may have to
   - **Allow packages from any publisher**
     - Go to **Settings** and set the **Trust Level** to "**Any publisher**".
 - Click on **Manual Install** and upload the package you just downloaded.
 
-Don't forget to **change back** the **Trust level** to "Synology Inc." for additional security.
-
-You can view the logs by clicking on **View Log** on the packages page, or, if not available on your device, by using the [command line](#install-via-command-line).  
+Don't forget to **change back** the **Trust level** to "Synology Inc." for additional security.  
 
 ### Install via command line
 
@@ -128,22 +135,26 @@ You could also clone this repository on your synology device and build your pack
 
 #### Logfiles
 
+- **AirConnect-Synology and AirConnect Log File**
+  - The *AirConnect application logfile* is located at `/volume1/airconnect/log/airconnect.log` (default location)
+    - This is a symlink of `/volume1/@appstore/AirConnect/log/airconnect.log`
+  - You can open it using the Synology **FileStation** by navigating to `airconnect` - `log`
+    - You can also open it after login with ssh to your NAS/Router: `sudo /usr/syno/bin/synopkg log AirConnect` or by using a command line utility like `more` (`more /volume1/airconnect/log/airconnect`) `tail` (`tail -100 /volume1/airconnect/log/airconnect`).
+      - If you get a `permission denied`, you should use the full path, f.e. `more volume1/@appstore/AirConnect/log/airconnect.log`
+  - This log file is written by the AirConnect-Synology package. All log entries of the AirConnect application (airupnp + aircast) are also written into this log file.
+  - This is the first place to look for errors.
 - **Synology Service Log File**
   - The *synology dsm package logfile* ist located at `/var/log/packages/AirConnect.log`
-  - This logfile is used from DSM/Synology for all installation/uninstallation/update purposes  
-- **AirConnect-Synology and AirConnect Log File**
-  - The *AirConnect application logfile* is located at `/var/log/airconnect.log` (default location)
-  - You can open it after login with ssh to your NAS/Router: `sudo /usr/syno/bin/synopkg log AirConnect` or by using a command line utility like `more` (`more /var/log/airconnect`) `tail` (`tail -100 /var/log/airconnect`) etc. 
-  - This log file is written by the AirConnect synology package. All log entries of the AirConnect application (airupnp + aircast) are also written into this log file.
-  - This is the first place to look for errors.
+  - This logfile is used from DSM/Synology for all installation/uninstallation/update purposes
+  - In general you will only use it for debugging purposes
 
 ## How it works
 
 It runs the AirConnect processes with the following options by default tuned for sonos:
 
 ```bash
-/volume1/@appstore/AirConnect/airupnp -b [synology device local ip]:49154 -l 1000:2000 -x "/volume1/@appstore/AirConnect/config.xml" -o "<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless" -z -f "/var/log/airconnect.log" -d all=info  
-/volume1/@appstore/AirConnect/aircast -b [synology device local ip] -l 1000:2000 -x "/volume1/@appstore/AirConnect/config-cast.xml" -z -f "/var/log/airconnect.log" -d all=info
+/volume1/@appstore/AirConnect/airupnp -b [synology device local ip]:49154 -l 1000:2000 -x "/volume1/@appstore/AirConnect/config.xml" -o "<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless" -z -f "/volume1/@appstore/AirConnect/log/airconnect.log" -d all=info  
+/volume1/@appstore/AirConnect/aircast -b [synology device local ip] -l 1000:2000 -x "/volume1/@appstore/AirConnect/config-cast.xml" -z -f "/volume1/@appstore/AirConnect/log/airconnect.log" -d all=info
 ```
 
 ### Supported UPnP Speakers
@@ -152,7 +163,32 @@ To speed up the detection of Sonos/UPnP/DLNA speakers and to do not discover spe
 
 > If you have another UPnP based speaker that you want to be supported by this package which is not in the list below, please open an [issue](https://github.com/eizedev/AirConnect-Synology/issues) and let me know (Please tell me the product name (**model name**, **model number** etc.))
 
->With `-o <NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless` the sonos/UPnP speakers that are natively supporting AirPlay or AirPlay2 will be ignored from AirConnect/airupnp and only the ones listed with `-o` will be used. Since no new "non airplay" speakers (from sonos) will be released in the future, that should work in any case. So they will be not displayed twice in the list.  
+>With `-o <NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless` the sonos/UPnP speakers that are natively supporting AirPlay or AirPlay2 will be ignored from AirConnect/airupnp and only the ones listed with `-o` will be used. Since no new "non airplay" speakers (from sonos) will be released in the future, that should work in any case. So they will be not displayed twice in the list.
+
+#### How to detect UPnP speakers on your network
+
+To find UPnP speakers, their device_description URL and the model number, follow the following steps.
+
+If you are familiar with linux commands you could use `tcpdump` to discover upnp devices on your network. You can install tcpdump on any synology NAS by using he integrated synology diagnostic tools. Just execute as root via SSH `synogear install` to install the diagnostic tools. See documentation here: [FAQ-synogear](https://github.com/SynoCommunity/spksrc/wiki/FAQ-synogear).  
+Synogear also installs a few other useful linux/busybox commands. I have installed the diagnostic tools (synogear) on every synology device that i own.
+
+**Change en0 to your network adapter name** (wait a few seconds until the devices get discovered)
+
+`sudo tcpdump -vv -A -s 0 -i en0 host 239.255.255.250 and port 1900 | grep LOCATION`
+
+![image](https://user-images.githubusercontent.com/6794362/118552071-bd8ee700-b75e-11eb-94a5-9190d62ee5a7.png)
+
+Then you need to find your Onkyo AVR ip and catch the Location URL.
+
+With the `curl` command (or the browser of your choice) you can then search for the `modelNumber` in the device xml configuration:
+
+`curl http://192.168.1.122:1400/xml/device_description.xml | grep modelNumber`
+
+![image](https://user-images.githubusercontent.com/6794362/118552462-473eb480-b75f-11eb-9156-54e96ab5bd8b.png)
+
+S12 is a Sonos Play:1 in this example.
+
+This modelNumber is the number that i need to extend the following [List of supported UPnP Speakers](#list-of-supported-upnp-speakers).
 
 #### List of supported UPnP Speakers
 
@@ -266,9 +302,9 @@ Usage: [options]
 By default the config file will **not** being used as long as the file is not created (And you are not running on debug log level). The file is **not** created by default.  
 
 - Config File location for airupnp
-  - `/volume1/@appstore/AirConnect/config.xml`
+  - `/volume1/airconnect/config.xml`
 - Config File location for aircast
-  - `/volume1/@appstore/AirConnect/config-cast.xml`
+  - `/volume1/airconnect/config-cast.xml`
 
 You can create each of these files manually or a reference version can be generated using the `-i [config file name]` command line parameter.
 For the following example i am using the default configuration you can find above in the [How it works](#how-it-works) section. I am just change the `-x` parameter with the `-i` parameter.
@@ -344,9 +380,21 @@ You can find the built packages in the **dist** directory.
 
 ## Troubleshooting
 
-### Cannot be installed
+### Cannot be installed or pgrade from an older version
 
-If you get an error message that the package **cannot be installed** or **updated** when updating AirConnect-Synology, please **uninstall the old version** first (`Package Center -> AirConnect -> Uninstall`) and then install the new version. Uninstalling also removes the old scripts, references and configurations (only the logfile remains). Sometimes it can happen that the problem is already fixed with this.  
+If you get an error message that the package **cannot be installed** or **updated** or **started** when updating AirConnect-Synology, please **uninstall the old version** first (`Package Center -> AirConnect -> Uninstall`) and then install the new version. Uninstalling also removes the old scripts, references and configurations (only the logfile remains). Sometimes it can happen that the problem is already fixed with this.  
+
+If the normal uninstallation also does not work, please cleanup the old package using SSH with root permissions:
+
+- Delete old package (directory)
+  - `rm -rf /var/packages/AirConnect`
+- Delete old airconnect user(s) from a previous installation
+  - `synouser --del airconnect`
+  - `synouser --del airconnect__PKG_`
+- Delete old airconnect group from a previous installation
+  - `synogroup --del airconnect`
+
+- After that please install the new package as found in [how-to-install](#how-to-install)
 
 ### Issues
 
@@ -366,7 +414,7 @@ So make sure that multicast is allowed on your router, your switches and your fi
 I have activated but properly configured igmp snooping and igmp proxy + different VLANs. It will work with AirConnect, if properly configured.
 
 - When players disappear regularly, it might be that your router is filtering out multicast packets. For example and testing, for a Asus AC-RT68U, you have to login by ssh and run `echo 0 > /sys/class/net/br0/bridge/multicast_snooping` but it does not stay after a reboot.
-- Lots of users seems to have problems with Unify and broadcasting / finding players. Here is a guide https://www.neilgrogan.com/ubnt-sonos/ made by somebody who fixes the issue for his Sonos environment
+- Lots of users seems to have problems with Unify and broadcasting / finding players. Here is a guide [ubnt-sonos](https://www.neilgrogan.com/ubnt-sonos/) made by somebody who fixes the issue for his Sonos environment
 
 For additional information, please check the following issues in the official AirConnect Repository:
 
@@ -382,4 +430,9 @@ If you want to see more logs then change the `-d all=info` parameter in `scripts
 
 ## License
 
-See [LICENSE](https://github.com/philippe44/AirConnect/blob/master/LICENSE).
+- AirConnect: See [LICENSE](https://github.com/philippe44/AirConnect/blob/master/LICENSE).
+- AirConnect-Synology: See [LICENSE](./LICENSE)
+
+## Credits
+
+Credits go to [@bandesz](https://github.com/bandesz) for the initial work and idea of a Synology package for AirConnect and of course to [philippe44](https://github.com/philippe44) for this great AirConnect application.  
