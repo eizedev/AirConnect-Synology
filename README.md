@@ -15,8 +15,8 @@ It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream 
     - [Download the pre-build Synology package](#download-the-pre-build-synology-package)
     - [Upgrade from DSM6 to DSM7](#upgrade-from-dsm6-to-dsm7)
     - [Install via GUI (Package Center)](#install-via-gui-package-center)
-    - [Install via command line](#install-via-command-line)
     - [Logfiles](#logfiles)
+  - [airconnect.conf](#airconnectconf)
   - [How it works](#how-it-works)
     - [Supported UPnP Speakers](#supported-upnp-speakers)
       - [How to detect UPnP speakers on your network](#how-to-detect-upnp-speakers-on-your-network)
@@ -25,7 +25,7 @@ It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream 
     - [Command-Line Arguemts](#command-line-arguemts)
       - [airupnp](#airupnp)
       - [aircast](#aircast)
-    - [Config File](#config-file)
+    - [airupnp and aircast configuration](#airupnp-and-aircast-configuration)
     - [Player specific settings, hints and tips](#player-specific-settings-hints-and-tips)
       - [Sonos](#sonos)
       - [Bose SoundTouch](#bose-soundtouch)
@@ -35,7 +35,7 @@ It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream 
     - [Build packages for all architectures](#build-packages-for-all-architectures)
     - [Build a package for a specific architecture](#build-a-package-for-a-specific-architecture)
   - [Troubleshooting](#troubleshooting)
-    - [Cannot be installed or pgrade from an older version](#cannot-be-installed-or-pgrade-from-an-older-version)
+    - [Cannot be installed or upgrade from an older version](#cannot-be-installed-or-upgrade-from-an-older-version)
     - [Issues](#issues)
     - [Multicast and IGMP Snooping/Proxy](#multicast-and-igmp-snoopingproxy)
     - [Debugging](#debugging)
@@ -112,29 +112,15 @@ If you encounter any problems, please read the [troubleshooting](#troubleshootin
 ### Install via GUI (Package Center)
 
 - Open the Package Center app.
-- (On DSM5 and some DSM6 Devices) As this package is not an official Synology package you may have to
-  - **Allow packages from any publisher**
-    - Go to **Settings** and set the **Trust Level** to "**Any publisher**".
 - Click on **Manual Install** and upload the package you just downloaded.
+  - Select AirConnect packages that should be installed
+    - ![AirConnect-Installation-Selection](doc/res/installation_selection.png)
+  - Insert IP (defaults to the synology primary ip) and the port for airupnp
+    - ![AirConnect-Installation-Connection](doc/res/installation_connection.png)
 
-Don't forget to **change back** the **Trust level** to "Synology Inc." for additional security.  
+> On DSM5 and some DSM6 devices: As this package is not an official Synology package you may have to **Allow packages from any publisher** (Go to **Settings** and set the **Trust Level** to "**Any publisher**".)  
 
-### Install via command line
-
-- Connect to your NAS/Router via ssh ([How to login to DSM with root permission via SSH/Telnet](https://www.synology.com/en-global/knowledgebase/DSM/tutorial/General_Setup/How_to_login_to_DSM_with_root_permission_via_SSH_Telnet))
-- Copy over or download your release for [your architecture](#download-the-pre-built-synology-package)
-  - For example, you can use (S)FTP to copy your files to your NAS ([How to access files on Synology NAS via FTP
-](https://www.synology.com/en-global/knowledgebase/DSM/tutorial/File_Sharing/How_to_access_files_on_Synology_NAS_via_FTP)).
-  - You can also copy your files to a shared folder (f.e. `home` -> `/volume1/home`) on your NAS and, after connecting via ssh, change to the shared folder directory.
-- Change the path to the directory where you copied the package file (f.e. `home` -> `cd /volume1/home`).
-- Run the following command based on your architecture and version `sudo synopkg install AirConnect-${ARCH}-${VERSION}.spk`
-  - Example: `sudo synopkg install AirConnect-arm-0.2.24.7-20200417.spk`
-- Start the **AirConnect** package with `sudo /usr/syno/bin/synopkg start AirConnect` or trough the Package Center
-- Check the status of AirConnect with `sudo /usr/syno/bin/synopkg status AirConnect`
-- The default installation directory is located here: `/var/packages/AirConnect/`
-  - The binaries can be found in: `/var/packages/AirConnect/target/`
-
-You could also clone this repository on your synology device and build your package for your architecture locally, check [Build](#build) for more details.
+> Do not forget to **change back** the **Trust level** to "Synology Inc." for additional security.  
 
 ### Logfiles
 
@@ -150,6 +136,40 @@ You could also clone this repository on your synology device and build your pack
   - The *synology dsm package logfile* ist located at `/var/log/packages/AirConnect.log`
   - This logfile is used from DSM/Synology for all installation/uninstallation/update purposes
   - In general you will only use it for debugging purposes
+
+## airconnect.conf
+
+Starting with release `0.2.50.5-20210801` you can customize the configuration of AirConnect-Synology by using the config file at `/volume1/airconnect/airconnect.conf`.  
+Please **stop** the package **before** changing the configuration.  
+If you have edited the configuration while AirConnect is running please **restart** the AirConnect package.
+
+The configuration options and default values are:
+
+```bash
+AIRCAST_ENABLED=1
+AIRCAST_LATENCY="1000:2000"
+AIRCAST_LOGLEVEL="all=info"
+AIRUPNP_ENABLED=1
+AIRUPNP_LATENCY="1000:2000"
+AIRUPNP_LOGLEVEL="all=info"
+AIRUPNP_PORT=49154
+FILTER_AIRPLAY2_DEVICES="<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless"
+SYNO_IP="<your synology ip>"
+```
+
+| Configuration Option    | Values                                             | Mandatory     | Description                                                            |
+| ----------------------- | -------------------------------------------------- | ------------- | ---------------------------------------------------------------------- |
+| AIRCAST_ENABLED         | `0` or `1`                                         | Yes           | Enables or disables AIRCAST                                            |
+| AIRCAST_LATENCY         | `[rtp][:http][:f]`                                 | No            | RTP and HTTP latency (ms), ':f' forces silence fill                    |
+| AIRCAST_LOGLEVEL        | `<log>=<level>`                                    | Yes           | logs: `all|raop|main|util|upnp`, level: `error|warn|info|debug|sdebug` |
+| AIRUPNP_ENABLED         | `0` or `1`                                         | Yes           | Enables or disables AIRUPNP                                            |
+| AIRUPNP_LATENCY         | `[rtp][:http][:f]`                                 | No            | RTP and HTTP latency (ms), ':f' forces silence fill                    |
+| AIRUPNP_LOGLEVEL        | `<log>=<level>`                                    | Yes           | logs: `all|raop|main|util|upnp`, level: `error|warn|info|debug|sdebug` |
+| AIRUPNP_PORT            | `49154`                                            | Yes (airupnp) | Port on which airupnp should be started                                |
+| FILTER_AIRPLAY2_DEVICES | `<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120` | No            | See [Supported UPnP Speakers](#supported-upnp-speakers)                |
+| SYNO_IP                 | `192.168.1.100`                                    | Yes           | The ip on which aircast/airupnp will be started                        |
+
+Configuration options with `Mandatory = Yes` must exist in the configuration. Options with `Mandatory = No` are optional.
 
 ## How it works
 
@@ -217,30 +237,6 @@ These default options should work for most of you but can also be changed by usi
 
 Both processes are running with the low-privilege user `airconnect`.
 
-The processes will only recognise your devices if they are bound to the appropriate local network IP, but this is not trivial as there are various Synology devices and network setups out there.  
-The start script will check all your local network interfaces for private ip addresses (Ranges: `192.168.*` or `10.*` or `172.16.* - 172.31.*` or `17.0.64.* - 17.0.127.*`).
-
->The startup check if new speakers were discovered is currently disabled due to a bug:
-
-~~After startup of airupnp/aircast the processes will check if any device (Sonos/UPnP/Chromcast) was discovered (based on some log entries).  
-It there are no devices added in the first **10 seconds** after startup, it will try the next interface (if more interfaces are available).  
-For the automatic IP discovery to work you should have at least **one UPnP/Sonos/Chromecast** device that is online in your local network.  
-If no device was discovered, the processes will be stopped automatically.~~
-
-If the start script is not able to find the right IP automatically you can fix it in `scripts/start-stop-status` by setting your own local IP (of your nas/router) and building your own package.
-
-Look for the following lines:
-
-```bash
-# If you want to start the airconnect processes on a specific IP please uncomment the following lines
-# and set your own local IP address:
-#
-# start_airconnect_on_ip "1.2.3.4" || true
-# return  0
-```
-
-Alternatively you can open an [issue](https://github.com/eizedev/AirConnect-Synology/issues) and include your network interface list and your local IP and i will extend the default network interfaces filter with your list.
-
 ### Configuration
 
 If you would like to tweak the AirConnect configuration you can also use the AirConnect configuration file.
@@ -300,7 +296,7 @@ Usage: [options]
   -t                    License terms
 ```
 
-### Config File
+### airupnp and aircast configuration
 
 By default the config file will **not** being used as long as the file is not created (And you are not running on debug log level). The file is **not** created by default.  
 
@@ -383,7 +379,7 @@ You can find the built packages in the **dist** directory.
 
 ## Troubleshooting
 
-### Cannot be installed or pgrade from an older version
+### Cannot be installed or upgrade from an older version
 
 If you get an error message that the package **cannot be installed** or **updated** or **started** when updating AirConnect-Synology, please **uninstall the old version** first (`Package Center -> AirConnect -> Uninstall`) and then install the new version. Uninstalling also removes the old scripts, references and configurations (only the logfile remains). Sometimes it can happen that the problem is already fixed with this.  
 
@@ -429,7 +425,7 @@ For additional information, please check the following issues in the official Ai
 
 ### Debugging
 
-If you want to see more logs then change the `-d all=info` parameter in `scripts/start-stop-status` to `-d all=debug` and rebuild the package, then [install it again](#install-via-command-line).
+If you want to see more logs then change the AIRCAST_LOGLEVEL or AIRUPNP_LOGLEVEL from `all=info` in `/volume1/airconnect/airconnect.conf` to `all=debug` and restart the package.
 
 ## License
 

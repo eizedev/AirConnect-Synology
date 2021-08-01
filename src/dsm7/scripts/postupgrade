@@ -1,3 +1,13 @@
 #!/bin/sh
 
+LOG="${SYNOPKG_PKGDEST}/log/${AIRCONNECT_USER}.log"
+AIRCONNECT_CONFIG_FILE="airconnect.conf"
+
+echo "[$(date +'%T')] #### Start postupgrade... ####" >>"${LOG}"
+
+# restore config file
+/bin/cp -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${AIRCONNECT_CONFIG_FILE}" "${SYNOPKG_PKGDEST}"
+
+echo "[$(date +'%T')] #### Done postupgrade ####" >>"${LOG}"
+
 exit 0
