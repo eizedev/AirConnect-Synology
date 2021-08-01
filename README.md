@@ -170,17 +170,17 @@ FILTER_AIRPLAY2_DEVICES="<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,Li
 SYNO_IP="<your synology ip>"
 ```
 
-| Configuration Option    | Values                                             | Mandatory     | Description                                                            |
-| ----------------------- | -------------------------------------------------- | ------------- | ---------------------------------------------------------------------- |
-| AIRCAST_ENABLED         | `0` or `1`                                         | Yes           | Enables or disables AIRCAST                                            |
-| AIRCAST_LATENCY         | `[rtp][:http][:f]`                                 | No            | RTP and HTTP latency (ms), ':f' forces silence fill                    |
-| AIRCAST_LOGLEVEL        | `<log>=<level>`                                    | Yes           | logs: `all|raop|main|util|upnp`, level: `error|warn|info|debug|sdebug` |
-| AIRUPNP_ENABLED         | `0` or `1`                                         | Yes           | Enables or disables AIRUPNP                                            |
-| AIRUPNP_LATENCY         | `[rtp][:http][:f]`                                 | No            | RTP and HTTP latency (ms), ':f' forces silence fill                    |
-| AIRUPNP_LOGLEVEL        | `<log>=<level>`                                    | Yes           | logs: `all|raop|main|util|upnp`, level: `error|warn|info|debug|sdebug` |
-| AIRUPNP_PORT            | `49154`                                            | Yes (airupnp) | Port on which airupnp should be started                                |
-| FILTER_AIRPLAY2_DEVICES | `<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120` | No            | See [Supported UPnP Speakers](#supported-upnp-speakers)                |
-| SYNO_IP                 | `192.168.1.100`                                    | Yes           | The ip on which aircast/airupnp will be started                        |
+| Configuration Option    | Values                                           | Mandatory     | Description                                                            |
+| ----------------------- | ------------------------------------------------ | ------------- | ---------------------------------------------------------------------- |
+| AIRCAST_ENABLED         | `0` or `1`                                       | Yes           | Enables or disables AIRCAST                                            |
+| AIRCAST_LATENCY         | `[rtp][:http][:f]`                               | No            | RTP and HTTP latency (ms), ':f' forces silence fill                    |
+| AIRCAST_LOGLEVEL        | `<log>=<level>`                                  | Yes           | logs: `all|raop|main|util|upnp`, level: `error|warn|info|debug|sdebug` |
+| AIRUPNP_ENABLED         | `0` or `1`                                       | Yes           | Enables or disables AIRUPNP                                            |
+| AIRUPNP_LATENCY         | `[rtp][:http][:f]`                               | No            | RTP and HTTP latency (ms), ':f' forces silence fill                    |
+| AIRUPNP_LOGLEVEL        | `<log>=<level>`                                  | Yes           | logs: `all|raop|main|util|upnp`, level: `error|warn|info|debug|sdebug` |
+| AIRUPNP_PORT            | `49154`                                          | Yes (airupnp) | Port on which airupnp should be started                                |
+| FILTER_AIRPLAY2_DEVICES | `<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,...` | No            | See [Supported UPnP Speakers](#supported-upnp-speakers)                |
+| SYNO_IP                 | `192.168.1.100`                                  | Yes           | The ip on which aircast/airupnp will be started                        |
 
 Configuration options with `Mandatory = Yes` must exist in the configuration. Options with `Mandatory = No` are optional.
 
