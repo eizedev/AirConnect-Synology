@@ -402,6 +402,8 @@ If the normal uninstallation also does not work, please cleanup the old package 
 
 - Delete old package (directory)
   - `rm -rf /var/packages/AirConnect`
+- Delete old airconnect configuration directory
+  - `synoshare --del TRUE airconnect`
 - Delete old airconnect user(s) from a previous installation
   - `synouser --del airconnect`
   - `synouser --del airconnect__PKG_`
