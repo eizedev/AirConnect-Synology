@@ -105,6 +105,8 @@ For the Synology **Routers** you should use the **ARM** (ARMv7 - dakota, ipq806x
 If you upgrade your NAS from DSM6 to DSM7, you should just download the new dsm7 package for your device. The old package and new DSM6 packages will not work anymore, since DSM7 changes a lot under the hood (no more root permissions for packages, minimum package version 7.0, etc.).  
 Just download the DSM7 package and install it from the Package Center as usual.
 
+If, after upgrading to DSM 7, the old package is still installed, please uninstall it and install it again.
+
 If you encounter any problems, please read the [troubleshooting](#troubleshooting) section first.
 
 ### Install via GUI (Package Center)
