@@ -15,6 +15,8 @@ It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream 
     - [Download the pre-build Synology package](#download-the-pre-build-synology-package)
     - [Upgrade from DSM6 to DSM7](#upgrade-from-dsm6-to-dsm7)
     - [Install via GUI (Package Center)](#install-via-gui-package-center)
+      - [DSM 7](#dsm-7)
+      - [DSM 6](#dsm-6)
     - [Logfiles](#logfiles)
   - [airconnect.conf](#airconnectconf)
   - [How it works](#how-it-works)
@@ -39,6 +41,8 @@ It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream 
     - [Issues](#issues)
     - [Multicast and IGMP Snooping/Proxy](#multicast-and-igmp-snoopingproxy)
     - [Debugging](#debugging)
+      - [DSM 7](#dsm-7-1)
+      - [DSM 5 and 6](#dsm-5-and-6)
   - [License](#license)
   - [Credits](#credits)
 
@@ -111,12 +115,19 @@ If you encounter any problems, please read the [troubleshooting](#troubleshootin
 
 ### Install via GUI (Package Center)
 
+#### DSM 7
+
 - Open the Package Center app.
 - Click on **Manual Install** and upload the package you just downloaded.
   - Select AirConnect packages that should be installed
     - ![AirConnect-Installation-Selection](doc/res/installation_selection.png)
   - Insert IP (defaults to the synology primary ip) and the port for airupnp
     - ![AirConnect-Installation-Connection](doc/res/installation_connection.png)
+
+#### DSM 6
+
+- Open the Package Center app.
+- Click on **Manual Install** and upload the package you just downloaded.
 
 > On DSM5 and some DSM6 devices: As this package is not an official Synology package you may have to **Allow packages from any publisher** (Go to **Settings** and set the **Trust Level** to "**Any publisher**".)  
 
@@ -138,6 +149,8 @@ If you encounter any problems, please read the [troubleshooting](#troubleshootin
   - In general you will only use it for debugging purposes
 
 ## airconnect.conf
+
+> Only available for DSM 7 packages!
 
 Starting with release `0.2.50.5-20210801` you can customize the configuration of AirConnect-Synology by using the config file at `/volume1/airconnect/airconnect.conf`.  
 Please **stop** the package **before** changing the configuration.  
@@ -425,7 +438,13 @@ For additional information, please check the following issues in the official Ai
 
 ### Debugging
 
+#### DSM 7
+
 If you want to see more logs then change the AIRCAST_LOGLEVEL or AIRUPNP_LOGLEVEL from `all=info` in `/volume1/airconnect/airconnect.conf` to `all=debug` and restart the package.
+
+#### DSM 5 and 6
+
+If you want to see more logs then change the `-d all=info` parameter in `scripts/start-stop-status` to `-d all=debug` and rebuild the package, then [install it again](#install-via-command-line).
 
 ## License
 
