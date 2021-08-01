@@ -67,7 +67,7 @@ So you only need one package to support **UPnP**, **Sonos** and **Chromcast** de
 
 ### Download the pre-build Synology package
 
-You can find the available packages under [releases](https://github.com/eizedev/AirConnect-Synology/releases) for the follow different architecture groups.
+You can find the available packages under [releases](https://github.com/eizedev/AirConnect-Synology/releases) for the following synology DSM distributions (DSM 5, 6 and 7) and the different architecture groups of the synology NAS/Router devices.
 
 | DSM Firmware Version                              | Package Naming                                                                         |
 | ------------------------------------------------- | -------------------------------------------------------------------------------------- |
@@ -181,7 +181,7 @@ Synogear also installs a few other useful linux/busybox commands. I have install
 
 ![image](https://user-images.githubusercontent.com/6794362/118552071-bd8ee700-b75e-11eb-94a5-9190d62ee5a7.png)
 
-Then you need to find your Onkyo AVR ip and catch the Location URL.
+Then you need to find your device ip and catch the location URL.
 
 With the `curl` command (or the browser of your choice) you can then search for the `modelNumber` in the device xml configuration:
 
