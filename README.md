@@ -195,9 +195,11 @@ It runs the AirConnect processes with the following options by default tuned for
 
 ### Supported UPnP Speakers
 
-To speed up the detection of Sonos/UPnP/DLNA speakers and to do not discover speakers which natively supports airplay, this synology package will only include the devices mentioned in the table below.
+> On **DSM7** you can just change the parameter `FILTER_AIRPLAY2_DEVICES` in the configuration file [airconnect.conf](#airconnectconf). You could also remove these configuration parameter to allow all airplay2 devices.
 
-> If you have another UPnP based speaker that you want to be supported by this package which is not in the list below, please open an [issue](https://github.com/eizedev/AirConnect-Synology/issues) and let me know (Please tell me the product name (**model name**, **model number** etc.))
+To speed up the detection of Sonos/UPnP/DLNA speakers and to not discover speakers which natively supports airplay, this synology package will only include the devices mentioned in the [List of supported UPnP Speakers](#list-of-supported-upnp-speakers).
+
+> If you have another UPnP based speaker that you want to be supported by this package which is not in the list below, please open an [issue](https://github.com/eizedev/AirConnect-Synology/issues) and let me know (Please tell me the product name (**model name**, **model number** etc.)), then i will include it to the default configuration.
 
 >With `-o <NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless` the sonos/UPnP speakers that are natively supporting AirPlay or AirPlay2 will be ignored from AirConnect/airupnp and only the ones listed with `-o` will be used. Since no new "non airplay" speakers (from sonos) will be released in the future, that should work in any case. So they will be not displayed twice in the list.
 
