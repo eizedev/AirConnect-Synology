@@ -140,7 +140,7 @@ If you encounter any problems, please read the [troubleshooting](#troubleshootin
     - This is a symlink of `/volume1/@appstore/AirConnect/log/airconnect.log`
   - You can open it using the Synology **FileStation** by navigating to `airconnect` - `log`
     - You can also open it after login with ssh to your NAS/Router: `sudo /usr/syno/bin/synopkg log AirConnect` or by using a command line utility like `more` (`more /volume1/airconnect/log/airconnect`) `tail` (`tail -100 /volume1/airconnect/log/airconnect`).
-      - If you get a `permission denied`, you should use the full path, f.e. `more volume1/@appstore/AirConnect/log/airconnect.log`
+      - If you get a `permission denied`, you should use the full path, f.e. `more /volume1/@appstore/AirConnect/log/airconnect.log`
   - This log file is written by the AirConnect-Synology package. All log entries of the AirConnect application (airupnp + aircast) are also written into this log file.
   - This is the first place to look for errors.
 - **Synology Service Log File**
