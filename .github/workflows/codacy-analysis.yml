@@ -15,7 +15,7 @@ on:
     # The branches below must be a subset of the branches above
     branches: [ master ]
   schedule:
-    - cron: '45 21 * * *'
+    - cron: '0 22 * * *'
 
 jobs:
   codacy-security-scan:
