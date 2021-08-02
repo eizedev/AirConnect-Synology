@@ -1,8 +1,8 @@
 #!/bin/sh
 
-SYNO_IP=$(ip route get $(ip route show 0.0.0.0/0 | grep -oP 'via \K\S+') | grep -oP 'src \K\S+')
+SYNO_IP=$(ip route get "$(ip route show 0.0.0.0/0 | grep -oP 'via \K\S+')" | grep -oP 'src \K\S+')
 
-tee $SYNOPKG_TEMP_LOGFILE <<EOF
+tee "$SYNOPKG_TEMP_LOGFILE" <<EOF
 [
     {
         "step_title": "Which AirConnect program(s) do you want to install?",
