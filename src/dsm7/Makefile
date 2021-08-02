@@ -125,4 +125,4 @@ build-all: clean-dist
 
 .PHONY: shellcheck
 shellcheck:
-	shellcheck -s sh scripts/* build.sh
+	shellcheck -s sh scripts/* build.sh WIZARD_UIFILES/*
