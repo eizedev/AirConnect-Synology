@@ -98,11 +98,18 @@ If the `x86` (32-bit) package is not working on your device, please download the
 
 You can check which architecture you have in the `Package Arch` column on the Synology [What kind of CPU does my Synology NAS have?](https://www.synology.com/en-us/knowledgebase/DSM/tutorial/Compatibility_Peripherals/What_kind_of_CPU_does_my_NAS_have) site.
 
+For the Synology **Routers** you should use the **ARM** (ARMv7 - dakota, ipq806x, northstarplus) version. If the normal ARM package is not working on your device, please try **ARM Static** instead.
+
+#### Static packages
+
+On some devices, dependencies that are necessary to run airupnp or aircast are not available (mostly on older devices).
+These dependencies are included in the static version of the packages. This is the reason why the static packages are bigger than the normal versions.
+
+So in general always you should always use the normal package (with static in the name), not the static one. Only when the normal package does not work on your device, please test the static package instead.
+
 > If the above **ARMv7** package will not work on your device, please download the latest `arm-static` package. The static package includes "static" binaries, that means, it includes binaries that have no external library dependencies and **should** be run on your ARMv7 device if the normal ARMv7 package fails.
 
 > If the above **PowerPC** package will not work on your device, please download the latest `ppc-static` package. The static package includes "static" binaries, that means, it includes binaries that have no external library dependencies and **should** be run on your PPC device if the normal PPC package fails.
-
-For the Synology **Routers** you should use the **ARM** (ARMv7 - dakota, ipq806x, northstarplus) version. If the normal ARM package is not working on your device, please try **ARM Static** instead.
 
 ### Upgrade from DSM6 to DSM7
 
