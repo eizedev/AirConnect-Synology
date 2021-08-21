@@ -13,6 +13,7 @@ It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream 
   - [Information](#information)
   - [How to install](#how-to-install)
     - [Download the pre-build Synology package](#download-the-pre-build-synology-package)
+      - [Static packages](#static-packages)
     - [Upgrade from DSM6 to DSM7](#upgrade-from-dsm6-to-dsm7)
     - [Install via GUI (Package Center)](#install-via-gui-package-center)
       - [DSM 7](#dsm-7)
