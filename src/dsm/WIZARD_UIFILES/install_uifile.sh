@@ -1,6 +1,7 @@
 #!/bin/sh
 
-SYNO_IP=$(ip route get "$(ip route show 0.0.0.0/0 | grep -oP 'via \K\S+')" | grep -oP 'src \K\S+')
+SYNO_IP=$(ip -o route get to 1.0.0.0 | sed -n 's/.*src \([0-9.]\+\).*/\1/p')
+#ip -4 -o addr show dev `netstat -rn | awk '/^0.0.0.0/ {thif=substr($0,74,10); print thif;} /^default.*UG/ {thif=substr($0,65,10); print thif;}'`| awk '{split($4,a,"/");print a[1]}'
 
 tee "$SYNOPKG_TEMP_LOGFILE" <<EOF
 [
