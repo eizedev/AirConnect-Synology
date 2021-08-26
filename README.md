@@ -13,6 +13,7 @@ It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream 
   - [Information](#information)
   - [How to install](#how-to-install)
     - [Download the pre-build Synology package](#download-the-pre-build-synology-package)
+      - [Synology Router SRM](#synology-router-srm)
       - [Static packages](#static-packages)
     - [Upgrade from DSM6 to DSM7](#upgrade-from-dsm6-to-dsm7)
     - [Install via GUI (Package Center)](#install-via-gui-package-center)
@@ -99,7 +100,9 @@ If the `x86` (32-bit) package is not working on your device, please download the
 
 You can check which architecture you have in the `Package Arch` column on the Synology [What kind of CPU does my Synology NAS have?](https://www.synology.com/en-us/knowledgebase/DSM/tutorial/Compatibility_Peripherals/What_kind_of_CPU_does_my_NAS_have) site.
 
-For the Synology **Routers** you should use the **ARM** (ARMv7 - dakota, ipq806x, northstarplus) version. If the normal ARM package is not working on your device, please try **ARM Static** instead.
+#### Synology Router SRM
+
+For all the Synology **Routers** running Synology SRM you should use the **ARM** (ARMv7 - dakota, ipq806x, northstarplus) version. If the normal ARM package is not working on your device, please try **ARM Static** instead.
 
 #### Static packages
 
