@@ -1,3 +1,13 @@
 #!/bin/sh
 
+LOG="${SYNOPKG_PKGDEST}/log/${AIRCONNECT_USER}.log"
+AIRCONNECT_CONFIG_FILE="airconnect.conf"
+
+echo "[$(date +'%T')] #### Start preupgrade... ####" >>"${LOG}"
+
+# backup of config file before upgrade
+/bin/cp -f "${SYNOPKG_PKGDEST}/${AIRCONNECT_CONFIG_FILE}" "${SYNOPKG_TEMP_UPGRADE_FOLDER}"
+
+echo "[$(date +'%T')] #### Done preupgrade ####" >>"${LOG}"
+
 exit 0

@@ -27,6 +27,9 @@ target/package.tgz: target
 target/scripts: target
 	cp -a scripts target
 
+target/WIZARD_UIFILES: target
+	cp -a WIZARD_UIFILES target
+
 target/conf: target
 	cp -a conf target
 
@@ -46,7 +49,7 @@ target/INFO: target
 	sed -i.bak -e 's/#INFO_FIRMWARE#/${INFO_FIRMWARE}/' target/INFO
 	rm target/INFO.bak
 
-dist/AirConnect-${ARCH}-${VERSION}.spk: target/package.tgz target/scripts target/conf target/LICENSE target/INFO target/PACKAGE_ICON.PNG dist
+dist/AirConnect-${ARCH}-${VERSION}.spk: target/package.tgz target/scripts target/WIZARD_UIFILES target/conf target/LICENSE target/INFO target/PACKAGE_ICON.PNG dist
 	$(if ${ARCH},$(info dist - Arch: ${ARCH}),$(error dist - Must specify ARCH))
 	cd target && tar -cf AirConnect-${ARCH}-${VERSION}.spk *
 	mv target/AirConnect-${ARCH}-${VERSION}.spk dist/
@@ -122,4 +125,4 @@ build-all: clean-dist
 
 .PHONY: shellcheck
 shellcheck:
-	shellcheck -s sh scripts/* build.sh
+	shellcheck -s sh scripts/* build.sh WIZARD_UIFILES/*

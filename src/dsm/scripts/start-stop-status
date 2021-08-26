@@ -3,104 +3,198 @@
 set -eu
 
 AIRCONNECT_USER="$(echo "${SYNOPKG_PKGNAME}" | awk '{print tolower($_)}')"
-CONFIG_UPNP_FILE="${SYNOPKG_PKGDEST}/config.xml"
-CONFIG_CAST_FILE="${SYNOPKG_PKGDEST}/config-cast.xml"
-AIRCONNECT_DESTINATION="${SYNOPKG_PKGDEST}/../../airconnect/"
+CONFIG_UPNP_FILE="config.xml"
+CONFIG_UPNP_DESTINATION="${SYNOPKG_PKGDEST}/${CONFIG_UPNP_FILE}"
+CONFIG_CAST_FILE="config-cast.xml"
+CONFIG_CAST_DESTINATION="${SYNOPKG_PKGDEST}/${CONFIG_CAST_FILE}"
+AIRCONNECT_DESTINATION="${SYNOPKG_PKGDEST_VOL}/airconnect"
+AIRCONNECT_CONFIG_FILE="airconnect.conf"
+AIRCONNECT_CONFIG="${SYNOPKG_PKGDEST}/${AIRCONNECT_CONFIG_FILE}"
 
-FILTER_AIRPLAY2_DEVICES="<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless"
 LOG="${SYNOPKG_PKGDEST}/log/${AIRCONNECT_USER}.log"
 
+# backward compatibility for older packages, airconnect configuration file is needed
+if [ ! -f "${AIRCONNECT_CONFIG}" ]; then
+    echo "[$(date +'%T')] AirConnect config file does not exist! Please uninstall the package and reinstall it again!" >>"$LOG"
+    echo "[$(date +'%T')] AirConnect config file does not exist! Please uninstall the package and reinstall it again!" >>"$SYNOPKG_TEMP_LOGFILE"
+    exit 150
+fi
+
+# import config file
+# shellcheck source=/dev/null
+. "${AIRCONNECT_CONFIG}"
+
+# pgrep not available by default on synology devices
+# shellcheck disable=SC2009
 get_pid() {
     PID=$(ps aux | grep -E 'airupnp|aircast' | grep -v grep | awk '{print $2}')
 }
 
 start_airconnect_on_ip() {
-    ip="$1"
-    port=49154
-    if [ -n "${port}" ]; then
-        if netstat -tlpn | grep :${port}; then
-            echo "[$(date +'%T')] Your selected port ${port} is already in use." >>"$LOG"
-            echo "[$(date +'%T')] Please check what is running on the port and try again." >>"$LOG"
-            echo "[$(date +'%T')] Port ${port} already in use. Please check what is running on the port and try again." >>"$SYNOPKG_TEMP_LOGFILE"
-            return 1
+    echo "[$(date +'%T')] Linking airconnect configuration to \"${AIRCONNECT_DESTINATION}/${AIRCONNECT_CONFIG_FILE}\"." >>"$LOG"
+    #if [ -f "${AIRCONNECT_DESTINATION}/${AIRCONNECT_CONFIG_FILE}" ]; then
+    #    rm -f "${AIRCONNECT_DESTINATION}/${AIRCONNECT_CONFIG_FILE}"
+    #fi
+    ln -fs "${AIRCONNECT_CONFIG}" "${AIRCONNECT_DESTINATION}/${AIRCONNECT_CONFIG_FILE}"
+
+    if [ "${AIRUPNP_ENABLED}" = 1 ] && [ "${AIRCAST_ENABLED}" = 1 ]; then
+        if [ -n "${AIRUPNP_PORT}" ]; then
+            if netstat -tln | grep :"${AIRUPNP_PORT}"; then
+                echo "[$(date +'%T')] Your selected port ${AIRUPNP_PORT} is already in use." >>"$LOG"
+                echo "[$(date +'%T')] Please check what is running on the port and try again." >>"$LOG"
+                echo "[$(date +'%T')] Port ${AIRUPNP_PORT} already in use. Please check what is running on the port and try again." >>"$SYNOPKG_TEMP_LOGFILE"
+                return 1
+            fi
+        else
+            echo "[$(date +'%T')] AIRUPNP port cannot be found! Please uninstall the package and reinstall it again (or set AIRUPNP_PORT in \"${AIRCONNECT_CONFIG}\")!" >>"$LOG"
+            echo "[$(date +'%T')] AIRUPNP port cannot be found! Please uninstall the package and reinstall it again (or set AIRUPNP_PORT in \"${AIRCONNECT_CONFIG}\")!" >>"$SYNOPKG_TEMP_LOGFILE"
+            exit 150
         fi
+
+        if [ -z "${AIRUPNP_LOGLEVEL}" ] || [ -z "${AIRCAST_LOGLEVEL}" ]; then
+            echo "[$(date +'%T')] Loglevel for AIRUPNP and AIRCAST cannot be found! Please uninstall the package and reinstall it again (or set AIRCAST_LOGLEVEL and AIRUPNP_LOGLEVEL in \"${AIRCONNECT_CONFIG}\")!" >>"$LOG"
+            echo "[$(date +'%T')] Loglevel for AIRUPNP and AIRCAST cannot be found! Please uninstall the package and reinstall it again (or set AIRCAST_LOGLEVEL and AIRUPNP_LOGLEVEL in \"${AIRCONNECT_CONFIG}\")!" >>"$SYNOPKG_TEMP_LOGFILE"
+            exit 150
+        fi
+
+        echo "[$(date +'%T')] Linking airupnp configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}\"." >>"$LOG"
+        ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}" "${CONFIG_UPNP_DESTINATION}"
+        echo "[$(date +'%T')] Starting airupnp on ${SYNO_IP}:${AIRUPNP_PORT}" >>"$LOG"
+        if [ -n "${FILTER_AIRPLAY2_DEVICES}" ] && [ -n "${AIRUPNP_LATENCY}" ]; then
+            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -l "${AIRUPNP_LATENCY}" -x "${CONFIG_UPNP_DESTINATION}" -o "${FILTER_AIRPLAY2_DEVICES}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
+        elif [ -n "${FILTER_AIRPLAY2_DEVICES}" ]; then
+            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -x "${CONFIG_UPNP_DESTINATION}" -o "${FILTER_AIRPLAY2_DEVICES}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
+        elif [ -n "${AIRUPNP_LATENCY}" ]; then
+            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -l "${AIRUPNP_LATENCY}" -x "${CONFIG_UPNP_DESTINATION}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
+        else
+            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -x "${CONFIG_UPNP_DESTINATION}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
+        fi
+        echo "[$(date +'%T')] Linking aircast configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}\"." >>"$LOG"
+        ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}" "${CONFIG_CAST_DESTINATION}"
+        echo "[$(date +'%T')] Starting aircast on ${SYNO_IP}" >>"$LOG"
+        if [ -n "${AIRCAST_LATENCY}" ]; then
+            "${SYNOPKG_PKGDEST}"/aircast -b "${SYNO_IP}" -l "${AIRCAST_LATENCY}" -x "${CONFIG_CAST_DESTINATION}" -z -f "${LOG}" -d "${AIRCAST_LOGLEVEL}" 2>&1
+        else
+            "${SYNOPKG_PKGDEST}"/aircast -b "${SYNO_IP}" -x "${CONFIG_CAST_DESTINATION}" -z -f "${LOG}" -d "${AIRCAST_LOGLEVEL}" 2>&1
+        fi
+    elif [ "${AIRUPNP_ENABLED}" = 1 ]; then
+        if [ -n "${AIRUPNP_PORT}" ]; then
+            if netstat -tln | grep :"${AIRUPNP_PORT}"; then
+                echo "[$(date +'%T')] Your selected port ${AIRUPNP_PORT} is already in use." >>"$LOG"
+                echo "[$(date +'%T')] Please check what is running on the port and try again." >>"$LOG"
+                echo "[$(date +'%T')] Port ${AIRUPNP_PORT} already in use. Please check what is running on the port and try again." >>"$SYNOPKG_TEMP_LOGFILE"
+                return 1
+            fi
+        else
+            echo "[$(date +'%T')] AIRUPNP port cannot be found! Please uninstall the package and reinstall it again (or set AIRUPNP_PORT in \"${AIRCONNECT_CONFIG}\")!" >>"$LOG"
+            echo "[$(date +'%T')] AIRUPNP port cannot be found! Please uninstall the package and reinstall it again (or set AIRUPNP_PORT in \"${AIRCONNECT_CONFIG}\")!" >>"$SYNOPKG_TEMP_LOGFILE"
+            exit 150
+        fi
+
+        if [ -z "${AIRUPNP_LOGLEVEL}" ]; then
+            echo "[$(date +'%T')] Loglevel for AIRUPNP cannot be found! Please uninstall the package and reinstall it again (or set AIRUPNP_LOGLEVEL in \"${AIRCONNECT_CONFIG}\")!" >>"$LOG"
+            echo "[$(date +'%T')] Loglevel for AIRUPNP cannot be found! Please uninstall the package and reinstall it again (or set AIRUPNP_LOGLEVEL in \"${AIRCONNECT_CONFIG}\")!" >>"$SYNOPKG_TEMP_LOGFILE"
+            exit 150
+        fi
+
+        echo "[$(date +'%T')] Linking airupnp configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}\"." >>"$LOG"
+        ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}" "${CONFIG_UPNP_DESTINATION}"
+        echo "[$(date +'%T')] Starting airupnp on ${SYNO_IP}:${AIRUPNP_PORT}" >>"$LOG"
+        if [ -n "${FILTER_AIRPLAY2_DEVICES}" ] && [ -n "${AIRUPNP_LATENCY}" ]; then
+            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -l "${AIRUPNP_LATENCY}" -x "${CONFIG_UPNP_DESTINATION}" -o "${FILTER_AIRPLAY2_DEVICES}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
+        elif [ -n "${FILTER_AIRPLAY2_DEVICES}" ]; then
+            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -x "${CONFIG_UPNP_DESTINATION}" -o "${FILTER_AIRPLAY2_DEVICES}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
+        elif [ -n "${AIRUPNP_LATENCY}" ]; then
+            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -l "${AIRUPNP_LATENCY}" -x "${CONFIG_UPNP_DESTINATION}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
+        else
+            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -x "${CONFIG_UPNP_DESTINATION}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
+        fi
+    elif [ "${AIRCAST_ENABLED}" = 1 ]; then
+        if [ -z "${AIRCAST_LOGLEVEL}" ]; then
+            echo "[$(date +'%T')] Loglevel for AIRCAST cannot be found! Please uninstall the package and reinstall it again (or set AIRCAST_LOGLEVEL in \"${AIRCONNECT_CONFIG}\")!" >>"$LOG"
+            echo "[$(date +'%T')] Loglevel for AIRCAST cannot be found! Please uninstall the package and reinstall it again (or set AIRCAST_LOGLEVEL in \"${AIRCONNECT_CONFIG}\")!" >>"$SYNOPKG_TEMP_LOGFILE"
+            exit 150
+        fi
+
+        echo "[$(date +'%T')] Linking aircast configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}\"." >>"$LOG"
+        ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}" "${CONFIG_CAST_DESTINATION}"
+        echo "[$(date +'%T')] Starting aircast on ${SYNO_IP}" >>"$LOG"
+        if [ -n "${AIRCAST_LATENCY}" ]; then
+            "${SYNOPKG_PKGDEST}"/aircast -b "${SYNO_IP}" -l "${AIRCAST_LATENCY}" -x "${CONFIG_CAST_DESTINATION}" -z -f "${LOG}" -d "${AIRCAST_LOGLEVEL}" 2>&1
+        else
+            "${SYNOPKG_PKGDEST}"/aircast -b "${SYNO_IP}" -x "${CONFIG_CAST_DESTINATION}" -z -f "${LOG}" -d "${AIRCAST_LOGLEVEL}" 2>&1
+        fi
+    else
+        echo "[$(date +'%T')] Neither airupnp nor aircast should be launched! Please uninstall the package and reinstall it again (or set AIRUPNP_ENABLED=1 and/or AIRCAST_ENABLED=1 in \"${AIRCONNECT_CONFIG}\")!" >>"$LOG"
+        echo "[$(date +'%T')] Neither airupnp nor aircast should be launched! Please uninstall the package and reinstall it again (or set AIRUPNP_ENABLED=1 and/or AIRCAST_ENABLED=1 in \"${AIRCONNECT_CONFIG}\")!" >>"$SYNOPKG_TEMP_LOGFILE"
+        return 150
     fi
-    echo "[$(date +'%T')] Linking airupnp configuration to \"${AIRCONNECT_DESTINATION}\"." >>"$LOG"
-    ln -s "${AIRCONNECT_DESTINATION}" "${CONFIG_UPNP_FILE}"
-    echo "[$(date +'%T')] Starting airupnp on ${ip}:${port}" >>"$LOG"
-    ${SYNOPKG_PKGDEST}/airupnp -b "${ip}":"${port}" -l 1000:2000 -x "${CONFIG_UPNP_FILE}" -o "${FILTER_AIRPLAY2_DEVICES}" -z -f "${LOG}" -d "all=info" 2>&1
-
-    echo "[$(date +'%T')] Linking aircast configuration to \"${AIRCONNECT_DESTINATION}\"." >>"$LOG"
-    ln -s "${AIRCONNECT_DESTINATION}" "${CONFIG_CAST_FILE}"
-    echo "[$(date +'%T')] Starting aircast on ${ip}" >>"$LOG"
-    ${SYNOPKG_PKGDEST}/aircast -b "${ip}" -l 1000:2000 -x "${CONFIG_CAST_FILE}" -z -f "${LOG}" -d "all=info" 2>&1
-
     return 0
 }
 
 start_airconnect() {
-    # If you want to start the airconnect processes on a specific IP please uncomment the following lines
-    # and set your own local IP address:
-    #
-    # start_airconnect_on_ip "1.2.3.4" || true
-    # return 0
-
-    interface=$(awk '$2 == 00000000 { print $1 }' /proc/net/route)
-    if [ -z "$interface" ]; then
-        echo "[$(date +'%T')] Failed to get local default Ethernet interface" >>"$LOG"
-        echo "[$(date +'%T')] Failed to get local default Ethernet interface" >>"$SYNOPKG_TEMP_LOGFILE"
-        return 1
-    fi
-
-    ip=$(ip addr show dev "$interface" | awk '$1 == "inet" { sub("/.*", "", $2); print $2 }')
-
-    if [ -n "$ip" ]; then
-        if start_airconnect_on_ip "$ip"; then
-            echo "[$(date +'%T')] AirConnect successfully started on ip \"${ip}\"!" >>"$LOG"
+    if [ -n "${SYNO_IP}" ]; then
+        if start_airconnect_on_ip; then
+            echo "[$(date +'%T')] AirConnect successfully started on ip \"${SYNO_IP}\"!" >>"$LOG"
             return 0
         else
-            echo "[$(date +'%T')] Failed to start AirConnect on ip \"${ip}\", stopping it..." >>"$LOG"
-            echo "[$(date +'%T')] Failed to start AirConnect on ip \"${ip}\", stopping it..." >>"$SYNOPKG_TEMP_LOGFILE"
+            echo "[$(date +'%T')] Failed to start AirConnect on ip \"${SYNO_IP}\", stopping it..." >>"$LOG"
+            echo "[$(date +'%T')] Failed to start AirConnect on ip \"${SYNO_IP}\", stopping it..." >>"$SYNOPKG_TEMP_LOGFILE"
             stop_airconnect
         fi
+    else
+        echo "[$(date +'%T')] Synology IP cannot be found! Please uninstall the package and reinstall it again (or change SYNO_IP in \"${AIRCONNECT_CONFIG}\")!" >>"$LOG"
+        echo "[$(date +'%T')] Synology IP cannot be found! Please uninstall the package and reinstall it again! (or change SYNO_IP in \"${AIRCONNECT_CONFIG}\")" >>"$SYNOPKG_TEMP_LOGFILE"
+        exit 150
     fi
-    echo "[$(date +'%T')] Failed to start AirConnect on the local interface \"${interface}\", please make sure this is the correct interface you have at least one UPnP/Sonos/Chromecast device on your network" >>"$LOG"
-    echo "[$(date +'%T')] Failed to start AirConnect on the local interface \"${interface}\", please make sure this is the correct interface you have at least one UPnP/Sonos/Chromecast device on your network" >>"$SYNOPKG_TEMP_LOGFILE"
-    return 1
 }
 
 stop_airconnect() {
     get_pid
-    kill $PID
+    if [ -n "${PID}" ]; then
+        # shellcheck disable=SC2086
+        kill $PID
+    else
+        return 0
+    fi
     sleep 10
 
-    # Check if ps has ax options
-    if ps ax >/dev/null 2>&1; then
-        # shellcheck disable=SC2009
-        if ! ps ax | grep -E 'airupnp' | grep -v -q grep && ! ps ax | grep -E 'aircast' | grep -v -q grep; then
-            return 0
-        elif ps ax | grep -E 'airupnp' | grep -v -q grep && ps ax | grep -E 'aircast' | grep -v -q grep; then
-            echo "[$(date +'%T')] Stop: airupnp & aircast are still running!" >>"$LOG"
-            return 1
-        elif ! ps ax | grep -E 'airupnp' | grep -v -q grep && ps ax | grep -E 'aircast' | grep -v -q grep; then
-            echo "[$(date +'%T')] Stop: aircast is still running!" >>"$LOG"
-            return 1
-        elif ps ax | grep -E 'airupnp' | grep -v -q grep && ! ps ax | grep -E 'aircast' | grep -v -q grep; then
-            echo "[$(date +'%T')] Stop: airupnp is still running!" >>"$LOG"
-            return 1
-        fi
-    else
+    if [ "${AIRUPNP_ENABLED}" = 1 ] && [ "${AIRCAST_ENABLED}" = 1 ]; then
+        # pgrep not available by default on synology devices
         # shellcheck disable=SC2009
         if ! ps | grep -E 'airupnp' | grep -v -q grep && ! ps | grep -E 'aircast' | grep -v -q grep; then
             return 0
         elif ps | grep -E 'airupnp' | grep -v -q grep && ps | grep -E 'aircast' | grep -v -q grep; then
             echo "[$(date +'%T')] Stop: airupnp & aircast are still running!" >>"$LOG"
+            echo "[$(date +'%T')] Stop: airupnp & aircast are still running" >>"$SYNOPKG_TEMP_LOGFILE"
             return 1
         elif ! ps | grep -E 'airupnp' | grep -v -q grep && ps | grep -E 'aircast' | grep -v -q grep; then
             echo "[$(date +'%T')] Stop: aircast is still running!" >>"$LOG"
+            echo "[$(date +'%T')] Stop: aircast is still running!" >>"$SYNOPKG_TEMP_LOGFILE"
             return 1
         elif ps | grep -E 'airupnp' | grep -v -q grep && ! ps | grep -E 'aircast' | grep -v -q grep; then
             echo "[$(date +'%T')] Stop: airupnp is still running!" >>"$LOG"
+            echo "[$(date +'%T')] Stop: airupnp is still running!" >>"$SYNOPKG_TEMP_LOGFILE"
+            return 1
+        fi
+    elif [ "${AIRUPNP_ENABLED}" = 1 ]; then
+        # pgrep not available by default on synology devices
+        # shellcheck disable=SC2009
+        if ! ps | grep -E 'airupnp' | grep -v -q grep; then
+            return 0
+        else
+            echo "[$(date +'%T')] Stop: airupnp is still running!" >>"$LOG"
+            echo "[$(date +'%T')] Stop: airupnp is still running!" >>"$SYNOPKG_TEMP_LOGFILE"
+            return 1
+        fi
+    elif [ "${AIRCAST_ENABLED}" = 1 ]; then
+        # pgrep not available by default on synology devices
+        # shellcheck disable=SC2009
+        if ! ps | grep -E 'aircast' | grep -v -q grep; then
+            return 0
+        else
+            echo "[$(date +'%T')] Stop: aircast is still running!" >>"$LOG"
+            echo "[$(date +'%T')] Stop: aircast is still running!" >>"$SYNOPKG_TEMP_LOGFILE"
             return 1
         fi
     fi
@@ -108,23 +202,8 @@ stop_airconnect() {
 }
 
 airconnect_status() {
-    # Check if ps has ax options
-    if ps ax >/dev/null 2>&1; then
-        # shellcheck disable=SC2009
-        if ps ax | grep -E 'airupnp' | grep -v -q grep && ps ax | grep -E 'aircast' | grep -v -q grep; then
-            return 0
-        elif ! ps ax | grep -E 'airupnp' | grep -v -q grep && ! ps ax | grep -E 'aircast' | grep -v -q grep; then
-            return 3
-        elif ! ps ax | grep -E 'airupnp' | grep -v -q grep && ps ax | grep -E 'aircast' | grep -v -q grep; then
-            echo "[$(date +'%T')] Status: airupnp not running!" >>"$LOG"
-            return 3
-        elif ps ax | grep -E 'airupnp' | grep -v -q grep && ! ps ax | grep -E 'aircast' | grep -v -q grep; then
-            echo "[$(date +'%T')] Status: aircast not running!" >>"$LOG"
-            return 3
-        else
-            return 4
-        fi
-    else
+    if [ "${AIRUPNP_ENABLED}" = 1 ] && [ "${AIRCAST_ENABLED}" = 1 ]; then
+        # pgrep not available by default on synology devices
         # shellcheck disable=SC2009
         if ps | grep -E 'airupnp' | grep -v -q grep && ps | grep -E 'aircast' | grep -v -q grep; then
             return 0
@@ -138,6 +217,24 @@ airconnect_status() {
             return 3
         else
             return 4
+        fi
+    elif [ "${AIRUPNP_ENABLED}" = 1 ]; then
+        # pgrep not available by default on synology devices
+        # shellcheck disable=SC2009
+        if ps | grep -E 'airupnp' | grep -v -q grep; then
+            return 0
+        else
+            echo "[$(date +'%T')] Status: airupnp not running!" >>"$LOG"
+            return 3
+        fi
+    elif [ "${AIRCAST_ENABLED}" = 1 ]; then
+        # pgrep not available by default on synology devices
+        # shellcheck disable=SC2009
+        if ps | grep -E 'aircast' | grep -v -q grep; then
+            return 0
+        else
+            echo "[$(date +'%T')] Status: aircast not running!" >>"$LOG"
+            return 3
         fi
     fi
     # return unknown if nothing matched
