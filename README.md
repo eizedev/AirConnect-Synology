@@ -21,6 +21,7 @@ It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream 
       - [DSM 6](#dsm-6)
     - [Logfiles](#logfiles)
   - [airconnect.conf](#airconnectconf)
+    - [Editing airconnect.conf using your PC](#editing-airconnectconf-using-your-pc)
   - [How it works](#how-it-works)
     - [Supported UPnP Speakers](#supported-upnp-speakers)
       - [How to detect UPnP speakers on your network](#how-to-detect-upnp-speakers-on-your-network)
@@ -30,6 +31,7 @@ It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream 
       - [airupnp](#airupnp)
       - [aircast](#aircast)
     - [airupnp and aircast configuration](#airupnp-and-aircast-configuration)
+      - [Editing config files using your PC](#editing-config-files-using-your-pc)
     - [Player specific settings, hints and tips](#player-specific-settings-hints-and-tips)
       - [Sonos](#sonos)
       - [Bose SoundTouch](#bose-soundtouch)
@@ -195,6 +197,19 @@ SYNO_IP="<your synology ip>"
 
 Configuration options with `Mandatory = Yes` must exist in the configuration. Options with `Mandatory = No` are optional.
 
+> Please do not remove the optional configuration options you do not want to use, just set no value (empty value/string). Example: `FILTER_AIRPLAY2_DEVICES=""`
+
+### Editing airconnect.conf using your PC
+
+If you want to edit your `airconnect.conf` file from your computer using a network share (SMB) you need to `allow symlinks` in your SMB configuration on your synology NAS device.
+
+`Settings/Control Panel` - `File Services` - `SMB` - `Advanced Settings`
+
+Please activate both options:
+
+![AirConnect-Installation-Connection](doc/res/smb_symlink.png)
+
+
 ## How it works
 
 It runs the AirConnect processes with the following options by default tuned for sonos:
@@ -272,7 +287,7 @@ If you would like to tweak the AirConnect configuration you can also use the Air
 
 #### airupnp
 
-```bash
+```txt
 v0.2.41.0 (Dec  8 2020 @ 18:43:14)
 See -t for license terms
 Usage: [options]
@@ -290,7 +305,7 @@ Usage: [options]
   -p <pid file>         write PID in file
   -m <n1,n2...>         exclude devices whose model include tokens
   -n <m1,m2,...>        exclude devices whose name includes tokens
-  -o <m1,m2,...>        include only listed models; overrides -m and -n (use <NULL> if player don't return a model)
+  -o <m1,m2,...>        include only listed models; overrides -m and -n (use <NULL> if player do not return a model)
   -d <log>=<level>      Set logging level, logs: all|raop|main|util|upnp, level: error|warn|info|debug|sdebug
   -z                    Daemonize
   -Z                    NOT interactive
@@ -300,7 +315,7 @@ Usage: [options]
 
 #### aircast
 
-```bash
+```txt
 v0.2.41.0 (Dec  8 2020 @ 18:41:57)
 See -t for license terms
 Usage: [options]
@@ -343,6 +358,16 @@ Example:
 ```
 
 After running this command, airupnp will be started until all needed information and devices are gathered, stopped and the resulted configuration will be written to the defined config file.
+
+#### Editing config files using your PC
+
+If you want to edit your `config.xml` or `config_cast.xml` file from your computer using a network share (SMB) you need to `allow symlinks` in your SMB configuration on your synology NAS device.
+
+`Settings/Control Panel` - `File Services` - `SMB` - `Advanced Settings`
+
+Please activate both options:
+
+![AirConnect-Installation-Connection](doc/res/smb_symlink.png)
 
 ### Player specific settings, hints and tips
 
