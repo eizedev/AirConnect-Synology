@@ -167,6 +167,8 @@ If you encounter any problems, please read the [troubleshooting](#troubleshootin
 
 > Only available for DSM 7 packages!
 
+> Please keep in mind, that if you upgrade your existing AirConnect-Synology package no changes will be made to the `airconnect.conf` file. If you want to overwrite your `airconnect.conf` configuration with the default one, please uninstall and install the package again. You can also copy the default values found below to your configuration file.
+
 Starting with release `0.2.50.5-20210801` you can customize the configuration of AirConnect-Synology by using the config file at `/volume1/airconnect/airconnect.conf`.  
 Please **stop** the package **before** changing the configuration.  
 If you have edited the configuration while AirConnect is running please **restart** the AirConnect package.
