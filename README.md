@@ -139,6 +139,8 @@ If you encounter any problems, please read the [troubleshooting](#troubleshootin
 
 #### DSM 6
 
+> Please use the older release for DSM 5 & 6: [0.2.50.5-20210706](https://github.com/eizedev/AirConnect-Synology/releases/tag/0.2.50.5-20210706)
+
 - Open the Package Center app.
 - Click on **Manual Install** and upload the package you just downloaded.
 
