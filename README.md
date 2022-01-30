@@ -363,7 +363,7 @@ After running this command, airupnp will be started until all needed information
 
 #### Editing config files using your PC
 
-If you want to edit your `config.xml` or `config_cast.xml` file from your computer using a network share (SMB) you need to `allow symlinks` in your SMB configuration on your synology NAS device.
+If you want to edit your `config.xml` or `config-cast.xml` file from your computer using a network share (SMB) you need to `allow symlinks` in your SMB configuration on your synology NAS device.
 
 `Settings/Control Panel` - `File Services` - `SMB` - `Advanced Settings`
 
