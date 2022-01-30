@@ -181,7 +181,7 @@ AIRUPNP_ENABLED=1
 AIRUPNP_LATENCY="1000:2000"
 AIRUPNP_LOGLEVEL="all=info"
 AIRUPNP_PORT=49154
-FILTER_AIRPLAY2_DEVICES="<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless"
+FILTER_AIRPLAY2_DEVICES="<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam"
 SYNO_IP="<your synology ip>"
 ```
 
@@ -199,7 +199,7 @@ SYNO_IP="<your synology ip>"
 
 Configuration options with `Mandatory = Yes` must exist in the configuration. Options with `Mandatory = No` are optional.
 
-> Please do not remove the optional configuration options you do not want to use, just set no value (empty value/string). Example: `FILTER_AIRPLAY2_DEVICES=""`
+> Please do not remove the optional configuration options you do not want to use, just set no value (empty value/string). Example: `FILTER_AIRPLAY2_DEVICES=`
 
 ### Editing airconnect.conf using your PC
 
@@ -211,13 +211,12 @@ Please activate both options:
 
 ![AirConnect-Installation-Connection](doc/res/smb_symlink.png)
 
-
 ## How it works
 
 It runs the AirConnect processes with the following options by default tuned for sonos:
 
 ```bash
-/volume1/@appstore/AirConnect/airupnp -b [synology device local ip]:49154 -l 1000:2000 -x "/volume1/@appstore/AirConnect/config.xml" -o "<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless" -z -f "/volume1/@appstore/AirConnect/log/airconnect.log" -d all=info  
+/volume1/@appstore/AirConnect/airupnp -b [synology device local ip]:49154 -l 1000:2000 -x "/volume1/@appstore/AirConnect/config.xml" -o "<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam" -z -f "/volume1/@appstore/AirConnect/log/airconnect.log" -d all=info  
 /volume1/@appstore/AirConnect/aircast -b [synology device local ip] -l 1000:2000 -x "/volume1/@appstore/AirConnect/config-cast.xml" -z -f "/volume1/@appstore/AirConnect/log/airconnect.log" -d all=info
 ```
 
@@ -341,6 +340,8 @@ Usage: [options]
 
 ### airupnp and aircast configuration
 
+> Hint: If you want to filter/include/exclude speakers in the configuration file or `airupnp` you need to disable the default filter in `airconnect.conf` using `FILTER_AIRPLAY2_DEVICES=`. See also [airconnect.conf](#airconnectconf). The default filter will overwrite any filter in the `config.xml` file of airupnp.
+
 By default the config file will **not** being used as long as the file is not created (And you are not running on debug log level). The file is **not** created by default.  
 
 - Config File location for airupnp
@@ -395,7 +396,7 @@ Check the [Configuration](#configuration) section on how to apply the below tuni
 
 Some of these speakers only support mp3 and require a modified `ProtocolInfo` to stream correctly. This can be done by editing the [config file](#configuration) and changing `<codec>flac</codec>` to `<codec>mp3</codec>` and replacing the `<mp3>..</mp3>` line with:
 
-```html
+```c++
 <mp3>http-get:*:audio/mpeg:DLNA.ORG_PN=MP3;DLNA.ORG_OP=00;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=0d500000000000000000000000000000</mp3>
 ```
 
