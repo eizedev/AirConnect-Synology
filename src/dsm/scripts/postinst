@@ -35,7 +35,7 @@ if [ "$SYNOPKG_PKG_STATUS" = "INSTALL" ]; then
             echo "[$(date +'%T')] Setting AIRUPNP_LATENCY=\"1000:2000\" n \"${AIRCONNECT_CONFIG}\""
             echo "[$(date +'%T')] Setting AIRUPNP_LOGLEVEL=\"all=info\" in \"${AIRCONNECT_CONFIG}\""
             echo "[$(date +'%T')] Setting AIRUPNP_PORT=${pkgwizard_airupnp_port} in \"${AIRCONNECT_CONFIG}\""
-            echo "[$(date +'%T')] Setting FILTER_AIRPLAY2_DEVICES=\"<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam\" in \"${AIRCONNECT_CONFIG}\""
+            echo "[$(date +'%T')] Setting FILTER_AIRPLAY2_DEVICES=\"<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam,2.2.6\" in \"${AIRCONNECT_CONFIG}\""
         } >>"$LOG"
         {
             echo "AIRCAST_ENABLED=0"
@@ -45,7 +45,7 @@ if [ "$SYNOPKG_PKG_STATUS" = "INSTALL" ]; then
             echo "AIRUPNP_LATENCY=\"1000:2000\""
             echo "AIRUPNP_LOGLEVEL=\"all=info\""
             echo "AIRUPNP_PORT=${pkgwizard_airupnp_port}"
-            echo "FILTER_AIRPLAY2_DEVICES=\"<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam\""
+            echo "FILTER_AIRPLAY2_DEVICES=\"<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam,2.2.6\""
         } >>"${AIRCONNECT_CONFIG}"
     else
         {
@@ -56,7 +56,7 @@ if [ "$SYNOPKG_PKG_STATUS" = "INSTALL" ]; then
             echo "[$(date +'%T')] Setting AIRUPNP_LATENCY=\"1000:2000\" n \"${AIRCONNECT_CONFIG}\""
             echo "[$(date +'%T')] Setting AIRUPNP_LOGLEVEL=\"all=info\" in \"${AIRCONNECT_CONFIG}\""
             echo "[$(date +'%T')] Setting AIRUPNP_PORT=${pkgwizard_airupnp_port} in \"${AIRCONNECT_CONFIG}\""
-            echo "[$(date +'%T')] Setting FILTER_AIRPLAY2_DEVICES=\"<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam\" in \"${AIRCONNECT_CONFIG}\""
+            echo "[$(date +'%T')] Setting FILTER_AIRPLAY2_DEVICES=\"<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam,2.2.6\" in \"${AIRCONNECT_CONFIG}\""
         } >>"$LOG"
         {
             echo "AIRCAST_ENABLED=1"
@@ -66,7 +66,7 @@ if [ "$SYNOPKG_PKG_STATUS" = "INSTALL" ]; then
             echo "AIRUPNP_LATENCY=\"1000:2000\""
             echo "AIRUPNP_LOGLEVEL=\"all=info\""
             echo "AIRUPNP_PORT=${pkgwizard_airupnp_port}"
-            echo "FILTER_AIRPLAY2_DEVICES=\"<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam\""
+            echo "FILTER_AIRPLAY2_DEVICES=\"<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam,2.2.6\""
         } >>"${AIRCONNECT_CONFIG}"
     fi
 
