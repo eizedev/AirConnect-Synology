@@ -167,6 +167,8 @@ If you encounter any problems, please read the [troubleshooting](#troubleshootin
 
 > Only available for DSM 7 packages!
 
+> You cannot view/edit the file with FileStation due to a limitation in synology DMS (Symbolik links) by default
+
 > Please keep in mind, that if you upgrade your existing AirConnect-Synology package no changes will be made to the `airconnect.conf` file. If you want to overwrite your `airconnect.conf` configuration with the default one, please uninstall and install the package again. You can also copy the default values found below to your configuration file.
 
 Starting with release `0.2.50.5-20210801` you can customize the configuration of AirConnect-Synology by using the config file at `/volume1/airconnect/airconnect.conf`.  
@@ -343,6 +345,8 @@ Usage: [options]
 ```
 
 ### airupnp and aircast configuration
+
+> You cannot view/edit the file with FileStation due to a limitation in synology DMS (Symbolik links) by default
 
 > Hint: If you want to filter/include/exclude speakers in the configuration file or `airupnp` you need to disable the default filter in `airconnect.conf` using `FILTER_AIRPLAY2_DEVICES=`. See also [airconnect.conf](#airconnectconf). The default filter will overwrite any filter in the `config.xml` file of airupnp.
 
