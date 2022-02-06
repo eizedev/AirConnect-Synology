@@ -185,7 +185,7 @@ AIRUPNP_ENABLED=1
 AIRUPNP_LATENCY="1000:2000"
 AIRUPNP_LOGLEVEL="all=info"
 AIRUPNP_PORT=49154
-FILTER_AIRPLAY2_DEVICES="<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam,2.2.6"
+FILTER_AIRPLAY2_DEVICES="<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam,2.2.6,AllShare1.0"
 SYNO_IP="<your synology ip>"
 ```
 
@@ -220,7 +220,7 @@ Please activate both options:
 It runs the AirConnect processes with the following options by default tuned for sonos:
 
 ```bash
-/volume1/@appstore/AirConnect/airupnp -b [synology device local ip]:49154 -l 1000:2000 -x "/volume1/@appstore/AirConnect/config.xml" -o "<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam,2.2.6" -z -f "/volume1/@appstore/AirConnect/log/airconnect.log" -d all=info  
+/volume1/@appstore/AirConnect/airupnp -b [synology device local ip]:49154 -l 1000:2000 -x "/volume1/@appstore/AirConnect/config.xml" -o "<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam,2.2.6,AllShare1.0" -z -f "/volume1/@appstore/AirConnect/log/airconnect.log" -d all=info  
 /volume1/@appstore/AirConnect/aircast -b [synology device local ip] -l 1000:2000 -x "/volume1/@appstore/AirConnect/config-cast.xml" -z -f "/volume1/@appstore/AirConnect/log/airconnect.log" -d all=info
 ```
 
@@ -232,7 +232,7 @@ To speed up the detection of Sonos/UPnP/DLNA speakers and to not discover speake
 
 > If you have another UPnP based speaker that you want to be supported by this package which is not in the list below, please open an [issue](https://github.com/eizedev/AirConnect-Synology/issues) and let me know (Please tell me the product name (**model name**, **model number** etc.)), then i will include it to the default configuration.
 
-> With `-o <NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwillian,2.2.6` the sonos/UPnP speakers that are natively supporting AirPlay or AirPlay2 will be ignored from AirConnect/airupnp and only the ones listed with `-o` will be used. Since no new "non airplay" speakers (from sonos) will be released in the future, that should work in any case. So they will be not displayed twice in the list.
+> With `-o <NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwillian,2.2.6,AllShare1.0` the sonos/UPnP speakers that are natively supporting AirPlay or AirPlay2 will be ignored from AirConnect/airupnp and only the ones listed with `-o` will be used. Since no new "non airplay" speakers (from sonos) will be released in the future, that should work in any case. So they will be not displayed twice in the list.
 
 #### How to detect UPnP speakers on your network
 
@@ -277,6 +277,7 @@ This modelNumber is the number that i need to extend the following [List of supp
 | LibreWireless | LibreWireless based Speakers        | LibreSyncDMR                   |
 | Fitzwilliam   | Fitzwilliam                         | Fitzwilliam                    |
 | 2.2.6         | Devialet Expert Pro 140             | Devialet Export Pro            |
+| AllShare1.0   | Samsung HW-N950                     | Samsung HW-N950 Soundbar       |
 | `<NULL>`      | All speakers without a model number |                                |
 
 See [Command-Line Arguemts](#command-line-arguemts) for more information about these arguments.
