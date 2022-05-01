@@ -4,7 +4,7 @@
 
 ![AirConnect-Synology Logo](doc/res/header.png)
 
-> Compatible with DSM 7! Please download package with name beginning with `AirConnect-dsm7-`.
+> Compatible with DSM 7.0 and DSM 7.1! Please download the package with the name beginning with `AirConnect-dsm7-`.
 
 A minimal Synology package for [AirConnect](https://github.com/philippe44/AirConnect).  
 It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream to **UPnP/Sonos** & **Chromecast** devices that do not natively support AirPlay.  
