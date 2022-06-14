@@ -108,10 +108,10 @@ For all the Synology **Routers** running Synology SRM you should use the **ARM**
 
 #### Static packages
 
-On some devices, dependencies that are necessary to run airupnp or aircast are not available (mostly on older devices).
+On some devices, dependencies that are necessary to run `airupnp` or `aircast` are not available (mostly on older devices).
 These dependencies are included in the static version of the packages. This is the reason why the static packages are bigger than the normal versions.
 
-So in general always you should always use the normal package (with static in the name), not the static one. Only when the normal package does not work on your device, please test the static package instead.
+So in general you should always use the normal package (without static in the name). Only when the normal package does not work on your device, please test the static package instead.
 
 > If the above **ARMv7** package will not work on your device, please download the latest `arm-static` package. The static package includes "static" binaries, that means, it includes binaries that have no external library dependencies and **should** be run on your ARMv7 device if the normal ARMv7 package fails.
 
