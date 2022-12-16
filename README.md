@@ -4,7 +4,8 @@
 
 ![AirConnect-Synology Logo](doc/res/header.png)
 
-> Compatible with DSM 7.0 and DSM 7.1! Please download the package with the name beginning with `AirConnect-dsm7-`.
+> Compatible with DSM 7.0 and DSM 7.1! Please download the package with the name beginning with `AirConnect-dsm7-`
+
 > Updated packages for `AirConnect 1.0` available!
 
 A minimal Synology package for [AirConnect](https://github.com/philippe44/AirConnect).  
