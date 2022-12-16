@@ -134,12 +134,12 @@ So in general you should always use the normal package (without static in the na
 Only when the normal package does not work on your device, please test the static package instead.
 
 > If the above **ARMv7** package will not work on your device, please download the latest `arm-static` package.
-The static package includes "static" binaries, that means, it includes binaries that have no external library dependencies and
-**should** be run on your ARMv7 device if the normal ARMv7 package fails.
+> The static package includes "static" binaries, that means, it includes binaries that have no external library dependencies and
+> **should** be run on your ARMv7 device if the normal ARMv7 package fails.
 >
 > If the above **PowerPC** package will not work on your device, please download the latest `ppc-static` package.
-The static package includes "static" binaries, that means, it includes binaries that have no external library dependencies and
-**should** be run on your PPC device if the normal PPC package fails.
+> The static package includes "static" binaries, that means, it includes binaries that have no external library dependencies and
+> **should** be run on your PPC device if the normal PPC package fails.
 
 ### Upgrade from DSM6 to DSM7
 
