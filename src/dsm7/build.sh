@@ -10,7 +10,7 @@ ARCH_LIST="arm arm-static armv6 aarch64 aarch64-static x86 x86-64 powerpc powerp
 MAKE=$(which make)
 
 for arch in ${ARCH_LIST}; do
-  export ARCH=${arch}
+  export ARCH="${arch}"
   $MAKE clean build
 done
 
