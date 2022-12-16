@@ -116,13 +116,13 @@ x86-static:
 
 .PHONY: x86_64
 x86_64:
-	$(eval export INFO_ARCH=x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap v1000 geminilake purley)
+	$(eval export INFO_ARCH=x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk broadwellnkv2 Broadwellntbap v1000 geminilake purley)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
 .PHONY: x86_64-static
 x86_64-static:
-	$(eval export INFO_ARCH=x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap v1000 geminilake purley)
+	$(eval export INFO_ARCH=x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk broadwellnkv2 Broadwellntbap v1000 geminilake purley)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
