@@ -5,6 +5,7 @@
 ![AirConnect-Synology Logo](doc/res/header.png)
 
 > Compatible with DSM 7.0 and DSM 7.1! Please download the package with the name beginning with `AirConnect-dsm7-`.
+> Updated packages for `AirConnect 1.0` available!
 
 A minimal Synology package for [AirConnect](https://github.com/philippe44/AirConnect).  
 It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay) to stream to **UPnP/Sonos** & **Chromecast** devices that do not natively support AirPlay.  
@@ -79,32 +80,35 @@ You can find the available packages under [releases](https://github.com/eizedev/
 
 | DSM Firmware Version                              | Package Naming                                                                         |
 | ------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| DSM 5.0-xxxx AND DSM 6.0-xxxx (f.e. DSM 6.0-7321) | `AirConnect-x86-64-${VERSION}` (f.e. AirConnect-x86-64-0.2.50.5-20210630.spk)          |
-| DSM 7.0-xxxx (f.e. DSM 7.0-40000)                 | `AirConnect-dsm7-x86-64-${VERSION}` (f.e. AirConnect-dsm7-86-64-0.2.50.5-20210630.spk) |
+| DSM 5.0-xxxx AND DSM 6.0-xxxx (f.e. DSM 6.0-7321) | `AirConnect-x86_64-${VERSION}` (f.e. AirConnect-x86_64-0.2.50.5-20210630.spk)          |
+| DSM 7.0-xxxx (f.e. DSM 7.0-40000)                 | `AirConnect-dsm7-x86_64-${VERSION}` (f.e. AirConnect-dsm7-86-64-0.2.50.5-20210630.spk) |
 
 The minimum firmware version for the DSM7 packages is **DSM 7.0-40000)**.  
-The minimum firmware version for the x86_64 package `AirConnect-x86-64-${VERSION}` is **DSM 6.0-7321**.  
+The minimum firmware version for the x86_64 package `AirConnect-x86_64-${VERSION}` is **DSM 6.0-7321**.  
 For **all** other package the minimum firmware version is DSM **5.0-4458**.
 
-If the `x86` (32-bit) package is not working on your device, please download the `x86-64` (64-bit) package instead.
+If the `x86` (32-bit) package is not working on your device, please download the `x86_64` (64-bit) package instead.
 
-| Architecture Group                | Architecture                                                                                                                                                              | Package to download                           |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| **ARMv5**                         | 88f6282, 88f6281, 88f628x                                                                                                                                                 | `AirConnect-(dsm7-)arm5-${VERSION}`           |
-| **ARMv7**                         | ipq806x, ipq806x, armada370, armadaxp, armada375, armada38x, alpine, alpine4k, monaco, comcerto2k, hi3535, dakota, ipq806x, northstarplus                                 | `AirConnect-(dsm7-)arm-${VERSION}`            |
-| **ARMv7 Static**                  | noarch, ipq806x, ipq806x, armada370, armadaxp, armada375, armada38x, alpine, alpine4k, monaco, comcerto2k, hi3535, dakota, ipq806x, northstarplus                         | `AirConnect-a(dsm7-)rm-static-${VERSION}`     |
-| **ARMv8**                         | rtd1296, armada37xx                                                                                                                                                       | `AirConnect-(dsm7-)aarch64-${VERSION}`        |
-| **ARMv8 Static**                  | noarch, rtd1296, armada37xx                                                                                                                                               | `AirConnect-(dsm7-)aarch64-static-${VERSION}` |
-| **PowerPC**                       | qoriq, Ppc853x                                                                                                                                                            | `AirConnect-(dsm7-)ppc-${VERSION}`            |
-| **PowerPC Static**                | noarch, qoriq, Ppc853x                                                                                                                                                    | `AirConnect-(dsm7-)ppc-static-${VERSION}`     |
-| **Intel - 32-bit**                | x86, cedarview, bromolow, evansport, braswell, broadwell, dockerx64, kvmx64, denverton, grantley, broadwellnk, Broadwellntbap                                             | `AirConnect-(dsm7-)x86-${VERSION}`            |
-| **Intel/AMD - 64-bit (DSM 6.0+)** | x86_64, x64, cedarview, bromolow, avoton, braswell, broadwell, apollolake, dockerx64, kvmx64, denverton, grantley, broadwellnk, Broadwellntbap, v1000, geminilake, purley | `AirConnect-(dsm7-)x86-64-${VERSION}`         |
+| Architecture Group                       | Architecture                                                                                                                                                                           | Package to download                           |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| **ARMv5 & ARMv6**                        | 88f6282, 88f6281, 88f628x                                                                                                                                                              | `AirConnect-(dsm7-)armv6-${VERSION}`          |
+| **ARMv5 & ARMv6 Static**                 | 88f6282, 88f6281, 88f628x                                                                                                                                                              | `AirConnect-(dsm7-)armv6-static-${VERSION}`   |
+| **ARMv7**                                | ipq806x, ipq806x, armada370, armadaxp, armada375, armada38x, alpine, alpine4k, monaco, comcerto2k, hi3535, dakota, ipq806x, northstarplus                                              | `AirConnect-(dsm7-)arm-${VERSION}`            |
+| **ARMv7 Static**                         | noarch, ipq806x, ipq806x, armada370, armadaxp, armada375, armada38x, alpine, alpine4k, monaco, comcerto2k, hi3535, dakota, ipq806x, northstarplus                                      | `AirConnect-(dsm7-)arm-static-${VERSION}`     |
+| **ARMv8**                                | rtd1296, armada37xx                                                                                                                                                                    | `AirConnect-(dsm7-)aarch64-${VERSION}`        |
+| **ARMv8 Static**                         | noarch, rtd1296, armada37xx                                                                                                                                                            | `AirConnect-(dsm7-)aarch64-static-${VERSION}` |
+| **PowerPC**                              | qoriq, Ppc853x                                                                                                                                                                         | `AirConnect-(dsm7-)powerpc-${VERSION}`        |
+| **PowerPC Static**                       | noarch, qoriq, Ppc853x                                                                                                                                                                 | `AirConnect-(dsm7-)powerpc-static-${VERSION}` |
+| **Intel - 32-bit**                       | x86, cedarview, bromolow, evansport, braswell, broadwell, dockerx64, kvmx64, denverton, grantley, broadwellnk, Broadwellntbap                                                          | `AirConnect-(dsm7-)x86-${VERSION}`            |
+| **Intel - 32-bit Static**                | x86, cedarview, bromolow, evansport, braswell, broadwell, dockerx64, kvmx64, denverton, grantley, broadwellnk, Broadwellntbap                                                          | `AirConnect-(dsm7-)x86-static-${VERSION}`     |
+| **Intel/AMD - 64-bit (DSM 6.0+)**        | x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 epyc7002 r1000 kvmx64 denverton grantley broadwellnk broadwellnkv2 Broadwellntbap v1000 geminilake purley | `AirConnect-(dsm7-)x86_64-${VERSION}`         |
+| **Intel/AMD - 64-bit (DSM 6.0+) Static** | x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 epyc7002 r1000 kvmx64 denverton grantley broadwellnk broadwellnkv2 Broadwellntbap v1000 geminilake purley | `AirConnect-(dsm7-)x86_64-static-${VERSION}`  |
 
 You can check which architecture you have in the `Package Arch` column on the Synology [What kind of CPU does my Synology NAS have?](https://www.synology.com/en-us/knowledgebase/DSM/tutorial/Compatibility_Peripherals/What_kind_of_CPU_does_my_NAS_have) site.
 
 #### Synology Router SRM
 
-For all the Synology **Routers** running Synology SRM you should use the **ARM** (ARMv7 - dakota, ipq806x, northstarplus) version. If the normal ARM package is not working on your device, please try **ARM Static** instead.
+For all the Synology **Routers** running Synology SRM you should use the **ARM** (ARMv7 - dakota, ipq806x, northstarplus) version. If the normal ARM package is not working on your device, please try **ARM Static** (ARMv7 Static) instead.
 
 #### Static packages
 
@@ -189,17 +193,17 @@ FILTER_AIRPLAY2_DEVICES="<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,Li
 SYNO_IP="<your synology ip>"
 ```
 
-| Configuration Option    | Values                                           | Mandatory     | Description                                                            |
-| ----------------------- | ------------------------------------------------ | ------------- | ---------------------------------------------------------------------- |
-| AIRCAST_ENABLED         | `0` or `1`                                       | Yes           | Enables or disables AIRCAST                                            |
-| AIRCAST_LATENCY         | `[rtp][:http][:f]`                               | No            | RTP and HTTP latency (ms), ':f' forces silence fill                    |
-| AIRCAST_LOGLEVEL        | `<log>=<level>`                                  | Yes           | logs: `all|raop|main|util|upnp`, level: `error|warn|info|debug|sdebug` |
-| AIRUPNP_ENABLED         | `0` or `1`                                       | Yes           | Enables or disables AIRUPNP                                            |
-| AIRUPNP_LATENCY         | `[rtp][:http][:f]`                               | No            | RTP and HTTP latency (ms), ':f' forces silence fill                    |
-| AIRUPNP_LOGLEVEL        | `<log>=<level>`                                  | Yes           | logs: `all|raop|main|util|upnp`, level: `error|warn|info|debug|sdebug` |
-| AIRUPNP_PORT            | `49154`                                          | Yes (airupnp) | Port on which airupnp should be started                                |
-| FILTER_AIRPLAY2_DEVICES | `<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,...` | No            | See [Supported UPnP Speakers](#supported-upnp-speakers)                |
-| SYNO_IP                 | `192.168.1.100`                                  | Yes           | The ip on which aircast/airupnp will be started                        |
+| Configuration Option    | Values                                           | Mandatory     | Description                                             |
+| ----------------------- | ------------------------------------------------ | ------------- | ------------------------------------------------------- |
+| AIRCAST_ENABLED         | `0` or `1`                                       | Yes           | Enables or disables AIRCAST                             |
+| AIRCAST_LATENCY         | `[rtp][:http][:f]`                               | No            | RTP and HTTP latency (ms), ':f' forces silence fill     |
+| AIRCAST_LOGLEVEL        | `<log>=<level>`                                  | Yes           | logs: `all                                              | raop | main | util | upnp`, level: `error | warn | info | debug | sdebug` |
+| AIRUPNP_ENABLED         | `0` or `1`                                       | Yes           | Enables or disables AIRUPNP                             |
+| AIRUPNP_LATENCY         | `[rtp][:http][:f]`                               | No            | RTP and HTTP latency (ms), ':f' forces silence fill     |
+| AIRUPNP_LOGLEVEL        | `<log>=<level>`                                  | Yes           | logs: `all                                              | raop | main | util | upnp`, level: `error | warn | info | debug | sdebug` |
+| AIRUPNP_PORT            | `49154`                                          | Yes (airupnp) | Port on which airupnp should be started                 |
+| FILTER_AIRPLAY2_DEVICES | `<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,...` | No            | See [Supported UPnP Speakers](#supported-upnp-speakers) |
+| SYNO_IP                 | `192.168.1.100`                                  | Yes           | The ip on which aircast/airupnp will be started         |
 
 Configuration options with `Mandatory = Yes` must exist in the configuration. Options with `Mandatory = No` are optional.
 
@@ -436,7 +440,7 @@ make clean build-all
 ARCH=arm make clean build
 ```
 
-Possible values for **ARCH**: `arm, aarch64, arm5, ppc, ppc-static, x86, x86-64`
+Possible values for **ARCH**: `rm arm-static armv6 armv6-static aarch64 aarch64-static x86 x86-static x86_64 x86_64-static powerpc powerpc-static`
 
 You can find the built packages in the **dist** directory.
 
