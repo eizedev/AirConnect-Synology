@@ -351,54 +351,60 @@ If you would like to tweak the AirConnect configuration you can also use the Air
 
 #### airupnp
 
-```txt
-v0.2.41.0 (Dec  8 2020 @ 18:43:14)
+```markdown
+v1.0.13 (Dec 10 2022 @ 11:10:19)
 See -t for license terms
 Usage: [options]
-  -b <server>[:<port>]  network interface and UPnP port to use
-  -a <port>[:<count>]   set inbound port and range for RTP and HTTP
-  -c <mp3[:<rate>]|flc[:0..9]|wav|pcm>  audio format send to player
-  -g <-3|-1|0>          HTTP content-length mode (-3:chunked, -1:none, 0:fixed)
-  -u <version>  set the maximum UPnP version for search (default 1)
-  -x <config file>      read config from file (default is ./config.xml)
-  -i <config file>      discover players, save <config file> and exit
-  -I                    auto save config at every network scan
+  -b <ip>[:<port>] network interface and UPnP port to use
+  -a <port>[:<count>] set inbound port and range for RTP and HTTP
+  -c <mp3[:<rate>]|flc[:0..9]|wav|pcm> audio format send to player
+  -g <-3|-1|0>  HTTP content-length mode (-3:chunked, -1:none, 0:fixed)
+  -u <version> set the maximum UPnP version for search (default 1)
+  -x <config file> read config from file (default is ./config.xml)
+  -i <config file> discover players, save <config file> and exit
+  -I    auto save config at every network scan
   -l <[rtp][:http][:f]> RTP and HTTP latency (ms), ':f' forces silence fill
-  -r                    let timing reference drift (no click)
-  -f <logfile>          write debug to logfile
-  -p <pid file>         write PID in file
-  -m <n1,n2...>         exclude devices whose model include tokens
-  -n <m1,m2,...>        exclude devices whose name includes tokens
-  -o <m1,m2,...>        include only listed models; overrides -m and -n (use <NULL> if player do not return a model)
-  -d <log>=<level>      Set logging level, logs: all|raop|main|util|upnp, level: error|warn|info|debug|sdebug
-  -z                    Daemonize
-  -Z                    NOT interactive
-  -k                    Immediate exit on SIGQUIT and SIGTERM
-  -t                    License terms
+  -r    let timing reference drift (no click)
+  -f <logfile>  write debug to logfile
+  -p <pid file>  write PID in file
+  -m <n1,n2...>  exclude devices whose model include tokens
+  -n <m1,m2,...> exclude devices whose name includes tokens
+  -o <m1,m2,...> include only listed models; overrides -m and -n (use <NULL> if player don't return a model)
+  -d <log>=<level> Set logging level, logs: all|raop|main|util|upnp, level: error|warn|info|debug|sdebug
+  -z    Daemonize
+  -Z    NOT interactive
+  -k    Immediate exit on SIGQUIT and SIGTERM
+  -t    License terms
+  --noflush  ignore flush command (wait for teardown to stop)
+
+Build options: LINUX
 ```
 
 #### aircast
 
-```txt
-v0.2.41.0 (Dec  8 2020 @ 18:41:57)
+```markdown
+v1.0.13 (Dec 10 2022 @ 11:14:02)
 See -t for license terms
 Usage: [options]
-  -b <address>          network address to bind to
-  -a <port>[:<count>]   set inbound port and range for RTP and HTTP
-  -c <mp3[:<rate>]|flc[:0..9]|wav>      audio format send to player
-  -v <0..1>              group MediaVolume factor
-  -x <config file>      read config from file (default is ./config.xml)
-  -i <config file>      discover players, save <config file> and exit
-  -I                    auto save config at every network scan
+  -b <ip>  network address to bind to
+  -a <port>[:<count>] set inbound port and range for RTP and HTTP
+  -c <mp3[:<rate>]|flc[:0..9]|wav> audio format send to player
+  -v <0..1>   group MediaVolume factor
+  -x <config file> read config from file (default is ./config.xml)
+  -i <config file> discover players, save <config file> and exit
+  -I    auto save config at every network scan
   -l <[rtp][:http][:f]> RTP and HTTP latency (ms), ':f' forces silence fill
-  -r                    let timing reference drift (no click)
-  -f <logfile>          Write debug to logfile
-  -p <pid file>         write PID in file
-  -d <log>=<level>      Set logging level, logs: all|raop|main|util|cast, level: error|warn|info|debug|sdebug
-  -z                    Daemonize
-  -Z                    NOT interactive
-  -k                    Immediate exit on SIGQUIT and SIGTERM
-  -t                    License terms
+  -r    let timing reference drift (no click)
+  -f <logfile>  Write debug to logfile
+  -p <pid file>  write PID in file
+  -d <log>=<level> Set logging level, logs: all|raop|main|util|cast, level: error|warn|info|debug|sdebug
+  -z    Daemonize
+  -Z    NOT interactive
+  -k    Immediate exit on SIGQUIT and SIGTERM
+  -t    License terms
+  --noflush  ignore flush command (wait for teardown to stop)
+
+Build options: LINUX
 ```
 
 ### airupnp and aircast configuration
