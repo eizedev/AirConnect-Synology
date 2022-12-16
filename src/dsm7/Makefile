@@ -72,6 +72,12 @@ armv6:
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
+.PHONY: armv6-static
+armv6-static:
+	$(eval export INFO_ARCH=88f6282 88f6281 88f628x)
+	$(eval export INFO_FIRMWARE=7.0-40000)
+	@true
+
 .PHONY: aarch64
 aarch64:
 	$(eval export INFO_ARCH=rtd1296 armada37xx)
@@ -102,8 +108,20 @@ x86:
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
+.PHONY: x86-static
+x86-static:
+	$(eval export INFO_ARCH=x86 cedarview bromolow evansport braswell broadwell dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap)
+	$(eval export INFO_FIRMWARE=7.0-40000)
+	@true
+
 .PHONY: x86_64
 x86_64:
+	$(eval export INFO_ARCH=x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap v1000 geminilake purley)
+	$(eval export INFO_FIRMWARE=7.0-40000)
+	@true
+
+.PHONY: x86_64-static
+x86_64-static:
 	$(eval export INFO_ARCH=x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap v1000 geminilake purley)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
