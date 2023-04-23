@@ -67,13 +67,13 @@ arm-static:
 	@true
 
 .PHONY: armv5
-arm5:
+armv5:
 	$(eval export INFO_ARCH=88f6282 88f6281 88f628x)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
 .PHONY: armv5-static
-arm5:
+armv5-static:
 	$(eval export INFO_ARCH=88f6282 88f6281 88f628x)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
