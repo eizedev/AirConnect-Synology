@@ -6,7 +6,7 @@ rm -r -f dist
 
 set -eu
 
-ARCH_LIST="arm arm-static armv6 armv6-static aarch64 aarch64-static x86 x86-static x86_64 x86_64-static powerpc powerpc-static"
+ARCH_LIST="arm arm-static armv5 armv5-static armv6 armv6-static aarch64 aarch64-static x86 x86-static x86_64 x86_64-static powerpc powerpc-static"
 MAKE=$(which make)
 
 for arch in ${ARCH_LIST}; do

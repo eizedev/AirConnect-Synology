@@ -12,8 +12,9 @@
 > Compatible with DSM 7.0 and DSM 7.1! Please download the package with the name beginning with `AirConnect-dsm7-`
 >
 > Updated packages for `AirConnect 1.0` available!
-> 
-> If you have problems on older synology NAS devices, this could be related to the old device kernel (old kernel, old glibc). Please read the comments in the following [issue](https://github.com/eizedev/AirConnect-Synology/issues/63)
+>
+> If you have problems on older synology NAS devices, this could be related to the old device kernel (old kernel, old glibc).
+> Please read the comments in the following [issue](https://github.com/eizedev/AirConnect-Synology/issues/63)
 
 A minimal Synology package for [AirConnect](https://github.com/philippe44/AirConnect).  
 It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay)
@@ -104,8 +105,10 @@ If the `x86` (32-bit) package is not working on your device, please download the
 
 | Architecture Group                       | Architecture                                                                                                                                                                           | Package to download                           |
 | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| **ARMv5 & ARMv6**                        | 88f6282, 88f6281, 88f628x                                                                                                                                                              | `AirConnect-(dsm7-)armv6-${VERSION}`          |
-| **ARMv5 & ARMv6 Static**                 | 88f6282, 88f6281, 88f628x                                                                                                                                                              | `AirConnect-(dsm7-)armv6-static-${VERSION}`   |
+| **ARMv5**                                | 88f6282, 88f6281, 88f628x                                                                                                                                                              | `AirConnect-(dsm7-)armv6-${VERSION}`          |
+| **ARMv5 Static**                         | 88f6282, 88f6281, 88f628x                                                                                                                                                              | `AirConnect-(dsm7-)armv6-static-${VERSION}`   |
+| **ARMv6**                                | use is armv5 does not work - 88f6282, 88f6281, 88f628x                                                                                                                                 | `AirConnect-(dsm7-)armv5-${VERSION}`          |
+| **ARMv6 Static**                         | use is armv5 does not work - 88f6282, 88f6281, 88f628x                                                                                                                                 | `AirConnect-(dsm7-)armv5-static-${VERSION}`   |
 | **ARMv7**                                | ipq806x, ipq806x, armada370, armadaxp, armada375, armada38x, alpine, alpine4k, monaco, comcerto2k, hi3535, dakota, ipq806x, northstarplus                                              | `AirConnect-(dsm7-)arm-${VERSION}`            |
 | **ARMv7 Static**                         | noarch, ipq806x, ipq806x, armada370, armadaxp, armada375, armada38x, alpine, alpine4k, monaco, comcerto2k, hi3535, dakota, ipq806x, northstarplus                                      | `AirConnect-(dsm7-)arm-static-${VERSION}`     |
 | **ARMv8**                                | rtd1296, armada37xx                                                                                                                                                                    | `AirConnect-(dsm7-)aarch64-${VERSION}`        |
