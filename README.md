@@ -11,7 +11,7 @@
 
 > Compatible with DSM 7.0 and DSM 7.1! Please download the package with the name beginning with `AirConnect-dsm7-`
 >
-> Updated packages for `AirConnect 1.1` available!
+> Updated packages for `AirConnect 1.2+` available!
 >
 > Problems with playback after sonos update 15.2? Please update to 15.3. If the problem still exists, please check <https://github.com/philippe44/AirConnect/issues/458>
 >
