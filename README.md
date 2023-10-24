@@ -13,7 +13,7 @@
 >
 > Updated packages for `AirConnect 1.2+` available!
 >
-> Problems with playback after sonos update 15.2? Please update to 15.3. If the problem still exists, please check <https://github.com/philippe44/AirConnect/issues/458>
+> Problems with playback after sonos update 15.2? Please update to 15.3 (or latest available version). If the problem still exists, please check <https://github.com/philippe44/AirConnect/issues/458>
 >
 > If you have problems on older synology NAS devices, this could be related to the old device kernel (old kernel, old glibc).
 > Please read the comments in the following [issue](https://github.com/eizedev/AirConnect-Synology/issues/63)
