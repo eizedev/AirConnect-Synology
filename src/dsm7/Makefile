@@ -91,13 +91,13 @@ armv6-static:
 
 .PHONY: aarch64
 aarch64:
-	$(eval export INFO_ARCH=rtd1296 armada37xx)
+	$(eval export INFO_ARCH=rtd1296 rtd1619b armada37xx)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
 .PHONY: aarch64-static
 aarch64-static:
-	$(eval export INFO_ARCH=rtd1296 armada37xx noarch)
+	$(eval export INFO_ARCH=rtd1296 rtd1619b armada37xx noarch)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
