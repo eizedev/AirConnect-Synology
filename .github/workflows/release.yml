@@ -7,7 +7,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.1
+      #- uses: actions/checkout@v4.1.1
       - name: Get Release Version
         id: get_release
         uses: robinraju/release-downloader@v1.8
@@ -23,8 +23,8 @@ jobs:
       - name: Test downloaded Release
         id: test_release
         run: |
-          RELEASE_VERSION = ${{ steps.get_release.outputs.tag_name }}
-          RELEASE_FILES = ${{ fromJson(steps.get_release.outputs.downloaded_files)[0] }}
-          echo "$RELEASE_VERSION"
-          echo "$RELEASE_FILES"
-          ls -l "$GITHUB_WORKSPACE/downloads"
+          RELEASE_VERSION=${{ steps.get_release.outputs.tag_name }}
+          RELEASE_FILES=${{ fromJson(steps.get_release.outputs.downloaded_files)[0] }}
+          echo ${RELEASE_VERSION}
+          echo ${$RELEASE_FILES}
+          ls -l ${GITHUB_WORKSPACE/downloads}
