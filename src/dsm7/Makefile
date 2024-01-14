@@ -34,6 +34,9 @@ target/conf: target
 target/LICENSE: target
 	curl -s -L https://github.com/philippe44/AirConnect/raw/master/LICENSE -o target/LICENSE
 
+target/CHANGELOG: target
+	curl -s -L https://github.com/philippe44/AirConnect/raw/master/CHANGELOG -o target/CHANGELOG
+
 target/PACKAGE_ICON.PNG: target
 	cp PACKAGE_ICON.PNG target/PACKAGE_ICON.PNG
 	cp PACKAGE_ICON_256.PNG target/PACKAGE_ICON_256.PNG
@@ -47,7 +50,7 @@ target/INFO: target
 	sed -i.bak -e 's/#INFO_FIRMWARE#/${INFO_FIRMWARE}/' target/INFO
 	rm target/INFO.bak
 
-dist/AirConnect-dsm7-${ARCH}-${VERSION}.spk: target/package.tgz target/scripts target/WIZARD_UIFILES target/conf target/LICENSE target/INFO target/PACKAGE_ICON.PNG dist
+dist/AirConnect-dsm7-${ARCH}-${VERSION}.spk: target/package.tgz target/scripts target/WIZARD_UIFILES target/conf target/LICENSE target/CHANGELOG target/INFO target/PACKAGE_ICON.PNG dist
 	$(if ${ARCH},$(info dist - Arch: ${ARCH}),$(error dist - Must specify ARCH))
 	cd target && tar -cf AirConnect-dsm7-${ARCH}-${VERSION}.spk *
 	mv target/AirConnect-dsm7-${ARCH}-${VERSION}.spk dist/
