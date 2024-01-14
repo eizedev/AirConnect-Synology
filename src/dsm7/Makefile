@@ -1,10 +1,8 @@
 # Syno package structure: https://help.synology.com/developer-guide/synology_package/package_structure.html
-# Git commit SHA from https://github.com/philippe44/AirConnect/commits/master/bin
-REPO_REVISION=56804799c0c2cf6f8dcdd7e10abbe9bda4799551
-VERSION=1.2.2-$(shell date '+%Y%m%d')
+VERSION=${RELEASE_VERSION}-$(shell date '+%Y%m%d')
 
 LICENSE:
-	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/LICENSE -O
+	curl -s -L https://github.com/philippe44/AirConnect/raw/master/LICENSE -O
 
 target:
 	mkdir -p target
@@ -14,9 +12,9 @@ dist:
 
 target/package.tgz: target
 	$(if ${ARCH},$(info Arch: ${ARCH}),$(error Must specify ARCH))
-	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/bin/airupnp-linux-${ARCH} -o target/airupnp
+	cp bin/airupnp-linux-${ARCH} target/airupnp
 	chmod +x target/airupnp
-	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/bin/aircast-linux-${ARCH} -o target/aircast
+	cp bin/airupnp-linux-${ARCH} target/airupnp
 	chmod +x target/aircast
 	cp -a etc target/etc
 	cp -a log target/log
@@ -33,7 +31,7 @@ target/conf: target
 	cp -a conf target
 
 target/LICENSE: target
-	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/LICENSE -o target/LICENSE
+	curl -s -L https://github.com/philippe44/AirConnect/raw/master/LICENSE -o target/LICENSE
 
 target/PACKAGE_ICON.PNG: target
 	cp PACKAGE_ICON.PNG target/PACKAGE_ICON.PNG
