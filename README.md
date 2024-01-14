@@ -443,7 +443,7 @@ Change the ip and parameters for your needs:
 Example:
 
 ```bash
-/volume1/@appstore/AirConnect/airupnp -b 192.168.1.249:49154 -l 1000:2000 -i "/volume1/@appstore/AirConnect/config.xml" -o "S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120" -z -f "/var/log/airconnect.log" -d all info -d main=info
+/volume1/@appstore/AirConnect/airupnp -b 192.168.1.249:49154 -l 1000:2000 -i "/volume1/@appstore/AirConnect/config.xml" -o "<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam,2.2.6,AllShare1.0" -z -f "/volume1/@appstore/AirConnect/log/airconnect.log" -d all=info
 ```
 
 After running this command, airupnp will be started until all needed information and devices are gathered,
