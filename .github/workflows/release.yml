@@ -37,8 +37,7 @@ jobs:
 
       - name: Test packaging of x86_64
         run: |
-            RELEASE_VERSION=${{ steps.get_release.outputs.tag_name }}
-            cd ${GITHUB_WORKSPACE}/src/dsm7; ARCH=x86_64 make build
+            cd ${GITHUB_WORKSPACE}/src/dsm7; RELEASE_VERSION=${{ steps.get_release.outputs.tag_name }} ARCH=x86_64 make build
 
       - name: Test packaging of all architectures
         run: |
