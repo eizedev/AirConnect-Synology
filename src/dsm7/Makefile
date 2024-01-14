@@ -1,6 +1,7 @@
 # Syno package structure: https://help.synology.com/developer-guide/synology_package/package_structure.html
 VERSION=${RELEASE_VERSION}-$(shell date '+%Y%m%d')
-$(if ${RELEASE_VERSION},$(info AirConnect Version: ${RELEASE_VERSION}),$(error Must specify RELEASE_VERSION))
+#$(if ${RELEASE_VERSION},$(info AirConnect Version: ${RELEASE_VERSION}),$(error Must specify RELEASE_VERSION))
+$(if ${ARCH},$(info Arch: ${ARCH}),$(error Must specify ARCH))
 
 LICENSE:
 	curl -s -L https://github.com/philippe44/AirConnect/raw/master/LICENSE -O
@@ -12,7 +13,6 @@ dist:
 	mkdir -p dist
 
 target/package.tgz: target
-	$(if ${ARCH},$(info Arch: ${ARCH}),$(error Must specify ARCH))
 	cp bin/airupnp-linux-${ARCH} target/airupnp
 	chmod +x target/airupnp
 	cp bin/aircast-linux-${ARCH} target/aircast
