@@ -1,0 +1,30 @@
+name: Download and Unzip latest AirConnect Release
+on:
+  push:
+    branches:
+      - ci
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - name: Get Release Version
+        id: get_release
+        uses: robinraju/release-downloader@v1.8
+        with: 
+            repository: "philippe44/AirConnect"
+            latest: true                        
+            tarBall: false
+            zipBall: false
+            fileName: "AirConnect*.zip"
+            # "downloads" => It will create directory $GITHUB_WORKSPACE/downloads
+            out-file-path: "downloads"
+            extract: true
+      - name: Test downloaded Release
+        id: test_release
+        run: |
+          VERSION = ${{ steps.get_release.outputs.tag_name }}
+          FILES = ${{ fromJson(steps.get_release.outputs.downloaded_files)[0] }}
+          echo $VERSION
+          echo $FILES
+          ls -l $GITHUB_WORKSPACE/downloads
