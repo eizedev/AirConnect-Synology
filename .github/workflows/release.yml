@@ -33,19 +33,33 @@ jobs:
           ls -ltR ${GITHUB_WORKSPACE}/src/dsm7/bin/
 
       - name: Running shellcheck
+        id: check_code
         run: cd ${GITHUB_WORKSPACE}/src/dsm7; make shellcheck
 
       - name: Test packaging of x86_64 architecture
+        id: test_packaging
         run: cd ${GITHUB_WORKSPACE}/src/dsm7; RELEASE_VERSION=${{ steps.get_release.outputs.tag_name }} ARCH=x86_64 make build
 
       - name: Test packaging of ALL architectures
+        id: create_packages
         run: cd ${GITHUB_WORKSPACE}/src/dsm7; RELEASE_VERSION=${{ steps.get_release.outputs.tag_name }} make build-all
 
       - name: Cleanup target
+        id: clean_target
         run: cd ${GITHUB_WORKSPACE}/src/dsm7; make clean
 
       - name: Check dist
+        id: check_created_packages
         run: ls -ltR ${GITHUB_WORKSPACE}/src/dsm7/dist/
 
       - name: Cleanup dist
+        id: clean_dist
         run: cd ${GITHUB_WORKSPACE}/src/dsm7; make clean-dist
+      - name: Upload releases to artifacts
+        id: upload_releases  
+        uses: actions/upload-artifact@v4
+        with:
+            name: releases
+            path: ${GITHUB_WORKSPACE}/src/dsm7/dist/
+            if-no-files-found: error
+            retention-days: 7
