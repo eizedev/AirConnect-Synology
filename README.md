@@ -11,9 +11,10 @@
 
 > Compatible with DSM 7.0 and DSM 7.1! Please download the package with the name beginning with `AirConnect-dsm7-`
 >
-> Updated packages for `AirConnect 1.2+` available!
+> Updated packages for `AirConnect 1.6+` available!
 >
-> Problems with playback after sonos update 15.2? Please update to 15.3 (or latest available version). If the problem still exists, please check <https://github.com/philippe44/AirConnect/issues/458>
+> Problems with playback after sonos update 15.2? Please update to 15.3 (or latest available version).
+> If the problem still exists, please check <https://github.com/philippe44/AirConnect/issues/458>
 >
 > If you have problems on older synology NAS devices, this could be related to the old device kernel (old kernel, old glibc).
 > Please read the comments in the following [issue](https://github.com/eizedev/AirConnect-Synology/issues/63)
@@ -234,10 +235,10 @@ SYNO_IP="<your synology ip>"
 | ----------------------- | ------------------------------------------------ | ------------- | ------------------------------------------------------- |
 | AIRCAST_ENABLED         | `0` or `1`                                       | Yes           | Enables or disables AIRCAST                             |
 | AIRCAST_LATENCY         | `[rtp][:http][:f]`                               | No            | RTP and HTTP latency (ms), ':f' forces silence fill     |
-| AIRCAST_LOGLEVEL        | `<log>=<level>`                                  | Yes           | logs: `all                                              | raop | main | util | upnp`, level: `error | warn | info | debug | sdebug` |
+| AIRCAST_LOGLEVEL        | `<log>=<level>`                                  | Yes           | logs: `all                                              | raop | main | util | upnp`, level:`error | warn | info | debug | sdebug` |
 | AIRUPNP_ENABLED         | `0` or `1`                                       | Yes           | Enables or disables AIRUPNP                             |
 | AIRUPNP_LATENCY         | `[rtp][:http][:f]`                               | No            | RTP and HTTP latency (ms), ':f' forces silence fill     |
-| AIRUPNP_LOGLEVEL        | `<log>=<level>`                                  | Yes           | logs: `all                                              | raop | main | util | upnp`, level: `error | warn | info | debug | sdebug` |
+| AIRUPNP_LOGLEVEL        | `<log>=<level>`                                  | Yes           | logs: `all                                              | raop | main | util | upnp`, level:`error | warn | info | debug | sdebug` |
 | AIRUPNP_PORT            | `49154`                                          | Yes (airupnp) | Port on which airupnp should be started                 |
 | FILTER_AIRPLAY2_DEVICES | `<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,...` | No            | See [Supported UPnP Speakers](#supported-upnp-speakers) |
 | SYNO_IP                 | `192.168.1.100`                                  | Yes           | The ip on which aircast/airupnp will be started         |
@@ -359,12 +360,12 @@ If you would like to tweak the AirConnect configuration you can also use the Air
 #### airupnp
 
 ```markdown
-v1.0.13 (Dec 10 2022 @ 11:10:19)
+v1.6.3 (Jan  8 2024 @ 18:24:27)
 See -t for license terms
 Usage: [options]
-  -b <ip>[:<port>] network interface and UPnP port to use
+  -b <ip|iface>[:<port>] network interface or interface and UPnP port to use
   -a <port>[:<count>] set inbound port and range for RTP and HTTP
-  -c <mp3[:<rate>]|flc[:0..9]|wav|pcm> audio format send to player
+  -c <mp3[:<rate>]|flac[:0..9]|wav|pcm> audio format send to player
   -g <-3|-1|0>  HTTP content-length mode (-3:chunked, -1:none, 0:fixed)
   -u <version> set the maximum UPnP version for search (default 1)
   -x <config file> read config from file (default is ./config.xml)
@@ -374,6 +375,7 @@ Usage: [options]
   -r    let timing reference drift (no click)
   -f <logfile>  write debug to logfile
   -p <pid file>  write PID in file
+  -N <format>  transform device name using C format (%s=name)
   -m <n1,n2...>  exclude devices whose model include tokens
   -n <m1,m2,...> exclude devices whose name includes tokens
   -o <m1,m2,...> include only listed models; overrides -m and -n (use <NULL> if player don't return a model)
@@ -390,16 +392,17 @@ Build options: LINUX
 #### aircast
 
 ```markdown
-v1.0.13 (Dec 10 2022 @ 11:14:02)
+v1.6.3 (Jan  8 2024 @ 18:24:45)
 See -t for license terms
 Usage: [options]
-  -b <ip>  network address to bind to
+  -b <ip|iface>  network address or interface to bind to
   -a <port>[:<count>] set inbound port and range for RTP and HTTP
-  -c <mp3[:<rate>]|flc[:0..9]|wav> audio format send to player
+  -c <mp3[:<rate>]|aac[:<rate>]|flac[:0..9]|wav> audio format send to player
   -v <0..1>   group MediaVolume factor
   -x <config file> read config from file (default is ./config.xml)
   -i <config file> discover players, save <config file> and exit
   -I    auto save config at every network scan
+  -N <format>  transform device name using C format (%s=name)
   -l <[rtp][:http][:f]> RTP and HTTP latency (ms), ':f' forces silence fill
   -r    let timing reference drift (no click)
   -f <logfile>  Write debug to logfile
