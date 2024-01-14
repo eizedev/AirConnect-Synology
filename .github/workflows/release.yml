@@ -25,6 +25,6 @@ jobs:
         run: |
           RELEASE_VERSION=${{ steps.get_release.outputs.tag_name }}
           RELEASE_FILES=${{ fromJson(steps.get_release.outputs.downloaded_files)[0] }}
-          echo ${RELEASE_VERSION}
-          echo ${RELEASE_FILES}
-          ls -l ${GITHUB_WORKSPACE/downloads}
+          echo "Using AirConnect version '${RELEASE_VERSION}'"
+          echo "Using downloaded file: '${RELEASE_FILES}'"
+          ls -l ${GITHUB_WORKSPACE/downloads/}
