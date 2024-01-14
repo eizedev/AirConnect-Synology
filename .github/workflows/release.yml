@@ -29,6 +29,8 @@ jobs:
           RELEASE_FILES=${{ fromJson(steps.get_release.outputs.downloaded_files)[0] }}
           echo "Using AirConnect version '${RELEASE_VERSION}'"
           echo "Using downloaded file: '${RELEASE_FILES}'"
+          echo "Workspace directory: ${GITHUB_WORKSPACE}"
+          ls -ltr ${GITHUB_WORKSPACE}
           ls -ltr ${GITHUB_WORKSPACE/src/dsm7/bin/}
 
       - name: Shellcheck
