@@ -60,6 +60,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
             name: releases
-            path: ${GITHUB_WORKSPACE}/src/dsm7/dist/
+            path: src/dsm7/dist/
             if-no-files-found: error
             retention-days: 7
