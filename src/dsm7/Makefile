@@ -14,7 +14,7 @@ target/package.tgz: target
 	$(if ${ARCH},$(info Arch: ${ARCH}),$(error Must specify ARCH))
 	cp bin/airupnp-linux-${ARCH} target/airupnp
 	chmod +x target/airupnp
-	cp bin/airupnp-linux-${ARCH} target/airupnp
+	cp bin/aircast-linux-${ARCH} target/aircast
 	chmod +x target/aircast
 	cp -a etc target/etc
 	cp -a log target/log
