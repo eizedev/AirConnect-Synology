@@ -26,5 +26,5 @@ jobs:
           RELEASE_VERSION=${{ steps.get_release.outputs.tag_name }}
           RELEASE_FILES=${{ fromJson(steps.get_release.outputs.downloaded_files)[0] }}
           echo ${RELEASE_VERSION}
-          echo ${$RELEASE_FILES}
+          echo ${RELEASE_FILES}
           ls -l ${GITHUB_WORKSPACE/downloads}
