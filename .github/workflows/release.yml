@@ -23,8 +23,8 @@ jobs:
       - name: Test downloaded Release
         id: test_release
         run: |
-          VERSION = ${{ steps.get_release.outputs.tag_name }}
-          FILES = ${{ fromJson(steps.get_release.outputs.downloaded_files)[0] }}
-          echo $VERSION
-          echo $FILES
-          ls -l $GITHUB_WORKSPACE/downloads
+          RELEASE_VERSION = ${{ steps.get_release.outputs.tag_name }}
+          RELEASE_FILES = ${{ fromJson(steps.get_release.outputs.downloaded_files)[0] }}
+          echo "$RELEASE_VERSION"
+          echo "$RELEASE_FILES"
+          ls -l "$GITHUB_WORKSPACE/downloads"
