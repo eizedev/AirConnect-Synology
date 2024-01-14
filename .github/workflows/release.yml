@@ -7,7 +7,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      #- uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.1
       - name: Get Release Version
         id: get_release
         uses: robinraju/release-downloader@v1.8
