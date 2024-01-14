@@ -9,6 +9,8 @@ set -eu
 ARCH_LIST="arm arm-static armv5 armv5-static armv6 armv6-static aarch64 aarch64-static x86 x86-static x86_64 x86_64-static powerpc powerpc-static"
 MAKE=$(which make)
 
+export RELEASE_VERSION="${RELEASE_VERSION}"
+
 for arch in ${ARCH_LIST}; do
   export ARCH="${arch}"
   $MAKE clean build

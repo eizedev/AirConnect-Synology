@@ -1,8 +1,9 @@
-name: Download and Unzip latest AirConnect Release
+name: Download, unzip, test & package latest AirConnect release
 on:
   push:
-    branches:
-      - ci
+    branches: ["ci"]
+  pull_request:
+    branches: ["ci"]
 jobs:
   build:
     runs-on: ubuntu-latest
