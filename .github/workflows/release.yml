@@ -30,3 +30,5 @@ jobs:
           echo "Using AirConnect version '${RELEASE_VERSION}'"
           echo "Using downloaded file: '${RELEASE_FILES}'"
           ls -ltR ${GITHUB_WORKSPACE/src/dsm7/bin}
+          VERSION=${RELEASE_VERSION}-$(shell date '+%Y%m%d')
+          echo "Using AIRCONNECT-SYNOLOGY version: '${VERSION}'"
