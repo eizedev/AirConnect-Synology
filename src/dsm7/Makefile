@@ -1,5 +1,5 @@
 # Syno package structure: https://help.synology.com/developer-guide/synology_package/package_structure.html
-VERSION=${RELEASE_VERSION}-$(shell date '+%Y%m%d')
+VERSION=${AIRCONNECT_VERSION}-$(shell date '+%Y%m%d')
 
 LICENSE:
 	curl -s -L https://github.com/philippe44/AirConnect/raw/master/LICENSE -O
