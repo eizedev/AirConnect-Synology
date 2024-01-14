@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v4.1.1
         with:
             path: '.'
-      - name: Get Release Version
+      - name: Get latest AirConnect release
         id: get_release
         uses: robinraju/release-downloader@v1.8
         with: 
@@ -20,7 +20,6 @@ jobs:
             tarBall: false
             zipBall: false
             fileName: "AirConnect*.zip"
-            # "downloads" => It will create directory $GITHUB_WORKSPACE/downloads
             out-file-path: "src/dsm7/bin"
             extract: true
       - name: Test downloaded Release
