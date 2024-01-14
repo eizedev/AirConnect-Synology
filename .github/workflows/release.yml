@@ -51,9 +51,6 @@ jobs:
         id: check_created_packages
         run: ls -ltR ${GITHUB_WORKSPACE}/src/dsm7/dist/
 
-      - name: Cleanup dist
-        id: clean_dist
-        run: cd ${GITHUB_WORKSPACE}/src/dsm7; make clean-dist
       - name: Upload releases to artifacts
         id: upload_releases  
         uses: actions/upload-artifact@v4
@@ -62,3 +59,6 @@ jobs:
             path: src/dsm7/dist/
             if-no-files-found: error
             retention-days: 7
+      - name: Cleanup dist
+        id: clean_dist
+        run: cd ${GITHUB_WORKSPACE}/src/dsm7; make clean-dist
