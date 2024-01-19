@@ -4,7 +4,7 @@
 [![GitHub All Releases](https://img.shields.io/github/downloads/eizedev/AirConnect-Synology/total)](https://github.com/eizedev/AirConnect-Synology/releases)
 [![GitHub issues](https://img.shields.io/github/issues-raw/eizedev/AirConnect-Synology)](https://github.com/eizedev/AirConnect-Synology/issues)
 [![Security Scan](https://github.com/eizedev/AirConnect-Synology/actions/workflows/codacy-analysis.yml/badge.svg)](https://github.com/eizedev/AirConnect-Synology/actions/workflows/codacy-analysis.yml)
-[![CodeFactor](https://www.codefactor.io/repository/github/eizedev/airconnect-synology/badge)](https://www.codefactor.io/repository/github/eizedev/airconnect-synology)
+[![CodeFactor](https://www.codefactor.io/repository/github/eizedev/airconnect-synology/badge)](https://www.codefactor.io/repository/github/eizedev/airconnect-synology) [![GitHub Super-Linter](https://github.com/eizedev/AirConnect-Synology/actions/workflows/linter.yml/badge.svg)](https://github.com/marketplace/actions/super-linter)
 [![GitHub discussions](https://img.shields.io/badge/Discussions-Check%20latest%20community%20posts-lightgrey)](https://github.com/eizedev/AirConnect-Synology/discussions)
 
 ![AirConnect-Synology Logo](doc/res/header.png)
