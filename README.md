@@ -543,26 +543,23 @@ unzip AirConnect.zip
 ### Run shellcheck (optional)
 
 ```bash
+cd src/dsm7
 make shellcheck
-```
-
-### Build packages for all architectures
-
-```bash
-make clean build-all
 ```
 
 ### Build a package for a specific architecture
 
 ```bash
+cd src/dsm7
 ARCH=arm make clean build
 ```
 
-Possible values for **ARCH**: `rm arm-static armv6 armv6-static aarch64 aarch64-static x86 x86-static x86_64 x86_64-static powerpc powerpc-static`
+Possible values for **ARCH**: `arm arm-static armv6 armv6-static aarch64 aarch64-static x86 x86-static x86_64 x86_64-static powerpc powerpc-static`
 
 ### Build a package for all architectures
 
 ```bash
+cd src/dsm7
 make clean build-all
 ```
 
