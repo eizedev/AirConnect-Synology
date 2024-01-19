@@ -1,9 +1,9 @@
 name: Download, unzip, test & package latest AirConnect release
 on:
   push:
-    branches: ["ci"]
+    branches: ["master"]
   pull_request:
-    branches: ["ci"]
+    branches: ["master"]
 jobs:
   build:
     runs-on: ubuntu-latest
