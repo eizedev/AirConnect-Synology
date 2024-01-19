@@ -51,9 +51,12 @@ to stream to **UPnP/Sonos** & **Chromecast** devices that do not natively suppor
       - [Bose SoundTouch](#bose-soundtouch)
       - [Pioneer/Phorus/Play-Fi](#pioneerphorusplay-fi)
   - [Build](#build)
+    - [Set AirConnect Version](#set-airconnect-version)
+    - [Download AirConnect.zip and extract to /bin](#download-airconnectzip-and-extract-to-bin)
     - [Run shellcheck (optional)](#run-shellcheck-optional)
     - [Build packages for all architectures](#build-packages-for-all-architectures)
     - [Build a package for a specific architecture](#build-a-package-for-a-specific-architecture)
+    - [Build a package for all architectures](#build-a-package-for-all-architectures)
   - [Troubleshooting](#troubleshooting)
     - [Cannot be installed or upgrade from an older version](#cannot-be-installed-or-upgrade-from-an-older-version)
     - [Issues](#issues)
@@ -505,12 +508,37 @@ and replacing the `<mp3>..</mp3>` line with:
 
 ## Build
 
+The build steps are done using Github Actions CI/CD. So it will be build automatically.  
+In case you want to build it locally, you can also use the following steps.
+
 You need to install the following packages on your distribution:
 
 - make
 - shellcheck
+- clone/download this repository
 
 After that you can start the build process by running `shellcheck` or directly with the build steps.
+
+### Set AirConnect Version
+
+Grab version of your needed AirConnect package and set in variable `RELEASE_VERSION`
+
+```bash
+export RELEASE_VERSION=1.7.0
+```
+
+### Download AirConnect.zip and extract to /bin
+
+Go to the [releases](https://github.com/philippe44/AirConnect/releases) page and grab the latest release or the version you want.  
+Download it and extract to `src/dsm7/bin` folder
+
+Example for AirConnect `1.7.0`
+
+```bash
+wget https://github.com/philippe44/AirConnect/releases/download/1.7.0/AirConnect-1.7.0.zip -O src/dsm7/bin/AirConnect.zip
+cd src/dsm7/bin
+unzip AirConnect.zip
+```
 
 ### Run shellcheck (optional)
 
@@ -531,6 +559,12 @@ ARCH=arm make clean build
 ```
 
 Possible values for **ARCH**: `rm arm-static armv6 armv6-static aarch64 aarch64-static x86 x86-static x86_64 x86_64-static powerpc powerpc-static`
+
+### Build a package for all architectures
+
+```bash
+make clean build-all
+```
 
 You can find the built packages in the **dist** directory.
 
