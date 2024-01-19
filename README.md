@@ -11,9 +11,10 @@
 
 > Compatible with DSM 7.0 and DSM 7.1! Please download the package with the name beginning with `AirConnect-dsm7-`
 >
-> Updated packages for `AirConnect 1.2+` available!
+> Updated packages for `AirConnect 1.7+` available!
 >
-> Problems with playback after sonos update 15.2? Please update to 15.3 (or latest available version). If the problem still exists, please check <https://github.com/philippe44/AirConnect/issues/458>
+> Problems with playback after sonos update 15.2? Please update to 15.3 (or latest available version).
+> If the problem still exists, please check <https://github.com/philippe44/AirConnect/issues/458>
 >
 > If you have problems on older synology NAS devices, this could be related to the old device kernel (old kernel, old glibc).
 > Please read the comments in the following [issue](https://github.com/eizedev/AirConnect-Synology/issues/63)
@@ -50,9 +51,12 @@ to stream to **UPnP/Sonos** & **Chromecast** devices that do not natively suppor
       - [Bose SoundTouch](#bose-soundtouch)
       - [Pioneer/Phorus/Play-Fi](#pioneerphorusplay-fi)
   - [Build](#build)
+    - [Set AirConnect Version](#set-airconnect-version)
+    - [Download AirConnect.zip and extract to /bin](#download-airconnectzip-and-extract-to-bin)
     - [Run shellcheck (optional)](#run-shellcheck-optional)
     - [Build packages for all architectures](#build-packages-for-all-architectures)
     - [Build a package for a specific architecture](#build-a-package-for-a-specific-architecture)
+    - [Build a package for all architectures](#build-a-package-for-all-architectures)
   - [Troubleshooting](#troubleshooting)
     - [Cannot be installed or upgrade from an older version](#cannot-be-installed-or-upgrade-from-an-older-version)
     - [Issues](#issues)
@@ -234,10 +238,10 @@ SYNO_IP="<your synology ip>"
 | ----------------------- | ------------------------------------------------ | ------------- | ------------------------------------------------------- |
 | AIRCAST_ENABLED         | `0` or `1`                                       | Yes           | Enables or disables AIRCAST                             |
 | AIRCAST_LATENCY         | `[rtp][:http][:f]`                               | No            | RTP and HTTP latency (ms), ':f' forces silence fill     |
-| AIRCAST_LOGLEVEL        | `<log>=<level>`                                  | Yes           | logs: `all                                              | raop | main | util | upnp`, level: `error | warn | info | debug | sdebug` |
+| AIRCAST_LOGLEVEL        | `<log>=<level>`                                  | Yes           | log=all,raop,main,util,cast -- level=error,warn,info,debug,sdebug |
 | AIRUPNP_ENABLED         | `0` or `1`                                       | Yes           | Enables or disables AIRUPNP                             |
 | AIRUPNP_LATENCY         | `[rtp][:http][:f]`                               | No            | RTP and HTTP latency (ms), ':f' forces silence fill     |
-| AIRUPNP_LOGLEVEL        | `<log>=<level>`                                  | Yes           | logs: `all                                              | raop | main | util | upnp`, level: `error | warn | info | debug | sdebug` |
+| AIRUPNP_LOGLEVEL        | `<log>=<level>`                                  | Yes           | log=all,raop,main,util,upnp -- level=error,warn,info,debug,sdebug |
 | AIRUPNP_PORT            | `49154`                                          | Yes (airupnp) | Port on which airupnp should be started                 |
 | FILTER_AIRPLAY2_DEVICES | `<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,...` | No            | See [Supported UPnP Speakers](#supported-upnp-speakers) |
 | SYNO_IP                 | `192.168.1.100`                                  | Yes           | The ip on which aircast/airupnp will be started         |
@@ -359,12 +363,12 @@ If you would like to tweak the AirConnect configuration you can also use the Air
 #### airupnp
 
 ```markdown
-v1.0.13 (Dec 10 2022 @ 11:10:19)
+v1.6.3 (Jan  8 2024 @ 18:24:27)
 See -t for license terms
 Usage: [options]
-  -b <ip>[:<port>] network interface and UPnP port to use
+  -b <ip|iface>[:<port>] network interface or interface and UPnP port to use
   -a <port>[:<count>] set inbound port and range for RTP and HTTP
-  -c <mp3[:<rate>]|flc[:0..9]|wav|pcm> audio format send to player
+  -c <mp3[:<rate>]|flac[:0..9]|wav|pcm> audio format send to player
   -g <-3|-1|0>  HTTP content-length mode (-3:chunked, -1:none, 0:fixed)
   -u <version> set the maximum UPnP version for search (default 1)
   -x <config file> read config from file (default is ./config.xml)
@@ -374,6 +378,7 @@ Usage: [options]
   -r    let timing reference drift (no click)
   -f <logfile>  write debug to logfile
   -p <pid file>  write PID in file
+  -N <format>  transform device name using C format (%s=name)
   -m <n1,n2...>  exclude devices whose model include tokens
   -n <m1,m2,...> exclude devices whose name includes tokens
   -o <m1,m2,...> include only listed models; overrides -m and -n (use <NULL> if player don't return a model)
@@ -390,16 +395,17 @@ Build options: LINUX
 #### aircast
 
 ```markdown
-v1.0.13 (Dec 10 2022 @ 11:14:02)
+v1.6.3 (Jan  8 2024 @ 18:24:45)
 See -t for license terms
 Usage: [options]
-  -b <ip>  network address to bind to
+  -b <ip|iface>  network address or interface to bind to
   -a <port>[:<count>] set inbound port and range for RTP and HTTP
-  -c <mp3[:<rate>]|flc[:0..9]|wav> audio format send to player
+  -c <mp3[:<rate>]|aac[:<rate>]|flac[:0..9]|wav> audio format send to player
   -v <0..1>   group MediaVolume factor
   -x <config file> read config from file (default is ./config.xml)
   -i <config file> discover players, save <config file> and exit
   -I    auto save config at every network scan
+  -N <format>  transform device name using C format (%s=name)
   -l <[rtp][:http][:f]> RTP and HTTP latency (ms), ':f' forces silence fill
   -r    let timing reference drift (no click)
   -f <logfile>  Write debug to logfile
@@ -440,7 +446,7 @@ Change the ip and parameters for your needs:
 Example:
 
 ```bash
-/volume1/@appstore/AirConnect/airupnp -b 192.168.1.249:49154 -l 1000:2000 -i "/volume1/@appstore/AirConnect/config.xml" -o "S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120" -z -f "/var/log/airconnect.log" -d all info -d main=info
+/volume1/@appstore/AirConnect/airupnp -b 192.168.1.249:49154 -l 1000:2000 -i "/volume1/@appstore/AirConnect/config.xml" -o "<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam,2.2.6,AllShare1.0" -z -f "/volume1/@appstore/AirConnect/log/airconnect.log" -d all=info
 ```
 
 After running this command, airupnp will be started until all needed information and devices are gathered,
@@ -502,12 +508,37 @@ and replacing the `<mp3>..</mp3>` line with:
 
 ## Build
 
+The build steps are done using Github Actions CI/CD. So it will be build automatically.  
+In case you want to build it locally, you can also use the following steps.
+
 You need to install the following packages on your distribution:
 
 - make
 - shellcheck
+- clone/download this repository
 
 After that you can start the build process by running `shellcheck` or directly with the build steps.
+
+### Set AirConnect Version
+
+Grab version of your needed AirConnect package and set in variable `RELEASE_VERSION`
+
+```bash
+export RELEASE_VERSION=1.7.0
+```
+
+### Download AirConnect.zip and extract to /bin
+
+Go to the [releases](https://github.com/philippe44/AirConnect/releases) page and grab the latest release or the version you want.  
+Download it and extract to `src/dsm7/bin` folder
+
+Example for AirConnect `1.7.0`
+
+```bash
+wget https://github.com/philippe44/AirConnect/releases/download/1.7.0/AirConnect-1.7.0.zip -O src/dsm7/bin/AirConnect.zip
+cd src/dsm7/bin
+unzip AirConnect.zip
+```
 
 ### Run shellcheck (optional)
 
@@ -528,6 +559,12 @@ ARCH=arm make clean build
 ```
 
 Possible values for **ARCH**: `rm arm-static armv6 armv6-static aarch64 aarch64-static x86 x86-static x86_64 x86_64-static powerpc powerpc-static`
+
+### Build a package for all architectures
+
+```bash
+make clean build-all
+```
 
 You can find the built packages in the **dist** directory.
 

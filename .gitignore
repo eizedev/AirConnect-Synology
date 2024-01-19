@@ -3,3 +3,5 @@ package.tgz
 *.spk
 /target
 /dist
+src/dsm7/bin/**
+src/dsm/bin/**

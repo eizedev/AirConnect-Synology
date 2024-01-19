@@ -1,10 +1,8 @@
 # Syno package structure: https://help.synology.com/developer-guide/synology_package/package_structure.html
-# Git commit SHA from https://github.com/philippe44/AirConnect/commits/master/bin
-REPO_REVISION=56804799c0c2cf6f8dcdd7e10abbe9bda4799551
-VERSION=1.2.2-$(shell date '+%Y%m%d')
+VERSION=${RELEASE_VERSION}-$(shell date '+%Y%m%d')
 
 LICENSE:
-	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/LICENSE -O
+	curl -s -L https://github.com/philippe44/AirConnect/raw/master/LICENSE -O
 
 target:
 	mkdir -p target
@@ -13,10 +11,11 @@ dist:
 	mkdir -p dist
 
 target/package.tgz: target
+	$(if ${RELEASE_VERSION},$(info AirConnect Version: ${RELEASE_VERSION}),$(error Must specify RELEASE_VERSION))
 	$(if ${ARCH},$(info Arch: ${ARCH}),$(error Must specify ARCH))
-	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/bin/airupnp-linux-${ARCH} -o target/airupnp
+	cp bin/airupnp-linux-${ARCH} target/airupnp
 	chmod +x target/airupnp
-	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/bin/aircast-linux-${ARCH} -o target/aircast
+	cp bin/aircast-linux-${ARCH} target/aircast
 	chmod +x target/aircast
 	cp -a etc target/etc
 	cp -a log target/log
@@ -33,7 +32,10 @@ target/conf: target
 	cp -a conf target
 
 target/LICENSE: target
-	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/LICENSE -o target/LICENSE
+	curl -s -L https://github.com/philippe44/AirConnect/raw/master/LICENSE -o target/LICENSE
+
+target/CHANGELOG: target
+	curl -s -L https://github.com/philippe44/AirConnect/raw/master/CHANGELOG -o target/CHANGELOG
 
 target/PACKAGE_ICON.PNG: target
 	cp PACKAGE_ICON.PNG target/PACKAGE_ICON.PNG
@@ -48,7 +50,7 @@ target/INFO: target
 	sed -i.bak -e 's/#INFO_FIRMWARE#/${INFO_FIRMWARE}/' target/INFO
 	rm target/INFO.bak
 
-dist/AirConnect-dsm7-${ARCH}-${VERSION}.spk: target/package.tgz target/scripts target/WIZARD_UIFILES target/conf target/LICENSE target/INFO target/PACKAGE_ICON.PNG dist
+dist/AirConnect-dsm7-${ARCH}-${VERSION}.spk: target/package.tgz target/scripts target/WIZARD_UIFILES target/conf target/LICENSE target/CHANGELOG target/INFO target/PACKAGE_ICON.PNG dist
 	$(if ${ARCH},$(info dist - Arch: ${ARCH}),$(error dist - Must specify ARCH))
 	cd target && tar -cf AirConnect-dsm7-${ARCH}-${VERSION}.spk *
 	mv target/AirConnect-dsm7-${ARCH}-${VERSION}.spk dist/
@@ -147,6 +149,10 @@ clean:
 .PHONY: clean-dist
 clean-dist:
 	rm -rf dist
+
+.PHONY: clean-bin
+clean-bin:
+	rm -rf bin
 
 .PHONY: build-all
 build-all: clean-dist
