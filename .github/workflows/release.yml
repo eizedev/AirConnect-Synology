@@ -4,9 +4,14 @@ on:
     branches: ["master"]
   pull_request:
     branches: ["master"]
+permissions: read-all
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      deployments: write
+      contents: write
     steps:
       - uses: actions/checkout@v4.1.1
         with:
