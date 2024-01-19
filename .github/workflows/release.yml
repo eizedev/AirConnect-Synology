@@ -12,6 +12,8 @@ jobs:
       packages: write
       deployments: write
       contents: write
+      statuses: write
+      actions: read
     steps:
       - uses: actions/checkout@v4.1.1
         with:
