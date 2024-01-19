@@ -150,6 +150,10 @@ clean:
 clean-dist:
 	rm -rf dist
 
+.PHONY: clean-bin
+clean-bin:
+	rm -rf bin
+
 .PHONY: build-all
 build-all: clean-dist
 	./build.sh
