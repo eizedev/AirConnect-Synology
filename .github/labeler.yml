@@ -29,8 +29,8 @@ dsm7:
 # Add 'dsm6' label to any change to src files within the source dsm7 dir EXCEPT for the docs sub-folder
 dsm6:
   - changed-files:
-      - any-glob-to-any-file: "src/dsm6/**/*"
-      - all-globs-to-all-files: "!src/dsm6/docs/*"
+      - any-glob-to-any-file: "src/dsm/**/*"
+      - all-globs-to-all-files: "!src/dsm/docs/*"
 
 # Add 'feature' label to any PR where the head branch name starts with `feature` or has a `feature` section in the name
 feature:
