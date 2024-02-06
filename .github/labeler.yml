@@ -9,30 +9,35 @@ AnyChange:
   - changed-files:
       - any-glob-to-any-file: "**"
 
-# Add 'Documentation' label to any change to .md files within the entire repository
+---
+# Add 'Documentation' label to any change to .md files within entire repository
 Documentation:
   - changed-files:
       - any-glob-to-any-file: "**/*.md"
 
-# Add 'source' label to any change to src files within the source dir EXCEPT for the docs sub-folder
+# Add 'source' label to any change to src files within the source dir
+# EXCEPT for the docs sub-folder
 source:
   - changed-files:
       - any-glob-to-any-file: "src/**/*"
       - all-globs-to-all-files: "!src/docs/*"
 
-# Add 'dsm7' label to any change to src files within the source dsm7 dir EXCEPT for the docs sub-folder
+# Add 'dsm7' label to any change to src files within the source dsm7 dir
+# EXCEPT for the docs sub-folder
 dsm7:
   - changed-files:
       - any-glob-to-any-file: "src/dsm7/**/*"
       - all-globs-to-all-files: "!src/dsm7/docs/*"
 
-# Add 'dsm6' label to any change to src files within the source dsm7 dir EXCEPT for the docs sub-folder
+# Add 'dsm6' label to any change to src files within the source dsm7 dir
+# EXCEPT for the docs sub-folder
 dsm6:
   - changed-files:
       - any-glob-to-any-file: "src/dsm/**/*"
       - all-globs-to-all-files: "!src/dsm/docs/*"
 
-# Add 'feature' label to any PR where the head branch name starts with `feature` or has a `feature` section in the name
+# Add 'feature' label to any PR where the head branch name starts with `feature`
+# or has a `feature` section in the name
 feature:
   - head-branch: ["^feature", "feature"]
 
