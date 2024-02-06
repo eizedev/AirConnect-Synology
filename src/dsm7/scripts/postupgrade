@@ -2,11 +2,29 @@
 
 LOG="${SYNOPKG_PKGDEST}/log/${AIRCONNECT_USER}.log"
 AIRCONNECT_CONFIG_FILE="airconnect.conf"
+AIRCONNECT_CONFIG="${SYNOPKG_PKGDEST}/${AIRCONNECT_CONFIG_FILE}"
 
 echo "[$(date +'%T')] #### Start postupgrade... ####" >>"${LOG}"
 
 # restore config file
 /bin/cp -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${AIRCONNECT_CONFIG_FILE}" "${SYNOPKG_PKGDEST}"
+
+if [ -f "${AIRCONNECT_CONFIG}" ]; then
+    # shellcheck disable=SC2154
+    echo "[$(date +'%T')] Checking for missing parameters in config file ${AIRCONNECT_CONFIG} for aircast and correct them, if found"
+    grep -Fq "AIRCAST_ENABLED" "${AIRCONNECT_CONFIG}" || { echo "AIRCAST_ENABLED=" >>"${AIRCONNECT_CONFIG}"; }
+    grep -Fq "AIRCAST_LOGLEVEL" "${AIRCONNECT_CONFIG}" || { echo "AIRCAST_LOGLEVEL=\"all=info\"" >>"${AIRCONNECT_CONFIG}"; }
+    grep -Fq "AIRCAST_LATENCY" "${AIRCONNECT_CONFIG}" || { echo "AIRCAST_LATENCY=\"50:500\"" >>"${AIRCONNECT_CONFIG}"; }
+
+    # shellcheck disable=SC2154
+    echo "[$(date +'%T')] Checking for missing parameters in config file ${AIRCONNECT_CONFIG} for airupnp and correct them, if found"
+    grep -Fq "AIRUPNP_ENABLED" "${AIRCONNECT_CONFIG}" || { echo "AIRUPNP_ENABLED=" >>"${AIRCONNECT_CONFIG}"; }
+    grep -Fq "AIRUPNP_LATENCY" "${AIRCONNECT_CONFIG}" || { echo "AIRUPNP_LATENCY=\"50:500\"" >>"${AIRCONNECT_CONFIG}"; }
+    grep -Fq "AIRUPNP_CONTENTLENGTH_MODE" "${AIRCONNECT_CONFIG}" || { echo "AIRUPNP_CONTENTLENGTH_MODE=0" >>"${AIRCONNECT_CONFIG}"; }
+    grep -Fq "AIRUPNP_LOGLEVEL" "${AIRCONNECT_CONFIG}" || { echo "AIRUPNP_LOGLEVEL=\"all=info\"" >>"${AIRCONNECT_CONFIG}"; }
+    grep -Fq "AIRUPNP_PORT" "${AIRCONNECT_CONFIG}" || { echo "AIRUPNP_PORT=" >>"${AIRCONNECT_CONFIG}"; }
+    grep -Fq "FILTER_AIRPLAY2_DEVICES" "${AIRCONNECT_CONFIG}" || { echo "FILTER_AIRPLAY2_DEVICES=\"<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam,2.2.6,AllShare1.0\"" >>"${AIRCONNECT_CONFIG}"; }
+fi
 
 echo "[$(date +'%T')] #### Done postupgrade ####" >>"${LOG}"
 
