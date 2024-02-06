@@ -12,6 +12,7 @@ AIRCONNECT_CONFIG_FILE="airconnect.conf"
 AIRCONNECT_CONFIG="${SYNOPKG_PKGDEST}/${AIRCONNECT_CONFIG_FILE}"
 
 LOG="${SYNOPKG_PKGDEST}/log/${AIRCONNECT_USER}.log"
+LOGBACKUP="${SYNOPKG_PKGDEST}/log/${AIRCONNECT_USER}.1.log"
 
 # backward compatibility for older packages, airconnect configuration file is needed
 if [ ! -f "${AIRCONNECT_CONFIG}" ]; then
@@ -31,10 +32,17 @@ get_pid() {
 }
 
 start_airconnect_on_ip() {
+    # Cleanup before doing anything
+    # check if a logfile backup was already created before, delete it on the second start
+    if [ -f "${LOGBACKUP}" ]; then
+        [ "$(stat --printf '%s' "${LOGBACKUP}")" -gt 52428800 ] && rm "${LOGBACKUP}"
+    fi
+    # check if logfile is greater than 50mb, if yes delete it before starting airconnect
+    if [ -f "${LOG}" ]; then
+        [ "$(stat --printf '%s' "${LOG}")" -gt 52428800 ] && cp -p "${LOG}" "${LOGBACKUP}" && rm "${LOG}"
+    fi
     echo "[$(date +'%T')] Linking airconnect configuration to \"${AIRCONNECT_DESTINATION}/${AIRCONNECT_CONFIG_FILE}\"." >>"$LOG"
-    #if [ -f "${AIRCONNECT_DESTINATION}/${AIRCONNECT_CONFIG_FILE}" ]; then
-    #    rm -f "${AIRCONNECT_DESTINATION}/${AIRCONNECT_CONFIG_FILE}"
-    #fi
+
     ln -fs "${AIRCONNECT_CONFIG}" "${AIRCONNECT_DESTINATION}/${AIRCONNECT_CONFIG_FILE}"
 
     if [ "${AIRUPNP_ENABLED}" = 1 ] && [ "${AIRCAST_ENABLED}" = 1 ]; then
@@ -61,13 +69,13 @@ start_airconnect_on_ip() {
         ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}" "${CONFIG_UPNP_DESTINATION}"
         echo "[$(date +'%T')] Starting airupnp on ${SYNO_IP}:${AIRUPNP_PORT}" >>"$LOG"
         if [ -n "${FILTER_AIRPLAY2_DEVICES}" ] && [ -n "${AIRUPNP_LATENCY}" ]; then
-            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -l "${AIRUPNP_LATENCY}" -x "${CONFIG_UPNP_DESTINATION}" -o "${FILTER_AIRPLAY2_DEVICES}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
+            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -g "${AIRUPNP_CONTENTLENGTH_MODE}" -l "${AIRUPNP_LATENCY}" -x "${CONFIG_UPNP_DESTINATION}" -o "${FILTER_AIRPLAY2_DEVICES}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
         elif [ -n "${FILTER_AIRPLAY2_DEVICES}" ]; then
-            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -x "${CONFIG_UPNP_DESTINATION}" -o "${FILTER_AIRPLAY2_DEVICES}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
+            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -g "${AIRUPNP_CONTENTLENGTH_MODE}" -x "${CONFIG_UPNP_DESTINATION}" -o "${FILTER_AIRPLAY2_DEVICES}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
         elif [ -n "${AIRUPNP_LATENCY}" ]; then
-            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -l "${AIRUPNP_LATENCY}" -x "${CONFIG_UPNP_DESTINATION}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
+            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -g "${AIRUPNP_CONTENTLENGTH_MODE}" -l "${AIRUPNP_LATENCY}" -x "${CONFIG_UPNP_DESTINATION}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
         else
-            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -x "${CONFIG_UPNP_DESTINATION}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
+            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -g "${AIRUPNP_CONTENTLENGTH_MODE}" -x "${CONFIG_UPNP_DESTINATION}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
         fi
         echo "[$(date +'%T')] Linking aircast configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}\"." >>"$LOG"
         ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}" "${CONFIG_CAST_DESTINATION}"
@@ -101,13 +109,13 @@ start_airconnect_on_ip() {
         ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}" "${CONFIG_UPNP_DESTINATION}"
         echo "[$(date +'%T')] Starting airupnp on ${SYNO_IP}:${AIRUPNP_PORT}" >>"$LOG"
         if [ -n "${FILTER_AIRPLAY2_DEVICES}" ] && [ -n "${AIRUPNP_LATENCY}" ]; then
-            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -l "${AIRUPNP_LATENCY}" -x "${CONFIG_UPNP_DESTINATION}" -o "${FILTER_AIRPLAY2_DEVICES}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
+            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -g "${AIRUPNP_CONTENTLENGTH_MODE}" -l "${AIRUPNP_LATENCY}" -x "${CONFIG_UPNP_DESTINATION}" -o "${FILTER_AIRPLAY2_DEVICES}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
         elif [ -n "${FILTER_AIRPLAY2_DEVICES}" ]; then
-            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -x "${CONFIG_UPNP_DESTINATION}" -o "${FILTER_AIRPLAY2_DEVICES}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
+            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -g "${AIRUPNP_CONTENTLENGTH_MODE}" -x "${CONFIG_UPNP_DESTINATION}" -o "${FILTER_AIRPLAY2_DEVICES}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
         elif [ -n "${AIRUPNP_LATENCY}" ]; then
-            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -l "${AIRUPNP_LATENCY}" -x "${CONFIG_UPNP_DESTINATION}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
+            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -g "${AIRUPNP_CONTENTLENGTH_MODE}" -l "${AIRUPNP_LATENCY}" -x "${CONFIG_UPNP_DESTINATION}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
         else
-            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -x "${CONFIG_UPNP_DESTINATION}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
+            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -g "${AIRUPNP_CONTENTLENGTH_MODE}" -x "${CONFIG_UPNP_DESTINATION}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
         fi
     elif [ "${AIRCAST_ENABLED}" = 1 ]; then
         if [ -z "${AIRCAST_LOGLEVEL}" ]; then
