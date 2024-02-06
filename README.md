@@ -54,7 +54,6 @@ to stream to **UPnP/Sonos** & **Chromecast** devices that do not natively suppor
     - [Set AirConnect Version](#set-airconnect-version)
     - [Download AirConnect.zip and extract to /bin](#download-airconnectzip-and-extract-to-bin)
     - [Run shellcheck (optional)](#run-shellcheck-optional)
-    - [Build packages for all architectures](#build-packages-for-all-architectures)
     - [Build a package for a specific architecture](#build-a-package-for-a-specific-architecture)
     - [Build a package for all architectures](#build-a-package-for-all-architectures)
   - [Troubleshooting](#troubleshooting)
