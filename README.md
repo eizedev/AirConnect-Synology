@@ -1,6 +1,6 @@
 # AirConnect package for Synology NAS and Synology Router
 
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/eizedev/AirConnect-Synology)](https://github.com/eizedev/AirConnect-Synology/releases/latest)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/eizedev/AirConnect-Synology)](https://github.com/eizedev/AirConnect-Synology/releases/latest)****
 [![GitHub All Releases](https://img.shields.io/github/downloads/eizedev/AirConnect-Synology/total)](https://github.com/eizedev/AirConnect-Synology/releases)
 [![GitHub issues](https://img.shields.io/github/issues-raw/eizedev/AirConnect-Synology)](https://github.com/eizedev/AirConnect-Synology/issues)
 [![Security Scan](https://github.com/eizedev/AirConnect-Synology/actions/workflows/codacy-analysis.yml/badge.svg)](https://github.com/eizedev/AirConnect-Synology/actions/workflows/codacy-analysis.yml)
@@ -12,7 +12,7 @@
 
 > Compatible with DSM 7.0 and DSM 7.1! Please download the package with the name beginning with `AirConnect-dsm7-`
 >
-> Updated packages for `AirConnect 1.7+` available!
+> Updated packages for `AirConnect 1.8+` available!
 >
 > Problems with playback after sonos update 15.2? Please update to 15.3 (or latest available version).
 > If the problem still exists, please check <https://github.com/philippe44/AirConnect/issues/458>
@@ -103,7 +103,7 @@ for the following synology DSM distributions (DSM 5, 6 and 7) and the different 
 | DSM 5.0-xxxx AND DSM 6.0-xxxx (f.e. DSM 6.0-7321) | `AirConnect-x86_64-${VERSION}` (f.e. AirConnect-x86_64-0.2.50.5-20210630.spk)          |
 | DSM 7.0-xxxx (f.e. DSM 7.0-40000)                 | `AirConnect-dsm7-x86_64-${VERSION}` (f.e. AirConnect-dsm7-86-64-0.2.50.5-20210630.spk) |
 
-The minimum firmware version for the DSM7 packages is **DSM 7.0-40000)**.  
+The minimum firmware version for the DSM7 packages is **DSM 7.0-40000**.  
 The minimum firmware version for the x86_64 package `AirConnect-x86_64-${VERSION}` is **DSM 6.0-7321**.  
 For **all** other package the minimum firmware version is DSM **5.0-4458**.
 
