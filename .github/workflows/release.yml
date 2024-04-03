@@ -1,5 +1,5 @@
 ---
-name: Download, unzip, test & package latest AirConnect release
+name: Creating Release of latest AirConnect binaries
 on:
   release:
     types: [published]
