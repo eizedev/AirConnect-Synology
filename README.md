@@ -53,7 +53,7 @@ to stream to **UPnP/Sonos** & **Chromecast** devices that do not natively suppor
       - [Pioneer/Phorus/Play-Fi](#pioneerphorusplay-fi)
   - [Build](#build)
     - [Set AirConnect Version](#set-airconnect-version)
-    - [Download AirConnect.zip and extract to /bin](#download-airconnectzip-and-extract-to-bin)
+    - [Download AirConnect and extract to /bin](#download-airconnect-and-extract-to-bin)
     - [Run shellcheck (optional)](#run-shellcheck-optional)
     - [Build a package for a specific architecture](#build-a-package-for-a-specific-architecture)
     - [Build a package for all architectures](#build-a-package-for-all-architectures)
@@ -193,7 +193,7 @@ If you encounter any problems, please read the [troubleshooting](#troubleshootin
     - This is a symlink of `/volume1/@appstore/AirConnect/log/airconnect.log`
   - You can open it using the Synology **FileStation** by navigating to `airconnect` - `log`
     - You can also open it after login with ssh to your NAS/Router: `sudo /usr/syno/bin/synopkg log AirConnect`
-    - or by using a command line utility like
+    - or by using a command-line utility like
       - **more** (`more /volume1/airconnect/log/airconnect`)
       - **tail** (`tail -100 /volume1/airconnect/log/airconnect`)
     - If you get a `permission denied`, you should use the full path, f.e. `more /volume1/@appstore/AirConnect/log/airconnect.log`
@@ -443,7 +443,7 @@ The file is **not** created by default.
 - Config File location for aircast
   - `/volume1/airconnect/config-cast.xml`
 
-You can create each of these files manually or a reference version can be generated using the `-i [config file name]` command line parameter.
+You can create each of these files manually or a reference version can be generated using the `-i [config file name]` command-line parameter.
 For the following example i am using the default configuration you can find above in the [How it works](#how-it-works) section.
 I am just change the `-x` parameter with the `-i` parameter.
 
@@ -514,7 +514,7 @@ and replacing the `<mp3>..</mp3>` line with:
 
 ## Build
 
-The build steps are done using Github Actions CI/CD. So it will be build automatically.  
+The build steps are done using GitHub Actions CI/CD. So it will be build automatically.  
 In case you want to build it locally, you can also use the following steps.
 
 You need to install the following packages on your distribution:
@@ -530,18 +530,18 @@ After that you can start the build process by running `shellcheck` or directly w
 Grab version of your needed AirConnect package and set in variable `RELEASE_VERSION`
 
 ```bash
-export RELEASE_VERSION=1.7.0
+export RELEASE_VERSION=1.8.3
 ```
 
-### Download AirConnect.zip and extract to /bin
+### Download AirConnect and extract to /bin
 
 Go to the [releases](https://github.com/philippe44/AirConnect/releases) page and grab the latest release or the version you want.  
 Download it and extract to `src/dsm7/bin` folder
 
-Example for AirConnect `1.7.0`
+Example for AirConnect `1.8.3`
 
 ```bash
-wget https://github.com/philippe44/AirConnect/releases/download/1.7.0/AirConnect-1.7.0.zip -O src/dsm7/bin/AirConnect.zip
+wget https://github.com/philippe44/AirConnect/releases/download/1.8.3/AirConnect-1.8.3.zip -O src/dsm7/bin/AirConnect.zip
 cd src/dsm7/bin
 unzip AirConnect.zip
 ```
