@@ -1,8 +1,7 @@
 ---
 name: Creating Release of latest AirConnect binaries
 on:
-  release:
-    types: [published]
+  push:
   workflow_dispatch:
 
 permissions:
@@ -70,6 +69,7 @@ jobs:
             ${GITHUB_WORKSPACE}"/src/dsm7/dist/*.spk
           discussion_category_name: Releases
           generate_release_notes: true
+        if: startsWith(github.ref, 'refs/tags/')
 
       - name: Upload releases to artifacts
         id: upload_releases
