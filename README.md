@@ -224,27 +224,29 @@ The configuration options and default values are:
 
 ```bash
 AIRCAST_ENABLED=1
-AIRCAST_LATENCY="1000:2000"
+AIRCAST_LATENCY="50:500"
 AIRCAST_LOGLEVEL="all=info"
 AIRUPNP_ENABLED=1
-AIRUPNP_LATENCY="1000:2000"
+AIRUPNP_LATENCY="50:500"
 AIRUPNP_LOGLEVEL="all=info"
+AIRUPNP_CONTENTLENGTH_MODE=0
 AIRUPNP_PORT=49154
 FILTER_AIRPLAY2_DEVICES="<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam,2.2.6,AllShare1.0"
 SYNO_IP="<your synology ip>"
 ```
 
-| Configuration Option    | Values                                           | Mandatory     | Description                                             |
-| ----------------------- | ------------------------------------------------ | ------------- | ------------------------------------------------------- |
-| AIRCAST_ENABLED         | `0` or `1`                                       | Yes           | Enables or disables AIRCAST                             |
-| AIRCAST_LATENCY         | `[rtp][:http][:f]`                               | No            | RTP and HTTP latency (ms), ':f' forces silence fill     |
-| AIRCAST_LOGLEVEL        | `<log>=<level>`                                  | Yes           | log=all,raop,main,util,cast -- level=error,warn,info,debug,sdebug |
-| AIRUPNP_ENABLED         | `0` or `1`                                       | Yes           | Enables or disables AIRUPNP                             |
-| AIRUPNP_LATENCY         | `[rtp][:http][:f]`                               | No            | RTP and HTTP latency (ms), ':f' forces silence fill     |
-| AIRUPNP_LOGLEVEL        | `<log>=<level>`                                  | Yes           | log=all,raop,main,util,upnp -- level=error,warn,info,debug,sdebug |
-| AIRUPNP_PORT            | `49154`                                          | Yes (airupnp) | Port on which airupnp should be started                 |
-| FILTER_AIRPLAY2_DEVICES | `<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,...` | No            | See [Supported UPnP Speakers](#supported-upnp-speakers) |
-| SYNO_IP                 | `192.168.1.100`                                  | Yes           | The ip on which aircast/airupnp will be started         |
+| Configuration Option       | Values                                           | Mandatory     | Description                                                       |
+| -------------------------- | ------------------------------------------------ | ------------- | ----------------------------------------------------------------- |
+| AIRCAST_ENABLED            | `0` or `1`                                       | Yes           | Enables or disables AIRCAST                                       |
+| AIRCAST_LATENCY            | `[rtp][:http][:f]`                               | No            | RTP and HTTP latency (ms), ':f' forces silence fill               |
+| AIRCAST_LOGLEVEL           | `<log>=<level>`                                  | Yes           | log=all,raop,main,util,cast -- level=error,warn,info,debug,sdebug |
+| AIRUPNP_ENABLED            | `0` or `1`                                       | Yes           | Enables or disables AIRUPNP                                       |
+| AIRUPNP_LATENCY            | `[rtp][:http][:f]`                               | No            | RTP and HTTP latency (ms), ':f' forces silence fill               |
+| AIRUPNP_LOGLEVEL           | `<log>=<level>`                                  | Yes           | log=all,raop,main,util,upnp -- level=error,warn,info,debug,sdebug |
+| AIRUPNP_CONTENTLENGTH_MODE | `-3`or `-1`or `0`                                | Yes           | HTTP content-length mode (-3:chunked, -1:none, 0:fixed)           |
+| AIRUPNP_PORT               | `49154`                                          | Yes (airupnp) | Port on which airupnp should be started                           |
+| FILTER_AIRPLAY2_DEVICES    | `<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,...` | No            | See [Supported UPnP Speakers](#supported-upnp-speakers)           |
+| SYNO_IP                    | `192.168.1.100`                                  | Yes           | The ip on which aircast/airupnp will be started                   |
 
 Configuration options with `Mandatory = Yes` must exist in the configuration. Options with `Mandatory = No` are optional.
 
@@ -266,11 +268,11 @@ Please activate both options:
 It runs the AirConnect processes with the following options by default tuned for sonos:
 
 ```bash
-/volume1/@appstore/AirConnect/airupnp -b [synology device local ip]:49154 -l 1000:2000 -x "/volume1/@appstore/AirConnect/config.xml" -o "<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam,2.2.6,AllShare1.0" -z -f "/volume1/@appstore/AirConnect/log/airconnect.log" -d all=info
+/volume1/@appstore/AirConnect/airupnp -b [synology device local ip]:49154 -l 50:500 -g 0 -x "/volume1/@appstore/AirConnect/config.xml" -o "<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam,2.2.6,AllShare1.0" -z -f "/volume1/@appstore/AirConnect/log/airconnect.log" -d all=info
 ```
 
 ```bash
-/volume1/@appstore/AirConnect/aircast -b [synology device local ip] -l 1000:2000 -x "/volume1/@appstore/AirConnect/config-cast.xml" -z -f "/volume1/@appstore/AirConnect/log/airconnect.log" -d all=info
+/volume1/@appstore/AirConnect/aircast -b [synology device local ip] -l 50:500 -x "/volume1/@appstore/AirConnect/config-cast.xml" -z -f "/volume1/@appstore/AirConnect/log/airconnect.log" -d all=info
 ```
 
 ### Supported UPnP Speakers
@@ -446,7 +448,7 @@ Change the ip and parameters for your needs:
 Example:
 
 ```bash
-/volume1/@appstore/AirConnect/airupnp -b 192.168.1.249:49154 -l 1000:2000 -i "/volume1/@appstore/AirConnect/config.xml" -o "<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam,2.2.6,AllShare1.0" -z -f "/volume1/@appstore/AirConnect/log/airconnect.log" -d all=info
+/volume1/@appstore/AirConnect/airupnp -b 192.168.1.249:49154 -l 50:500 -g 0 -i "/volume1/@appstore/AirConnect/config.xml" -o "<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam,2.2.6,AllShare1.0" -z -f "/volume1/@appstore/AirConnect/log/airconnect.log" -d all=info
 ```
 
 After running this command, airupnp will be started until all needed information and devices are gathered,
