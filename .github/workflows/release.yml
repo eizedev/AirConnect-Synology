@@ -1,12 +1,14 @@
 ---
 name: Download, unzip, test & package latest AirConnect release
 on:
+  release:
+    types: [published]
   workflow_dispatch:
-  push:
-    branches: ["master"]
-  pull_request:
-    branches: ["master"]
-permissions: read-all
+
+permissions:
+  contents: write
+  discussions: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,7 +24,7 @@ jobs:
           path: "."
       - name: Get latest AirConnect release
         id: get_release
-        uses: robinraju/release-downloader@v1.9
+        uses: robinraju/release-downloader@v1.8
         with:
           repository: "philippe44/AirConnect"
           latest: true
@@ -59,6 +61,12 @@ jobs:
       - name: Check dist
         id: check_created_packages
         run: ls -ltR "${GITHUB_WORKSPACE}"/src/dsm7/dist/
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            src/dsm7/dist/*.spk
 
       - name: Upload releases to artifacts
         id: upload_releases
