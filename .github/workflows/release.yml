@@ -66,14 +66,16 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            src/dsm7/dist/*.spk
+            ${GITHUB_WORKSPACE}"/src/dsm7/dist/*.spk
+          discussion_category_name: Releases
+          generate_release_notes: true
 
       - name: Upload releases to artifacts
         id: upload_releases
         uses: actions/upload-artifact@v4
         with:
           name: releases
-          path: src/dsm7/dist/
+          path: ${GITHUB_WORKSPACE}"/src/dsm7/dist/
           if-no-files-found: error
           retention-days: 7
       - name: Cleanup dist
