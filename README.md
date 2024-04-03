@@ -205,6 +205,10 @@ If you encounter any problems, please read the [troubleshooting](#troubleshootin
   - This logfile is used from DSM/Synology for all installation/uninstallation/update purposes
   - In general you will only use it for debugging purposes
 
+> Since Version `1.8.3-20240403` The airconnect.log file will now be deleted if it exceeds a size of 50MB
+> A one time backup in the same directory will be created named `airconnect.1.log`
+> This backup will be deleted on the next start (useful if someone needs the old log for debugging).
+
 ## airconnect.conf
 
 > Only available for DSM 7 packages!
