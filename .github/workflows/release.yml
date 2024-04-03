@@ -33,8 +33,8 @@ jobs:
           fileName: "AirConnect*.zip"
           out-file-path: "src/dsm7/bin"
           extract: true
-      - name: Test downloaded Release
-        id: test_release
+      - name: Validate downloaded Release
+        id: validate_release
         run: |
           RELEASE_VERSION=${{ steps.get_release.outputs.tag_name }}
           RELEASE_FILES=${{ fromJson(steps.get_release.outputs.downloaded_files)[0] }}
@@ -43,14 +43,14 @@ jobs:
           ls -ltR "${GITHUB_WORKSPACE}"/src/dsm7/bin/
 
       - name: Running shellcheck
-        id: check_code
+        id: validate_code
         run: cd "${GITHUB_WORKSPACE}"/src/dsm7; make shellcheck
 
       - name: Test packaging of x86_64 architecture
         id: test_packaging
         run: cd "${GITHUB_WORKSPACE}"/src/dsm7; RELEASE_VERSION=${{ steps.get_release.outputs.tag_name }} ARCH=x86_64 make build
 
-      - name: Test packaging of ALL architectures
+      - name: Create packages of ALL architectures
         id: create_packages
         run: cd "${GITHUB_WORKSPACE}"/src/dsm7; RELEASE_VERSION=${{ steps.get_release.outputs.tag_name }} make build-all
 
@@ -58,11 +58,12 @@ jobs:
         id: clean_target
         run: cd "${GITHUB_WORKSPACE}"/src/dsm7; make clean
 
-      - name: Check dist
-        id: check_created_packages
+      - name: Validate created packages (dist)
+        id: validate_created_packages
         run: ls -ltR "${GITHUB_WORKSPACE}"/src/dsm7/dist/
 
-      - name: Release
+      - name: Creating GitHub Release
+        id: create_release
         uses: softprops/action-gh-release@v2
         with:
           files: |
@@ -78,6 +79,7 @@ jobs:
           path: ${GITHUB_WORKSPACE}"/src/dsm7/dist/
           if-no-files-found: error
           retention-days: 7
+
       - name: Cleanup dist
         id: clean_dist
         run: cd "${GITHUB_WORKSPACE}"/src/dsm7; make clean-dist
