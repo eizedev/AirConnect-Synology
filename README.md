@@ -10,7 +10,7 @@
 
 ![AirConnect-Synology Logo](doc/res/header.png)
 
-> Compatible with DSM 7.0 and DSM 7.1! Please download the package with the name beginning with `AirConnect-dsm7-`
+> Compatible with DSM 7.x (also 7.2)! Please download the package with the name beginning with `AirConnect-dsm7-`
 >
 > Updated packages for `AirConnect 1.8+` available!
 >
