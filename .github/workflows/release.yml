@@ -24,7 +24,7 @@ jobs:
           path: "."
       - name: Get latest AirConnect release
         id: get_release
-        uses: robinraju/release-downloader@v1.10
+        uses: robinraju/release-downloader@v1.11
         with:
           repository: "philippe44/AirConnect"
           latest: true
