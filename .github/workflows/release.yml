@@ -19,7 +19,7 @@ jobs:
       statuses: write
       actions: read
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v6
         with:
           path: "."
       - name: Get latest AirConnect release
