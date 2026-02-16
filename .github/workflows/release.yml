@@ -74,7 +74,7 @@ jobs:
 
       - name: Upload releases to artifacts
         id: upload_releases
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: releases
           path: src/dsm7/dist/
