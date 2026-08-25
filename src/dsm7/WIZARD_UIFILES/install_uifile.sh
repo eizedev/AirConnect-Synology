@@ -35,7 +35,7 @@ tee "$SYNOPKG_TEMP_LOGFILE" <<EOF
                 "desc": "<strong style='color:red'>Aircast</strong> = Needed for Chromecast devices"
             },
             {
-                "desc": "Please refer to the <a target='_blank' href='https://github.com/eizedev/AirConnect-Synology#readme'>documentation</a> in case of any problems/questions"
+                "desc": "Please refer to the <a target='_blank' href='https://github.com/aaltepet/AirConnect-Synology#readme'>documentation</a> in case of any problems/questions"
             }
         ]
     },

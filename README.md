@@ -12,7 +12,7 @@
 
 > Compatible with DSM 7.x (also 7.2)! Please download the package with the name beginning with `AirConnect-dsm7-`
 >
-> Updated packages for `AirConnect 1.8+` available!
+> Updated packages for `AirConnect 1.11.2` available!
 >
 > Problems with playback after sonos update 15.2? Please update to 15.3 (or latest available version).
 > If the problem still exists, please check <https://github.com/philippe44/AirConnect/issues/458>
@@ -115,16 +115,16 @@ If the `x86` (32-bit) package is not working on your device, please download the
 | **ARMv5 Static**                         | 88f6282, 88f6281, 88f628x                                                                                                                                                              | `AirConnect-(dsm7-)armv6-static-${VERSION}`   |
 | **ARMv6**                                | use is armv5 does not work - 88f6282, 88f6281, 88f628x                                                                                                                                 | `AirConnect-(dsm7-)armv5-${VERSION}`          |
 | **ARMv6 Static**                         | use is armv5 does not work - 88f6282, 88f6281, 88f628x                                                                                                                                 | `AirConnect-(dsm7-)armv5-static-${VERSION}`   |
-| **ARMv7**                                | ipq806x, ipq806x, armada370, armadaxp, armada375, armada38x, alpine, alpine4k, monaco, comcerto2k, hi3535, dakota, ipq806x, northstarplus                                              | `AirConnect-(dsm7-)arm-${VERSION}`            |
-| **ARMv7 Static**                         | noarch, ipq806x, ipq806x, armada370, armadaxp, armada375, armada38x, alpine, alpine4k, monaco, comcerto2k, hi3535, dakota, ipq806x, northstarplus                                      | `AirConnect-(dsm7-)arm-static-${VERSION}`     |
-| **ARMv8**                                | rtd1296, armada37xx                                                                                                                                                                    | `AirConnect-(dsm7-)aarch64-${VERSION}`        |
-| **ARMv8 Static**                         | noarch, rtd1296, armada37xx                                                                                                                                                            | `AirConnect-(dsm7-)aarch64-static-${VERSION}` |
+| **ARMv7**                                | ipq806x, armada370, armadaxp, armada375, armada38x, alpine, alpine4k, monaco, comcerto2k, hi3535, dakota, northstarplus, hawkeye, armv7                                                 | `AirConnect-(dsm7-)arm-${VERSION}`            |
+| **ARMv7 Static**                         | noarch, ipq806x, armada370, armadaxp, armada375, armada38x, alpine, alpine4k, monaco, comcerto2k, hi3535, dakota, northstarplus, hawkeye, armv7                                         | `AirConnect-(dsm7-)arm-static-${VERSION}`     |
+| **ARMv8**                                | rtd1296, rtd1619b, armada37xx, cypress, aarch64                                                                                                                                         | `AirConnect-(dsm7-)aarch64-${VERSION}`        |
+| **ARMv8 Static**                         | noarch, rtd1296, rtd1619b, armada37xx, cypress, aarch64                                                                                                                                 | `AirConnect-(dsm7-)aarch64-static-${VERSION}` |
 | **PowerPC**                              | qoriq, Ppc853x                                                                                                                                                                         | `AirConnect-(dsm7-)powerpc-${VERSION}`        |
 | **PowerPC Static**                       | noarch, qoriq, Ppc853x                                                                                                                                                                 | `AirConnect-(dsm7-)powerpc-static-${VERSION}` |
 | **Intel - 32-bit**                       | x86, cedarview, bromolow, evansport, braswell, broadwell, dockerx64, kvmx64, denverton, grantley, broadwellnk, Broadwellntbap                                                          | `AirConnect-(dsm7-)x86-${VERSION}`            |
 | **Intel - 32-bit Static**                | x86, cedarview, bromolow, evansport, braswell, broadwell, dockerx64, kvmx64, denverton, grantley, broadwellnk, Broadwellntbap                                                          | `AirConnect-(dsm7-)x86-static-${VERSION}`     |
-| **Intel/AMD - 64-bit (DSM 6.0+)**        | x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 epyc7002 r1000 kvmx64 denverton grantley broadwellnk broadwellnkv2 Broadwellntbap v1000 geminilake purley | `AirConnect-(dsm7-)x86_64-${VERSION}`         |
-| **Intel/AMD - 64-bit (DSM 6.0+) Static** | x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 epyc7002 r1000 kvmx64 denverton grantley broadwellnk broadwellnkv2 Broadwellntbap v1000 geminilake purley | `AirConnect-(dsm7-)x86_64-static-${VERSION}`  |
+| **Intel/AMD - 64-bit (DSM 6.0+)**        | x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 epyc7002 r1000 r1000nk kvmx64 denverton grantley broadwellnk broadwellnkv2 Broadwellntbap v1000 v1000nk geminilake geminilakenk purley | `AirConnect-(dsm7-)x86_64-${VERSION}`         |
+| **Intel/AMD - 64-bit (DSM 6.0+) Static** | x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 epyc7002 r1000 r1000nk kvmx64 denverton grantley broadwellnk broadwellnkv2 Broadwellntbap v1000 v1000nk geminilake geminilakenk purley | `AirConnect-(dsm7-)x86_64-static-${VERSION}`  |
 
 You can check which architecture you have in the `Package Arch` column on the Synology
 [What kind of CPU does my Synology NAS have?](https://www.synology.com/en-us/knowledgebase/DSM/tutorial/Compatibility_Peripherals/What_kind_of_CPU_does_my_NAS_have)
@@ -132,8 +132,8 @@ site.
 
 #### Synology Router SRM
 
-For all the Synology **Routers** running Synology SRM you should use the **ARM** (ARMv7 - dakota, ipq806x, northstarplus) version.
-If the normal ARM package is not working on your device, please try **ARM Static** (ARMv7 Static) instead.
+For Synology **Routers** running SRM, use the **ARM** package (ARMv7 - dakota, ipq806x, northstarplus, hawkeye).
+If the normal ARM package is not working, try **ARM Static**. Newer ARMv8 routers (`cypress`) should use the **aarch64** package.
 
 #### Static packages
 

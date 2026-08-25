@@ -32,10 +32,10 @@ target/conf: target
 	cp -a conf target
 
 target/LICENSE: target
-	curl -s -L https://github.com/philippe44/AirConnect/raw/master/LICENSE -o target/LICENSE
+	cp LICENSE target/LICENSE
 
 target/CHANGELOG: target
-	curl -s -L https://github.com/philippe44/AirConnect/raw/master/CHANGELOG -o target/CHANGELOG
+	cp CHANGELOG target/CHANGELOG
 
 target/PACKAGE_ICON.PNG: target
 	cp PACKAGE_ICON.PNG target/PACKAGE_ICON.PNG
@@ -57,13 +57,13 @@ dist/AirConnect-dsm7-${ARCH}-${VERSION}.spk: target/package.tgz target/scripts t
 
 .PHONY: arm
 arm:
-	$(eval export INFO_ARCH=ipq806x armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k hi3535 dakota ipq806x northstarplus)
+	$(eval export INFO_ARCH=ipq806x armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k hi3535 dakota northstarplus hawkeye armv7)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
 .PHONY: arm-static
 arm-static:
-	$(eval export INFO_ARCH=ipq806x armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k hi3535 dakota ipq806x northstarplus noarch)
+	$(eval export INFO_ARCH=ipq806x armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k hi3535 dakota northstarplus hawkeye armv7 noarch)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
@@ -93,13 +93,13 @@ armv6-static:
 
 .PHONY: aarch64
 aarch64:
-	$(eval export INFO_ARCH=rtd1296 rtd1619b armada37xx)
+	$(eval export INFO_ARCH=rtd1296 rtd1619b armada37xx cypress aarch64)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
 .PHONY: aarch64-static
 aarch64-static:
-	$(eval export INFO_ARCH=rtd1296 rtd1619b armada37xx noarch)
+	$(eval export INFO_ARCH=rtd1296 rtd1619b armada37xx cypress aarch64 noarch)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
@@ -129,13 +129,13 @@ x86-static:
 
 .PHONY: x86_64
 x86_64:
-	$(eval export INFO_ARCH=x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 epyc7002 r1000 kvmx64 denverton grantley broadwellnk broadwellnkv2 Broadwellntbap v1000 geminilake purley)
+	$(eval export INFO_ARCH=x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 epyc7002 r1000 r1000nk kvmx64 denverton grantley broadwellnk broadwellnkv2 Broadwellntbap v1000 v1000nk geminilake geminilakenk purley)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
 .PHONY: x86_64-static
 x86_64-static:
-	$(eval export INFO_ARCH=x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 epyc7002 r1000 kvmx64 denverton grantley broadwellnk broadwellnkv2 Broadwellntbap v1000 geminilake purley)
+	$(eval export INFO_ARCH=x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 epyc7002 r1000 r1000nk kvmx64 denverton grantley broadwellnk broadwellnkv2 Broadwellntbap v1000 v1000nk geminilake geminilakenk purley)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 

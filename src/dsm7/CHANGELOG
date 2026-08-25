@@ -1,0 +1,616 @@
+1.11.2
+ - airupnp: be less aggressive on bye-bye and do a targeted search
+ - airupnp: fix group volume calculation
+ 
+1.11.1
+ - forgot to backport some other fixes in libs
+ 
+1.11.0
+ - fix Sonos master selection (credit @iFlip721)
+ - fix some memory leak
+ - add streaming type parameter to reduce latency (act like a streaming service, credit @iFlip721)
+
+1.10.1
+ - update cli help and README
+ 
+1.10.0
+ - add option to set flac blocksize 
+ - transferMode.dlna.org always set to "streaming"
+
+1.9.3
+ - Windows' static version was missing/incorrect (SSL_STATIC LIB vs SSL_LIB_STATIC)
+ 
+1.9.2
+ - remove libatomic dependency
+ 
+1.9.1
+ - forgot to update libraop
+ 
+1.9.0
+ - OpenSSL 3.x
+ 
+1.8.3 
+ - (aircast) stream type is LIVE and duration is not part of metadata
+ 
+1.8.2
+ - UpnpResolveURL needs one extra byte if RelURL parameters does not start with a '/'
+ - use setlocale() so that atof does not fail on '.'
+ 
+1.8.1
+ - handle double resend from iOS and silence after flush
+ 
+1.8.0
+ - refactor raop flush/first packet
+ 
+1.7.1
+ - alternate getting of TransportInfo and PositionInfo (increase polling speed)
+ - ignore any frame seq below or equal flush seqno, even after a record
+ 
+1.7.0
+ - allow icy on every codec, just provide interval, let user config and requesting player decide
+ - (airupnp) only re-acquire state on play action completion. This is not needed on stop/pause and will create issues like fake stops
+
+1.6.3
+ - (airupnp) on error, reset counter to 0 if player responds
+ 
+1.6.2
+ - (airupnp) when player timeout's, use its DescDocURL, not the UpdateData which is NULL...
+ 
+1.6.1
+ - be more relax wrt player deletion and verify with either failed doc download (airupnp) or no response to ping (aircast)
+ 
+1.6.0
+ - (airupnp) remove possibility to tweak ProtocolInfo, it's useless
+ - only send silence on first GET (after a flush) and close socket on flush
+ - close socket immediately on flush which should stop playback right away 
+ 
+1.5.4
+ - use updated libcodec and libraop for alac
+ 
+1.5.3
+ - previous version had a miss build	
+ - fully add aac 
+ - add extension to stream's url 
+ - flc -> flac (but flc still works)
+ 
+1.5.2
+ - updated libraries with alac fixes (zero-initialized encoded buffer)
+ 
+1.5.1
+ - (airupnp) call http_pico_close on exit
+ - fix all known memory leaks
+ - use updated libcodecs that fixes codec close crash (NULL ptr)
+ 
+1.5.0
+ - add aac codec (use refactored libraop and move encoder to libcodecs
+
+1.4.0
+ - proper fix of HTTP frame sending & filling
+ 
+1.3.4
+ - libraop was sending 1 instead of 0 on icy retransmit since day one ... can't believe it
+ 
+1.3.3
+ - RTP and NTP order was not fixed either
+ 
+1.3.2
+ - fix http_fill
+
+1.3.1
+ - updated libraop allows subsequent GET, even with no range, to restart from 0 for players that open, close and re-open (for no reason)
+ 
+1.3.0
+ - add -N to allow simple name transformation
+ 
+1.2.5
+ - (aircast) ignore SIGPIPE (picohttp)
+ - (aircast) fix queue walker
+ 
+1.2.4
+ - use fixed libraop for unknown RTSP queries that should return no headers
+ 
+1.2.3
+ - (airupnp) test errorcoutn for < 0, not just -1
+ - (aircast) must increase number of clients for a source
+ 
+1.2.2
+ - (airupnp) fix upnp socket error deteection
+ 
+1.2.1
+ - (airupnp) unified source with spotconnect
+ - (aircast) revert exclusion of devices based on netmask
+ - display iface and network at start
+ - update XML_UpdateNode bug
+ 
+1.2.0
+ - use libraop version that re-sends HTTP when *explictely* request a range 0-XXX to try to cope with player that don't understand what HTTP protocol is and keep askign for a small "chunk"
+ - aircast display iface name upon startup
+ 
+1.1.9
+ - HTTP exec function should not crash on error when there is no token returned
+ 
+1.1.8
+ - json_pack with "so" does not require object's ref to be decremented
+ 
+1.1.7
+ - Don't call metadata callback on flush as it causes spurious play, call it on "STREAMER_PLAY" if we have metadata
+ 
+1.1.6
+ - update openssl to 1.1.1u
+
+1.1.5
+ - use shutdown instead of close in picohttp server when source has not been found or HEAD was used
+ 
+1.1.4
+ - Make static few function of aircast.c that should have been
+ - (aircast) update of config file was not done on new device creation
+  
+1.1.3
+ - (aircast) fix netmask endianness which created false expiries
+
+1.1.2
+ - (aircast) mDNS searcher was not regularly calling back
+ 
+1.1.1
+  - remove group volume scaling on SetVolume
+  
+1.1.0
+ - airupnp : add artwork in mp3 mode
+ - aircast : add metadata (including artwork)
+
+1.0.16
+ - bring back armv5 build
+ - fixes big memory leak in upnp
+
+1.0.14
+ - change network binding for UPnP: get name
+ 
+1.0.13
+ - don't use debug libs for Windows
+ 
+1.0.12
+ - update libraop (no functional change)
+ 
+1.0.11
+ - mdnssvc API change
+
+1.0.10
+ - Use (almost) full static GLIBC (-nss)
+
+1.0.9
+ - add armv6
+
+1.0.8
+ - fix mdnssd
+ 
+1.0.7
+ - update libmdns (no unicast and compliant mode)
+ 
+1.0.6
+ - request specific libcrypto & libssl version for MacOS
+ 
+1.0.5
+ - remove UPnP IPv6 support
+ 
+1.0.4
+ - update mdnssd for unicast  
+ 
+1.0.3
+ - update mdnssd that was binding queries to a port for no reason causing a race failure on freebsd
+ 
+1.0.2
+ - mips is usually bigendian
+ 
+1.0.1
+ - use new compilers so that min glib is 2.23
+ 
+1.0.0
+ - new build system
+  - fix IGMP snooping (hopefully)
+  
+0.2.51.2
+ - fix HTTP2 upgrade response to "Connection"
+ - audio/mp3 is not a correct mimetype...
+ 
+0.2.51.1
+ - Fix CVE-2017-12087
+ 
+0.2.51.0
+ - invoke stop callback on TEARDOWN first
+ 
+0.2.50.5
+ - mdns fix for blank name field
+ 
+0.2.50.4
+ - fix sslsym.c macros that were still incorrect
+ 
+0.2.50.3
+ - noflush was not effective for aircast
+ 
+0.2.50.2
+ - make sslsym compatible with openSSL 1.1.x
+ 
+0.2.50.1
+ - noflush properly send silent frames at the right speed
+
+0.2.50.0
+ - flush was broken since 0.2.27.0
+ - add --noflush options (and force :f in latencies if set)
+ - increment stream index at each SetURI/LOAD to make it unique
+ 
+0.2.44.1
+ - (aircast) reset "Remove" flag when adding 
+ 
+0.2.44.0
+ - openssl 1.1.x compatibility
+ 
+0.2.43.1
+ - address valgrind complaints
+ 
+0.2.43.0
+ - don't remove unresponsive UPnP devices when playing
+ - don't remove CC devices that still respond to ping
+ 
+0.2.42.1
+ - re-align airupnp & aircast version numbers
+ 
+0.2.42.0
+ - a bit of cleaning wrt below issue
+ - use "binding" as general parameter name for upnp/cast
+ 
+0.2.41.2
+ - %&@!* of Linux does not handle sscanf with %[^:]:%u when the first string is empty
+ 
+0.2.41.1
+ - RTSP port was not bound to range!
+ 
+0.2.41.0
+ - allow chunked encoding and fixed length
+ - DLNA.ORG_PN was missing for mp3
+
+0.2.40.0
+ - add HTTP header callback for better DLNA handling
+ - answer to getcontentFeatures
+ 
+0.2.30.0
+ - add port range
+ 
+0.2.28.5
+ - tweak HTTP logs
+ 
+0.2.28.4
+ - http_parse SDEBUG statement did not print received line
+ 
+0.2.28.3
+ - remove stristr and clean strcasestr case called with NULL
+ 
+0.2.28.2
+ - exclude NULL modelnumber when -o is specified unless they are explicitely autorized
+ 
+0.2.28.1
+ - check that model & modelnumber are not NULL before looking of exclusion
+ 
+0.2.28.0
+ - make max_players a parameter
+
+0.2.27.1
+ - handle range request beyond count better
+
+0.2.27.0
+ - (airupnp) add -u and UPnPMax config options to set the max upnp search
+ 
+0.2.26.1
+ - (airupnp) config update shall not be done when there is not config
+ 
+0.2.26.0
+ - (aircast) add -v <factor> to globally set group media volume
+
+0.2.25.0
+ - (airupnp) search for mediarenderer:2
+ 
+0.2.24.7
+ - garbadge left in airupnp.c
+ 
+0.2.24.6
+ - Can't re-send more bytes than we've received
+ 
+0.2.24.5
+ - (aircast) clear SSL context on shutdown
+ 
+0.2.24.4
+ - race condition where the UPnP/CC device could be stopped by a flush after it started to play due to de-sync of flush/play (RTP) detetcion
+ 
+0.2.24.3
+ - (airupnp) add remote_title
+ 
+0.2.24.2
+ - restore trailing '+' UPnP name changes
+ 
+0.2.24.1
+ - do not copy NULL strings ... (util.c)
+ 
+0.2.24.0
+ - do not send body when method is HEAD
+
+0.2.23.1
+ - A records expiration
+
+0.2.23.0
+ - improve mDNS detection on multiple VLAN
+
+0.2.22.1
+ - (upnp) -o option matches on exact model numbers only
+
+0.2.22.0
+ - (upnp) add -o option to enable only listed model numbers
+
+0.2.21.3
+ - remove un-necessary muted flag 
+ - in Volume feedback, CalcGroupVolume was called before caller device was updated
+ 
+0.2.21.2
+ - Can't use Sonos' group volume API as it takes time to "settle down", so need to create our own
+ 
+0.2.21.1
+ - handle master's volume within all devices loop
+ 
+0.2.21.0
+ - volume timestamp moved to UPnP/CC side instead of RAOP
+
+0.2.20.0 
+ - modify libupnp to search using unicast, but not device seems to support uPnP 1.1
+ - CheckAndLock waqs not locking device
+ - double timestamp to handle fast volume changes
+ - do not delete UPnP context when a Sonos player becomes a slave to manage volume for Sonos groups
+ 
+0.2.13.1
+ - revert buffer indexing modifications
+
+0.2.13.0
+ - follow original name change
+
+0.2.12.2
+ - correct a key problem with circula buffer management and fill estimation
+ - integer promotion caused u16 comparisons to be wrong
+ 
+0.2.12.1
+ - UDP sockets don't need shutdown
+ - destroy ab_mutex on thread termination
+ 
+0.2.12.0
+- static versions now include full static openssl 
+ 
+0.2.11.0
+ - revert previous change but force short int promotio in buf_fill calculation
+ - add protocolInfo as a parameter
+ 
+0.2.10.3
+ - ancient 32 bits overflow bug in expected playtime calculation
+ 
+0.2.10.2
+ - update built-in dll version to ones that do not need VS
+ - add x86_64 static version
+ 
+0.2.10.1
+ - Windows 10 does has renamed libeay32.dll to libcrypto.dll and ssleay32.dll to libssl.dll (and does not even include it)
+ - do not crash when SSL not found
+ 
+0.2.10.0
+ - openSSL loaded manually for compatibility => no need any more to deal with various openssl versions!
+ 
+0.2.9.0
+ - (aircast) authorize "on behalf" announces as long as they are not from a group member
+
+0.2.8.0
+ - silence frames count on http reconnect shall be 0 when already sending silence
+ - limit packet recovery to max of rtp latency and http delay
+ - misc network congestion corrections
+ - forced fill http moved to :f option on latencies
+ - add <drift> parameter
+ - STILL NEED TO KNOW WHY AIRCAST LOCKS ON EXIT 
+
+0.2.7.0
+ - add parameter to disable range acceptance in hairtunes (needed for shairtunes2)
+ - send silence frames as soon as playtime reached to ensure continuous HTTP stream
+ - reduce initial silence frames by number of already received frames
+ - discriminate FLUSH send at start to clean pipe from FLUSH used to stop playback using RECORD values and timer
+ - resend timeout was wrong (in http thread)
+ - silence frames count on http reconnect shall be 0 when already sending silence
+ - discard NTP sync that have a larger roundtrip (100ms)
+ - RTP latency can be negative to force filling of silence frame when buffer is empty but playtime has elapsed (continuous stream)
+
+0.2.6.1
+ - (cast) simplify device removal (no explicit wakeup call)
+ 
+0.2.6.0
+ - move RTSP server back to using accept() instead of select() and use connect() to close the connection
+ - remove usage of sleep() to redeuce CPU consumption in idle
+
+0.2.5.0
+  - backport some squeeze2upnp/cast changes with no impact
+  - add -n option in airupnp to exclude model number
+  
+0.2.4.0
+ - Detect main IP address change and restart
+ 
+0.2.3.1
+ - version mistake with 0.2.3.0
+ 
+0.2.3.0
+ - add -c <codec> command line
+ - work with CC that require a range request (buffer up to 2MB)
+ - metadata was freed after ctx was released
+ - silence frame shall be ignored when range requested
+ - default codec for upnp was 'flac' instead of 'flc'
+ 
+0.2.2.6
+ - set length for silent frame now that length must be returned
+ 
+0.2.2.5
+ - aesiv and aeskey can start with a '\0', use a decrypt explicit boolean
+ - QueueFlush correction
+ 
+0.2.2.4 
+ - Group update could free NULL pointer (cast only)
+
+0.2.2.3
+ - artwork was not a duplication, hence releasing metadata was failing (upnp only)
+ 
+0.2.2.2
+ - update build toolchain to full cross compiling, including OSX, FreeBSD and Solaris
+ - added Linux ppc
+ - (cast) stop receiver should send STOP to sessionId, not mediaSessionId
+ 
+0.2.2.1
+ - flac codec name is 'flc' not 'flac'
+
+0.2.2.0
+ - add mp3 for encoding and icy metadata
+ - use Sonos radio stream url for mp3
+ - add option to set flac compression level
+ - encoder was not mutex protected against flush
+  
+0.2.1.1
+ - Some controlers like AirParrot do not send encrypted audio
+ 
+0.2.1.0
+ - add static <artwork> parameter
+ - 32 bits comparaison correction
+ - (aircast) do not set playing state on "buffering" event
+ 
+0.2.0.8
+ - add aarch64
+ 
+0.2.0.7
+ - loglimit was not used in airupnp
+ 
+0.2.0.6
+ - kd_dump was writing in a NULL string when no header was received
+ 
+0.2.0.5
+ - alac.c compiles depends on endianness
+ - Some players (Roon) send a FLUSH after a TEARDOWN which caused access to a NULL hairtunes context
+ - When changing track, the previous HTTP socket was used to send new track, causing miss of flac header & track beginning yielding to very long CC start
+  
+0.2.0.4
+ - (airupnp) backporting of squeeze2upnp modifications
+ - Add TCP_NODELAY to HTTP socket
+
+0.2.0.3
+ - race condition & double free when stopping device (credit @codepeon)
+ - http parsing error caused memory leak (headers not released)
+ - cosmetic changes
+ - (airupnp) backport squeeze2upnp modification (AVTSetURI)
+ - (airupnp) subscription complete failure could lead to access NULL pointer
+ 
+0.2.0.2
+ - On keep-alive UPnP result, always move to next item if device found in list (even if removed as a Sonos slave)
+ - only use SEARCH_RESULT and not ADVERTISEMENT_ALIVE for keep-alive
+ 
+0.2.0.1
+ - (airupnp) search for master should return true in case of UPnP error
+ - (aircast) mDNS search for groups was messed-up
+ 
+0.2.0.0
+ - new handling of discovery (mDNS-SD and UPnP) for on-the-fly player addition / removal (no more discovery time and removal counts)
+ - Review of all mutex-related issue and various risk of unprotected code
+ - review of memory leaks (only the SSL remains, which is the same all over execution)
+ - mDNS records is now 120s (per RFQ) and not 75m so that in case of crash, player do not appear sticky for some applications
+ - add possibility to dump players ('dump' & 'dumpall' commmands)
+ - in SETUP response, cport and tport are set to 0 by default which will cause session to fail if none of these are provided
+ - handle "header folding" in HTTP response
+ - HTTP headers w/o : should not crash kbd_free
+ - use closesocket under Windows, not close!
+ - (aircast) SSL context is not deleted at every disconnect to avoid memory leaks
+ - (aircast) wrong volume local change when mute was set
+  
+0.1.6.1
+ - add Solaris i86pc build
+ - change some mdns options
+ 
+0.1.5.3
+ - compile flag to store streams
+ 
+0.1.5.2
+ - FreeBSD does not exit accept() even when socket shutdown properly, need to use select()
+ 
+0.1.5.1
+ - memory leak correction in isMatsre & GetGroupVolume (@codepeon)
+ 
+0.1.5.0
+ - add "+" after default name to identify AirConnect players
+ 
+0.1.4.4
+ - always remove players on BYEBYE message
+ 
+0.1.4.3
+ - (airupnp) default name is zone name for Sonos device
+
+0.1.4.2
+ - (airupnp) properly eliminate Sonos slaves
+ 
+0.1.4.1
+ - misc Sonos group cleaning
+ 
+0.1.4.0
+ - (airupnp) detect Sonos groups and do not add slaves
+ - (airupnp) add Sonos groups volume
+ 
+0.1.3.2
+ - discovery and exit (-i) could abort without searching on aircast
+ - new devices were not added to existing file when using -I
+ 
+0.1.3.1
+ - when cannot start, exit with no-zero code
+ 
+0.1.3.0
+ - title changed to "Streaming from AirConnect"
+ - code cleaning
+ 
+0.1.2.0
+ - send minimum metadata
+ - (aircast) remove unused config items 
+ 
+0.1.1.0
+ - support wav and pcm codecs
+ 
+0.1.0.5
+  - rare race condition in UPnP search timeout/result
+
+0.1.0.4
+ - flac_ready boolean was un-necessary
+ - wait for playing (RTP) before sending silent frames
+ - was sending a few raw frames at the beginning when using flac
+ - functions renaming for better consistency
+ 
+0.1.0.3
+ - pthread_join of remote search could be called twice
+ - update renderer thread cleaned for better exit
+ - memory leaks correction
+ 
+0.1.0.2
+ - code cleaning
+ - exclusion (-m) parsing was wrong and ";" is not a valid separator
+ 
+0.1.0.0
+ - HTTP delay uses silence frames
+ 
+0.0.2.7
+ - do not hold RTP frames when they are available! only hold missing one, up to RTP latency
+ - add HTTP delay for Chromecast as well
+
+0.0.2.6
+ - NULL (empty xml item) was causing crash and default save set <latency> to empty
+ 
+0.0.2.5
+ - <name> in config file was not taken into account
+
+0.0.2.4 
+ - only notify of playback when frame is not silence (all 0) to avoid iOS 10.x spurious play
+ - add wav header so that wav can be used in AirCast as well
+
+0.0.2.3
+ - increase SO_SNDBUF to try to better handle sloppy networks
+ 
+0.0.2.2
+ - high CPU usage in http frames handling
