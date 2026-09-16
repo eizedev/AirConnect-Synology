@@ -1,6 +1,6 @@
 package="AirConnect"
 version=#VERSION#
-description="Use AirPlay to stream to UPnP/Sonos & Chromecast devices"
+description="Use AirPlay to stream to UPnP/Sonos & Chromecast devices. Also works on Synology Routers (SRM)."
 maintainer="philippe44"
 maintainer_url="https://github.com/philippe44/AirConnect"
 distributor="eizedev"
