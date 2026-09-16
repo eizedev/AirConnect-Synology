@@ -20,6 +20,11 @@ Verified end-to-end on real hardware: fresh GUI install on a Synology router
   RTP/HTTP streams, so firewall rules have something fixed to allow instead of random
   OS-assigned ports. Passed through as airupnp's `-a` flag. Default `49155:128`.
   ([#142](https://github.com/eizedev/AirConnect-Synology/issues/142))
+- Automated upstream-update flow ([#19](https://github.com/eizedev/AirConnect-Synology/issues/19)):
+  a weekly check opens a PR when upstream AirConnect has a new release (checksum
+  pre-verified, upstream release notes attached); merging that PR automatically tags
+  and publishes the next AirConnect-Synology release. No auto-merge - review and
+  merging the PR is still a human decision.
 
 ### Fixed
 - Package Center could report AirConnect as "stopped" while it was actually running
