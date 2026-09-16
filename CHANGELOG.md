@@ -1,93 +1,75 @@
 # Changelog
 
-Changes to the **AirConnect-Synology packaging** itself — installer scripts, build
-pipeline, and packaging logic. This is separate from AirConnect's own changelog
-(bundled in each release as `CHANGELOG`, sourced from
-[philippe44/AirConnect](https://github.com/philippe44/AirConnect/blob/master/CHANGELOG)).
-
-Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+Changes to the **AirConnect-Synology packaging** — installer scripts, build pipeline,
+config handling. For changes to `airupnp`/`aircast` themselves, see the upstream
+[AirConnect CHANGELOG](https://github.com/philippe44/AirConnect/blob/master/CHANGELOG)
+(bundled in each release). Format loosely follows
+[Keep a Changelog](https://keepachangelog.com/en/1.0.0/). Entries before 1.11.3 are
+condensed from the [GitHub Releases](https://github.com/eizedev/AirConnect-Synology/releases)
+history, which remains the canonical source for full release notes.
 
 ## [Unreleased]
 
-All fixes below were verified together end-to-end via real Package Center installs on
-real hardware: a fresh install through the GUI on a Synology router (RT2600ac/SRM;
-install, wizard, start, and a running `airupnp`/`aircast`, after correcting the IP
-field's misleading VPN-interface default by hand - see "Known issues" below), and a
-real **upgrade** from an actual, previously-installed AirConnect 1.8.3 on a DS923+
-(DSM): the existing configuration was preserved exactly, the log file is now correctly
-named, and `synopkg status` correctly reports the package as running, matching the
-real, healthy `airupnp`/`aircast` processes.
-
-### Known issues
-
-- **The installer's auto-detected default IP can be wrong on multi-homed devices,
-  including some router setups - confirmed, not just suspected.** The detection picks
-  the source address of the machine's default route, which is not necessarily the
-  LAN-facing address. Directly confirmed via a real Package Center install on an SRM
-  router configured with a VPN/mesh interface as its default route: the wizard
-  correctly rendered and pre-filled the "IP of your Synology device" field, but with
-  that VPN interface's address rather than the device's LAN IP - the field had to be
-  corrected by hand before completing the install. The field is editable, so this
-  doesn't block installation, but the pre-filled default can be actively misleading on
-  such setups. Not fixed - flagged as a known limitation of the detection heuristic
-  rather than silently worked around, since a robust fix needs a considered decision
-  about which interface to prefer on an ambiguous multi-homed setup, not a quick
-  patch.
+Verified end-to-end on real hardware: fresh GUI install on a Synology router
+(RT2600ac/SRM), and an upgrade from a real, previously-installed 1.8.3 on a DS923+
+(DSM), config preserved.
 
 ### Fixed
+- Package Center could report AirConnect as "stopped" while it was actually running
+  (`start-stop-status` used bare `ps`, which can't see daemonized processes on DSM).
+  Now probes at runtime which `ps` invocation works, since DSM and SRM need opposite
+  approaches (SRM's BusyBox `ps` errors on the `aux` flag DSM requires).
+- Package installation could fail outright on Synology routers (SRM) and leave the
+  device unable to reinstall: every lifecycle script and `install_uifile.sh` were
+  tracked in git as non-executable, which DSM tolerates but SRM does not. Fixed for
+  all scripts in both the DSM 7 and legacy DSM 5/6 packages.
+- The installer's IP auto-detection crashed silently on SRM (`grep -P`, unsupported by
+  BusyBox `grep`), leaving the IP field blank. Switched to the portable `sed` approach
+  already used by the legacy DSM 5/6 installer.
+- `preupgrade`/`postupgrade` referenced `$AIRCONNECT_USER` without ever setting it,
+  sending their log output to `log/.log` instead of `log/airconnect.log`.
 
-- **`preupgrade`/`postupgrade` logged to the wrong file during package upgrades.**
-  Both scripts referenced `$AIRCONNECT_USER` without ever setting it (unlike
-  `postinst` and `start-stop-status`, which both derive it correctly); with no
-  `set -eu` in these two scripts, this silently expanded to an empty string instead
-  of erroring, sending their log output to `log/.log` instead of
-  `log/airconnect.log`. Fixed by deriving it the same way the other scripts already
-  do. Applies to both the DSM 7 and legacy DSM 5/6 packages.
+### Known issues
+- The installer's auto-detected default IP can be wrong on multi-homed devices
+  (confirmed: a router with a VPN/mesh interface as its default route got that
+  interface's IP pre-filled, not its LAN IP). The field is editable, so this doesn't
+  block installation. Not fixed - needs a considered choice of which interface to
+  prefer on an ambiguous setup, not a quick patch.
 
-- **The installer's IP auto-detection could crash silently on Synology routers (SRM),
-  leaving the "IP of your Synology device" field blank instead of pre-filled.** It
-  used `grep -P` (PCRE) to parse `ip route` output; BusyBox's `grep` on SRM (and
-  presumably on any Synology model that ships BusyBox instead of GNU grep) doesn't
-  support `-P` at all and errors with "invalid option -- 'P'" - silently, since the
-  script has no `set -e`, so the failure produced an empty IP instead of a visible
-  error. Fixed by switching to the same `sed`-based approach the legacy DSM 5/6
-  package's installer already used (which doesn't need PCRE) - confirmed by direct
-  testing that this produces the identical, correct result on real DSM hardware
-  (DS415+) and now also works without erroring on SRM (RT2600ac), where it previously
-  crashed outright.
+## Earlier history (condensed from GitHub Releases)
 
-- **Package Center could report AirConnect as "stopped" while it was actually running
-  healthy (DSM).** Both `airconnect_status()` (the status check) and
-  `stop_airconnect()`'s own success verification in `start-stop-status` used bare `ps`
-  to look for the `airupnp`/`aircast` processes; since both daemonize (detach from any
-  controlling terminal), DSM's `ps` could never see them without the `aux` flag,
-  regardless of whether they were actually running or had actually stopped. Verified on
-  real hardware (DS415+, DSM 7.1.1): before the fix, a fully healthy install
-  (discovering and streaming to real devices) was reported as `stopped`
-  (`status_code 3`) at every check; after the fix, the identical install correctly
-  reports `running` (`status_code 0`). Likely the root cause of several long-standing
-  "package shows stopped after install" reports.
-  - The fix now **probes which `ps` invocation actually works at runtime** instead of
-    hard-coding `ps aux`: Synology routers (SRM) ship a BusyBox `ps` that does the
-    opposite of DSM - it lists every process by default and **errors out** on `aux`.
-    A first version of this fix that just switched everything to `ps aux` would have
-    broken status/stop on routers while fixing DSM. Also fixes a separate, pre-existing
-    bug in the PID lookup used by the stop path, which had always hard-coded `ps aux`
-    even before this change - so `stop` was likely never able to find the right
-    processes to kill on SRM/routers either.
-  - Applies to both the DSM 7 and legacy DSM 5/6 packages.
-
-- **Package installation could fail outright on Synology routers (SRM), and leave the
-  device unable to reinstall afterward.** All lifecycle scripts (`preinst`, `postinst`,
-  etc.) and `WIZARD_UIFILES/install_uifile.sh` were tracked in git as non-executable
-  (mode `644`) instead of `755` - harmless on DSM, which invokes them via an
-  interpreter, but fatal on SRM. Root-caused on a real RT2600ac via
-  `/var/log/messages`:
-  ```
-  process.cpp:219 Failed to run .../WIZARD_UIFILES/install_uifile.sh, ret=[-1], Permission denied
-  pkgtool.cpp:2430 AirConnect can't run
-  pkgstartstop.cpp:216 Package target path broken, AirConnect
-  ```
-  That failure left the package registration broken, which then made a subsequent
-  clean install attempt on the same device fail too. Fixed by setting the executable
-  bit on every script in both the DSM 7 and legacy DSM 5/6 packages.
+- **1.8.3** (2024-04-03) - GitHub Actions now build and publish releases
+  automatically; `airconnect.log` auto-rotates at 50MB; new
+  `AIRUPNP_CONTENTLENGTH_MODE` config option; default latency lowered to `50:500`
+  (existing configs not touched - update manually); fixed a corrupted-binary release
+  caused by a `release-downloader` bug (thanks @seiry).
+- **1.6.3 / 1.7.0** (2024-01) - first (preliminary) GitHub Actions build automation.
+- **1.2.2** (2023-10-01) - no packaging changes; tracked upstream AirConnect only.
+- **1.1.0-1.1.7** (2023-04 to 2023-08) - `armv5` build re-added; upstream aircast
+  volume-control fix.
+- **1.0.13** (2022-12-16) - AirConnect 1.0 support; new architectures `epyc7002`,
+  `r1000`, `broadwellnkv2` (DS923+ and newer); static builds added for `armv5`,
+  `armv6`, `x86`, `x86_64`.
+- **0.2.51.2** (2021-11 to 2022-02) - security fix for CVE-2017-12087 (upstream);
+  default AirPlay-device filter extended (Samsung HW-N950, Devialet Expert Pro 140,
+  Fitzwilliam) - filter is not touched on upgrade, only on fresh installs.
+- **0.2.50.5 "dsm7" series** (2021-07 to 2021-08) - the DSM 7 rewrite: packages run
+  under a dedicated `airconnect` user instead of root; integrated Package Center
+  install wizard; `airconnect.conf` config file; dedicated `airconnect` shared folder
+  for log/config access via File Station. Breaking change - required uninstalling the
+  old package first.
+- **0.2.43.x - 0.2.44.x** (2021-01 to 2021-03) - `v1000`/`geminilake`/`purley`
+  architecture support (DS1821+, DS1621+, and newer Celeron/Xeon models); local
+  network interface detection fixes; log size cap lowered to 10MB; fixed a bug where
+  Chromecast devices would disappear.
+- **0.2.41.0** (2020-12-09) - default filter added for Sonos devices with native
+  AirPlay support, to stop them appearing twice (the `FILTER_AIRPLAY2_DEVICES`
+  mechanism still in use today).
+- **0.2.28.x** (2020-10-28) - `aarch64-static`/`arm-static` builds added.
+- **0.2.26.0 → 0.2.26.1** (2020-05-26/28) - a same-week regression: low-privileged-user
+  installs core-dumped on startup; fixed within two days.
+- **0.2.25.0** (2020-05-04/11) - packages for all architectures published; upgrades no
+  longer require uninstalling the previous version first.
+- **0.2.24.7** (2020-04-17/20) - the original DSM package: `postinst`/`preuninst`/
+  `postuninst` lifecycle scripts, dedicated package user, `config.xml`/
+  `config-cast.xml` support, port-in-use check, Sonos latency defaults (`-l 1000:2000`).
