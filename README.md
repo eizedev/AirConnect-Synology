@@ -7,9 +7,16 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/eizedev/airconnect-synology/badge)](https://www.codefactor.io/repository/github/eizedev/airconnect-synology)
 [![GitHub Super-Linter](https://github.com/eizedev/AirConnect-Synology/actions/workflows/linter.yml/badge.svg)](https://github.com/marketplace/actions/super-linter)
 [![GitHub discussions](https://img.shields.io/badge/Discussions-Check%20latest%20community%20posts-lightgrey)](https://github.com/eizedev/AirConnect-Synology/discussions)
+[![Available via 007revad Package Source](https://img.shields.io/badge/Package%20Center-007revad%20Package%20Source-blue)](https://github.com/007revad/Synology_package_source)
 
 ![AirConnect-Synology Logo](doc/res/header.png)
 
+> 📦 **This package is also listed in [007revad's Synology Package Source](https://github.com/007revad/Synology_package_source)** —
+> add it once in Package Center (Settings → Package Sources → Add → Name `007revad`,
+> Location `https://spkrepo.007daver.workers.dev/`) and install/update AirConnect from
+> the **Community** tab like any other Synology package, no manual downloads needed.
+> See discussion [#189](https://github.com/eizedev/AirConnect-Synology/discussions/189).
+>
 > Compatible with DSM 7.x (also 7.2)! Please download the package with the name beginning with `AirConnect-dsm7-`
 >
 > Updated packages for `AirConnect 1.8+` available!
