@@ -29,9 +29,19 @@ Usage:
 Exit status: 0 if every file passes the hard checks (ELF magic present,
 parseable, machine type matches the requested architecture, static/dynamic
 matches). Non-fatal findings (minimum kernel, glibc versions, interpreter,
-float ABI) are reported but never fail the run by themselves - they are
-meant to feed a generated compatibility matrix in the docs (not written yet
-as of this script's introduction; see tests/README.md for status).
+float ABI) are reported but never fail the run by themselves.
+
+IMPORTANT, learned the hard way (see the project's synology-kernel-compat
+memory entry / tests/README.md): the ELF note's declared minimum kernel
+does NOT reliably predict whether a binary will actually run on a given
+Synology device. Real-world reports (AirConnect-Synology issues #63, #104,
+confirmed by the upstream author) show failures on kernels this project
+later re-tested successfully on the same kernel/glibc version - the
+runtime check this note used to trigger was removed from glibc around
+2022, and whether it still fires depends on the target's own patched
+glibc build, not on this value. Treat min_kernel/glibc output as
+descriptive diagnostic data only - never build a pass/fail compatibility
+matrix or an arch= exclusion list from it alone.
 """
 
 import argparse

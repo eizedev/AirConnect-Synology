@@ -34,10 +34,20 @@ confirmed by measurement, see the comment in the script - a float-ABI
 mismatch on `arm`/`armv5`.
 
 Everything else (minimum kernel version, glibc symbol versions referenced,
-interpreter path) is reported but does not fail the run by itself. That data
-feeds the compatibility matrix described in the project plan (Phase 2/6) -
-the point of measuring it here is to know what we're shipping, not to assert
-an expected value we'd just be guessing at.
+interpreter path) is reported but does not fail the run by itself, and is
+**purely descriptive** - the point of measuring it here is to know what
+we're shipping, not to predict compatibility. Real-world testing (see the
+project's `synology-kernel-compat` memory) found that the ELF note's
+declared minimum kernel does not reliably predict whether a binary runs on
+a given device: the runtime check it used to trigger was removed from
+glibc around 2022, and whether it still fires depends on the target
+device's own patched glibc build, which varies by DSM patch level, not
+just by platform/kernel. **Do not build a static pass/fail compatibility
+matrix or an `arch=` exclusion list from this data alone** - the project's
+actual compatibility approach is a runtime probe at install time
+(`scripts/preinst` actually attempting to run the binary), because that is
+the only thing that reflects the real, per-device, per-patch-level
+situation.
 
 Findings recorded from real measurements so far live in the project's
 `synology-kernel-compat` memory entry, not in this repo (see the project
