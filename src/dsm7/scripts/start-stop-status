@@ -25,10 +25,23 @@ fi
 # shellcheck source=/dev/null
 . "${AIRCONNECT_CONFIG}"
 
-# pgrep not available by default on synology devices
-# shellcheck disable=SC2009
+# pgrep not available by default on synology devices. Which `ps` invocation
+# lists ALL processes (not just ones with a controlling terminal) differs
+# between platforms: DSM's ps needs "aux" - without it, a daemonized (-z)
+# airupnp/aircast is invisible even while running, which used to make this
+# script report a healthy install as "stopped". The BusyBox ps on Synology
+# routers (SRM) goes the other way: it lists everything by default and
+# errors out on "aux" ("invalid option -- 'a'"). Probe once and use
+# whichever this system's ps actually accepts.
+if ps aux >/dev/null 2>&1; then
+    PS_ALL_CMD="ps aux"
+else
+    PS_ALL_CMD="ps"
+fi
+
+# shellcheck disable=SC2009,SC2086
 get_pid() {
-    PID=$(ps aux | grep -E 'airupnp|aircast' | grep -v grep | awk '{print $2}')
+    PID=$($PS_ALL_CMD | grep -E 'airupnp|aircast' | grep -v grep | awk '{print $2}')
 }
 
 start_airconnect_on_ip() {
@@ -170,17 +183,17 @@ stop_airconnect() {
     if [ "${AIRUPNP_ENABLED}" = 1 ] && [ "${AIRCAST_ENABLED}" = 1 ]; then
         # pgrep not available by default on synology devices
         # shellcheck disable=SC2009
-        if ! ps aux | grep -E 'airupnp' | grep -v -q grep && ! ps aux | grep -E 'aircast' | grep -v -q grep; then
+        if ! $PS_ALL_CMD | grep -E 'airupnp' | grep -v -q grep && ! $PS_ALL_CMD | grep -E 'aircast' | grep -v -q grep; then
             return 0
-        elif ps aux | grep -E 'airupnp' | grep -v -q grep && ps aux | grep -E 'aircast' | grep -v -q grep; then
+        elif $PS_ALL_CMD | grep -E 'airupnp' | grep -v -q grep && $PS_ALL_CMD | grep -E 'aircast' | grep -v -q grep; then
             echo "[$(date +'%T')] Stop: airupnp & aircast are still running!" >>"$LOG"
             echo "[$(date +'%T')] Stop: airupnp & aircast are still running" >>"$SYNOPKG_TEMP_LOGFILE"
             return 1
-        elif ! ps aux | grep -E 'airupnp' | grep -v -q grep && ps aux | grep -E 'aircast' | grep -v -q grep; then
+        elif ! $PS_ALL_CMD | grep -E 'airupnp' | grep -v -q grep && $PS_ALL_CMD | grep -E 'aircast' | grep -v -q grep; then
             echo "[$(date +'%T')] Stop: aircast is still running!" >>"$LOG"
             echo "[$(date +'%T')] Stop: aircast is still running!" >>"$SYNOPKG_TEMP_LOGFILE"
             return 1
-        elif ps aux | grep -E 'airupnp' | grep -v -q grep && ! ps aux | grep -E 'aircast' | grep -v -q grep; then
+        elif $PS_ALL_CMD | grep -E 'airupnp' | grep -v -q grep && ! $PS_ALL_CMD | grep -E 'aircast' | grep -v -q grep; then
             echo "[$(date +'%T')] Stop: airupnp is still running!" >>"$LOG"
             echo "[$(date +'%T')] Stop: airupnp is still running!" >>"$SYNOPKG_TEMP_LOGFILE"
             return 1
@@ -188,7 +201,7 @@ stop_airconnect() {
     elif [ "${AIRUPNP_ENABLED}" = 1 ]; then
         # pgrep not available by default on synology devices
         # shellcheck disable=SC2009
-        if ! ps aux | grep -E 'airupnp' | grep -v -q grep; then
+        if ! $PS_ALL_CMD | grep -E 'airupnp' | grep -v -q grep; then
             return 0
         else
             echo "[$(date +'%T')] Stop: airupnp is still running!" >>"$LOG"
@@ -198,7 +211,7 @@ stop_airconnect() {
     elif [ "${AIRCAST_ENABLED}" = 1 ]; then
         # pgrep not available by default on synology devices
         # shellcheck disable=SC2009
-        if ! ps aux | grep -E 'aircast' | grep -v -q grep; then
+        if ! $PS_ALL_CMD | grep -E 'aircast' | grep -v -q grep; then
             return 0
         else
             echo "[$(date +'%T')] Stop: aircast is still running!" >>"$LOG"
@@ -213,14 +226,14 @@ airconnect_status() {
     if [ "${AIRUPNP_ENABLED}" = 1 ] && [ "${AIRCAST_ENABLED}" = 1 ]; then
         # pgrep not available by default on synology devices
         # shellcheck disable=SC2009
-        if ps aux | grep -E 'airupnp' | grep -v -q grep && ps aux | grep -E 'aircast' | grep -v -q grep; then
+        if $PS_ALL_CMD | grep -E 'airupnp' | grep -v -q grep && $PS_ALL_CMD | grep -E 'aircast' | grep -v -q grep; then
             return 0
-        elif ! ps aux | grep -E 'airupnp' | grep -v -q grep && ! ps aux | grep -E 'aircast' | grep -v -q grep; then
+        elif ! $PS_ALL_CMD | grep -E 'airupnp' | grep -v -q grep && ! $PS_ALL_CMD | grep -E 'aircast' | grep -v -q grep; then
             return 3
-        elif ! ps aux | grep -E 'airupnp' | grep -v -q grep && ps aux | grep -E 'aircast' | grep -v -q grep; then
+        elif ! $PS_ALL_CMD | grep -E 'airupnp' | grep -v -q grep && $PS_ALL_CMD | grep -E 'aircast' | grep -v -q grep; then
             echo "[$(date +'%T')] Status: airupnp not running!" >>"$LOG"
             return 3
-        elif ps aux | grep -E 'airupnp' | grep -v -q grep && ! ps aux | grep -E 'aircast' | grep -v -q grep; then
+        elif $PS_ALL_CMD | grep -E 'airupnp' | grep -v -q grep && ! $PS_ALL_CMD | grep -E 'aircast' | grep -v -q grep; then
             echo "[$(date +'%T')] Status: aircast not running!" >>"$LOG"
             return 3
         else
@@ -229,7 +242,7 @@ airconnect_status() {
     elif [ "${AIRUPNP_ENABLED}" = 1 ]; then
         # pgrep not available by default on synology devices
         # shellcheck disable=SC2009
-        if ps aux | grep -E 'airupnp' | grep -v -q grep; then
+        if $PS_ALL_CMD | grep -E 'airupnp' | grep -v -q grep; then
             return 0
         else
             echo "[$(date +'%T')] Status: airupnp not running!" >>"$LOG"
@@ -238,7 +251,7 @@ airconnect_status() {
     elif [ "${AIRCAST_ENABLED}" = 1 ]; then
         # pgrep not available by default on synology devices
         # shellcheck disable=SC2009
-        if ps aux | grep -E 'aircast' | grep -v -q grep; then
+        if $PS_ALL_CMD | grep -E 'aircast' | grep -v -q grep; then
             return 0
         else
             echo "[$(date +'%T')] Status: aircast not running!" >>"$LOG"

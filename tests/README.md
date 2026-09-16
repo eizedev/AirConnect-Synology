@@ -86,12 +86,20 @@ sh tests/validate_spk.sh dist/AirConnect-dsm7-x86_64-1.11.3-20260916.spk
 seven lifecycle scripts under `src/dsm7/scripts/` are tracked in git as
 mode `100644` (non-executable) instead of `100755` - confirmed with
 `git ls-files -s src/dsm7/scripts/` - and the built `.spk` inherits that.
-Whether this actually breaks anything is not established (the package has
-apparently worked for many users for years, so DSM's installer likely
-either invokes these scripts via an explicit interpreter or fixes
-permissions itself during install/extraction - not confirmed either way).
 Flagged for the maintainer to decide on rather than fixed here, since it
 touches tracked file modes rather than adding new files. Verified with a
 synthetic clean copy (`chmod +x` applied before re-tarring) that the
 validator reports a clean `OK` once the scripts are executable, so this
 isn't a false positive in the check itself.
+
+**On real DSM hardware this is confirmed harmless** (DS415+/DS923+, DSM
+7.1.1/7.4.1, `synopkg install`: `preinst`/`postinst` both ran with exit
+code 0 despite the missing +x bit) - DSM clearly invokes these scripts via
+an interpreter rather than executing them directly. **On SRM (RT2600ac)
+this is unconfirmed and currently looks different**: the one real install
+attempt that "succeeded" there never actually populated `airconnect.conf`
+or the log file, meaning `postinst` likely did not run to completion - and
+a second attempt failed the install outright. Not root-caused yet (see the
+project's `start-stop-status-ps-bug` memory for the full, still-open
+finding); until it is, **do not assume the exec-bit finding's "harmless"
+conclusion applies to SRM/routers** - treat it as DSM-specific.
