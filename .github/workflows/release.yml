@@ -124,6 +124,9 @@ jobs:
           files: |
             src/dsm7/dist/*.spk
           discussion_category_name: Releases
+          body: |
+            Packaging changes: see [CHANGELOG.md](https://github.com/eizedev/AirConnect-Synology/blob/master/CHANGELOG.md).
+            Upstream AirConnect ${{ steps.upstream.outputs.tag }} changes: see the [AirConnect CHANGELOG](https://github.com/philippe44/AirConnect/blob/master/CHANGELOG).
           generate_release_notes: true
         if: startsWith(github.ref, 'refs/tags/')
 

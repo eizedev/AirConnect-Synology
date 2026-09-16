@@ -1,0 +1,135 @@
+---
+name: Upstream AirConnect version bump
+
+# Two-stage, human-in-the-loop upstream update flow:
+#   1. check-for-update: runs weekly, compares the pinned version in
+#      upstream.json against philippe44/AirConnect's latest release. If
+#      newer, computes the new checksum and opens a PR - never merges it.
+#   2. tag-and-release: runs when a PR that touched upstream.json is merged
+#      to master (by a human, in Package Center). Creates and pushes the
+#      next release tag, which triggers release.yml's existing build,
+#      validate, and publish pipeline.
+#
+# This intentionally never auto-merges the version-bump PR - a human
+# reviews and merges it (see AirConnect-Synology project history: #106 and
+# #107 both shipped real breakage that only surfaced after users installed
+# it, so an unattended merge-and-publish pipeline is not worth the
+# convenience here).
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # weekly, Monday 06:00 UTC
+  workflow_dispatch:
+  pull_request:
+    types: [closed]
+    branches: [master]
+    paths:
+      - upstream.json
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-for-update:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Compare upstream release to pinned version
+        id: check
+        run: |
+          CURRENT_TAG=$(jq -r .tag upstream.json)
+          LATEST=$(curl -sL -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/philippe44/AirConnect/releases/latest")
+          LATEST_TAG=$(echo "$LATEST" | jq -r .tag_name)
+
+          if [ "$LATEST_TAG" = "$CURRENT_TAG" ] || [ -z "$LATEST_TAG" ] || [ "$LATEST_TAG" = "null" ]; then
+            echo "Already up to date (pinned: ${CURRENT_TAG}, upstream latest: ${LATEST_TAG:-unknown})."
+            echo "update_available=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "New upstream release: ${CURRENT_TAG} -> ${LATEST_TAG}"
+          ASSET_URL=$(echo "$LATEST" | jq -r '[.assets[] | select(.name | test("^AirConnect-.*\\.zip$"))][0].browser_download_url')
+          ASSET_NAME=$(basename "$ASSET_URL")
+          if [ -z "$ASSET_URL" ] || [ "$ASSET_URL" = "null" ]; then
+            echo "::error::Could not find an AirConnect-*.zip asset in the latest upstream release."
+            exit 1
+          fi
+
+          curl -sL -o /tmp/upstream.zip "$ASSET_URL"
+          SHA256=$(sha256sum /tmp/upstream.zip | awk '{print $1}')
+          rm -f /tmp/upstream.zip
+
+          jq -n --arg version "$LATEST_TAG" --arg tag "$LATEST_TAG" \
+                --arg asset "$ASSET_NAME" --arg sha256 "$SHA256" \
+            '{version: $version, tag: $tag, asset: $asset, sha256: $sha256}' \
+            > upstream.json
+
+          UPSTREAM_NOTES=$(echo "$LATEST" | jq -r '.body // "(no release notes provided upstream)"')
+
+          {
+            echo "Bumps the pinned upstream AirConnect version from"
+            echo "\`${CURRENT_TAG}\` to \`${LATEST_TAG}\`"
+            echo "in \`upstream.json\` (new SHA256 verified against the downloaded release asset)."
+            echo
+            echo "**This PR does not auto-merge.** Review the upstream changes below, merge"
+            echo "manually when ready - merging will automatically tag and publish a new"
+            echo "AirConnect-Synology release."
+            echo
+            echo "<details>"
+            echo "<summary>Upstream release notes for ${LATEST_TAG}</summary>"
+            echo
+            echo "${UPSTREAM_NOTES}"
+            echo
+            echo "</details>"
+            echo
+            echo "Full upstream changelog: https://github.com/philippe44/AirConnect/blob/master/CHANGELOG"
+          } > /tmp/pr_body.md
+
+          {
+            echo "update_available=true"
+            echo "old_tag=${CURRENT_TAG}"
+            echo "new_tag=${LATEST_TAG}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Open PR with the version bump
+        if: steps.check.outputs.update_available == 'true'
+        uses: peter-evans/create-pull-request@v8
+        with:
+          # Fixed branch name (no branch-suffix): re-running this workflow
+          # before the PR is merged updates the same PR instead of piling
+          # up a new one each week - unlike the images.yml workflow, which
+          # does use a timestamp suffix and is why it has accumulated
+          # several near-duplicate "Auto Compress Images" PRs.
+          branch: upstream-airconnect-bump
+          title: "chore(upstream): bump AirConnect to ${{ steps.check.outputs.new_tag }}"
+          commit-message: "chore(upstream): bump pinned AirConnect to ${{ steps.check.outputs.new_tag }}"
+          body-path: /tmp/pr_body.md
+
+  tag-and-release:
+    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Create and push the next release tag
+        run: |
+          VERSION=$(jq -r .version upstream.json)
+          TAG="${VERSION}-$(date +%Y%m%d)"
+
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "::error::Tag ${TAG} already exists - not pushing again. If this is a genuine same-day re-bump, tag manually with a disambiguating suffix."
+            exit 1
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" -m "AirConnect ${VERSION}"
+          git push origin "$TAG"
+          echo "Pushed tag ${TAG} - release.yml will build and publish it."
