@@ -11,6 +11,8 @@ links are included where a change traces back to one, so reports stay findable.
 
 ## [Unreleased]
 
+## [1.11.3-20260916] - 2026-09-16
+
 Verified end-to-end on real hardware: fresh GUI install on a Synology router
 (RT2600ac/SRM), and an upgrade from a real, previously-installed 1.8.3 on a DS923+
 (DSM), config preserved.
