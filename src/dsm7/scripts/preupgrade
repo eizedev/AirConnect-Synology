@@ -1,5 +1,6 @@
 #!/bin/sh
 
+AIRCONNECT_USER="$(echo "${SYNOPKG_PKGNAME}" | awk '{print tolower($0)}')"
 LOG="${SYNOPKG_PKGDEST}/log/${AIRCONNECT_USER}.log"
 AIRCONNECT_CONFIG_FILE="airconnect.conf"
 

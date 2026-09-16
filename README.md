@@ -22,7 +22,7 @@
 
 A minimal Synology package for [AirConnect](https://github.com/philippe44/AirConnect).  
 It allows you to use [AirPlay](https://en.wikipedia.org/wiki/AirPlay)
-to stream to **UPnP/Sonos** & **Chromecast** devices that do not natively support AirPlay.  
+to stream to **UPnP/Sonos** & **Chromecast** devices that do not natively support AirPlay.
 
 - [AirConnect package for Synology NAS and Synology Router](#airconnect-package-for-synology-nas-and-synology-router)
   - [Information](#information)
@@ -135,6 +135,18 @@ site.
 For all the Synology **Routers** running Synology SRM you should use the **ARM** (ARMv7 - dakota, ipq806x, northstarplus) version.
 If the normal ARM package is not working on your device, please try **ARM Static** (ARMv7 Static) instead.
 
+The packages are named `dsm7-*`, but the same package works on SRM (Synology's router
+OS) as well as DSM 7 - confirmed on a real router (RT2600ac, SRM 1.3.2-9366 Update 2),
+install through to a running `airupnp`/`aircast`.
+
+> **Check the pre-filled IP during install if your router has a VPN, mesh, or other
+> non-LAN default route.** The installer wizard's "IP of your Synology device" field is
+> auto-detected from your router's default route, which on such setups may not be your
+> LAN address (e.g. a Tailscale/VPN interface's IP instead). If AirConnect isn't
+> reachable after install, check the IP in `airconnect.conf` and correct it to your
+> router's actual LAN IP if needed - the field is editable during install, or you can
+> edit `airconnect.conf` afterward and restart the package.
+
 #### Static packages
 
 On some devices, dependencies that are necessary to run `airupnp` or `aircast` are not available (mostly on older devices).
@@ -182,17 +194,17 @@ If you encounter any problems, please read the [troubleshooting](#troubleshootin
 - Click on **Manual Install** and upload the package you just downloaded.
 
 > On DSM5 and some DSM6 devices: As this package is not an official Synology package you may have to **Allow packages from any publisher**
-> (Go to **Settings** and set the **Trust Level** to "**Any publisher**".)  
+> (Go to **Settings** and set the **Trust Level** to "**Any publisher**".)
 >
-> Do not forget to **change back** the **Trust level** to "Synology Inc." for additional security.  
+> Do not forget to **change back** the **Trust level** to "Synology Inc." for additional security.
 
 ### Logfiles
 
 - **AirConnect-Synology and AirConnect Log File**
-  - The *AirConnect application logfile* is located at `/volume1/airconnect/log/airconnect.log` (default location)
+  - The _AirConnect application logfile_ is located at `/volume1/airconnect/log/airconnect.log` (default location)
     - This is a symlink of `/volume1/@appstore/AirConnect/log/airconnect.log`
   - You can open it using the Synology **FileStation** by navigating to `airconnect` - `log`
-    - You can also open it after login with ssh to your NAS/Router: `sudo /usr/syno/bin/synopkg log AirConnect`
+    - You can also open it after login with SSH to your NAS/Router: `sudo /usr/syno/bin/synopkg log AirConnect`
     - or by using a command-line utility like
       - **more** (`more /volume1/airconnect/log/airconnect`)
       - **tail** (`tail -100 /volume1/airconnect/log/airconnect`)
@@ -201,7 +213,7 @@ If you encounter any problems, please read the [troubleshooting](#troubleshootin
     - All log entries of the AirConnect application (airupnp + aircast) are also written into this log file.
   - This is the first place to look for errors.
 - **Synology Service Log File**
-  - The *synology dsm package logfile* ist located at `/var/log/packages/AirConnect.log`
+  - The _synology dsm package logfile_ is located at `/var/log/packages/AirConnect.log`
   - This logfile is used from DSM/Synology for all installation/uninstallation/update purposes
   - In general you will only use it for debugging purposes
 
@@ -235,22 +247,24 @@ AIRUPNP_LATENCY="50:500"
 AIRUPNP_LOGLEVEL="all=info"
 AIRUPNP_CONTENTLENGTH_MODE=0
 AIRUPNP_PORT=49154
+AIRUPNP_PORTRANGE="49155:128"
 FILTER_AIRPLAY2_DEVICES="<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam,2.2.6,AllShare1.0"
 SYNO_IP="<your synology ip>"
 ```
 
-| Configuration Option       | Values                                           | Mandatory     | Description                                                       |
-| -------------------------- | ------------------------------------------------ | ------------- | ----------------------------------------------------------------- |
-| AIRCAST_ENABLED            | `0` or `1`                                       | Yes           | Enables or disables AIRCAST                                       |
-| AIRCAST_LATENCY            | `[rtp][:http][:f]`                               | No            | RTP and HTTP latency (ms), ':f' forces silence fill               |
-| AIRCAST_LOGLEVEL           | `<log>=<level>`                                  | Yes           | log=all,raop,main,util,cast -- level=error,warn,info,debug,sdebug |
-| AIRUPNP_ENABLED            | `0` or `1`                                       | Yes           | Enables or disables AIRUPNP                                       |
-| AIRUPNP_LATENCY            | `[rtp][:http][:f]`                               | No            | RTP and HTTP latency (ms), ':f' forces silence fill               |
-| AIRUPNP_LOGLEVEL           | `<log>=<level>`                                  | Yes           | log=all,raop,main,util,upnp -- level=error,warn,info,debug,sdebug |
-| AIRUPNP_CONTENTLENGTH_MODE | `-3`or `-1`or `0`                                | Yes           | HTTP content-length mode (-3:chunked, -1:none, 0:fixed)           |
-| AIRUPNP_PORT               | `49154`                                          | Yes (airupnp) | Port on which airupnp should be started                           |
-| FILTER_AIRPLAY2_DEVICES    | `<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,...` | No            | See [Supported UPnP Speakers](#supported-upnp-speakers)           |
-| SYNO_IP                    | `192.168.1.100`                                  | Yes           | The ip on which aircast/airupnp will be started                   |
+| Configuration Option       | Values                                           | Mandatory     | Description                                                                                                                                                                                                           |
+| -------------------------- | ------------------------------------------------ | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AIRCAST_ENABLED            | `0` or `1`                                       | Yes           | Enables or disables AIRCAST                                                                                                                                                                                           |
+| AIRCAST_LATENCY            | `[rtp][:http][:f]`                               | No            | RTP and HTTP latency (ms), ':f' forces silence fill                                                                                                                                                                   |
+| AIRCAST_LOGLEVEL           | `<log>=<level>`                                  | Yes           | log=all,raop,main,util,cast -- level=error,warn,info,debug,sdebug                                                                                                                                                     |
+| AIRUPNP_ENABLED            | `0` or `1`                                       | Yes           | Enables or disables AIRUPNP                                                                                                                                                                                           |
+| AIRUPNP_LATENCY            | `[rtp][:http][:f]`                               | No            | RTP and HTTP latency (ms), ':f' forces silence fill                                                                                                                                                                   |
+| AIRUPNP_LOGLEVEL           | `<log>=<level>`                                  | Yes           | log=all,raop,main,util,upnp -- level=error,warn,info,debug,sdebug                                                                                                                                                     |
+| AIRUPNP_CONTENTLENGTH_MODE | `-3`or `-1`or `0`                                | Yes           | HTTP content-length mode (-3:chunked, -1:none, 0:fixed)                                                                                                                                                               |
+| AIRUPNP_PORT               | `49154`                                          | Yes (airupnp) | Port on which airupnp should be started                                                                                                                                                                               |
+| AIRUPNP_PORTRANGE          | `<port>:<count>`, e.g. `49155:128`               | No            | Fixed port range for the RTP/HTTP streams airupnp opens per device (useful for firewall rules, see [#142](https://github.com/eizedev/AirConnect-Synology/issues/142)). Leave empty to let the OS assign random ports. |
+| FILTER_AIRPLAY2_DEVICES    | `<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,...` | No            | See [Supported UPnP Speakers](#supported-upnp-speakers)                                                                                                                                                               |
+| SYNO_IP                    | `192.168.1.100`                                  | Yes           | The ip on which aircast/airupnp will be started                                                                                                                                                                       |
 
 Configuration options with `Mandatory = Yes` must exist in the configuration. Options with `Mandatory = No` are optional.
 
@@ -305,12 +319,12 @@ this synology package will only include the devices mentioned in the [List of su
 
 To find UPnP speakers, their device_description URL and the model number, follow the following steps.
 
-If you are familiar with linux commands you could use `tcpdump` to discover upnp devices on your network.
+If you are familiar with Linux commands you could use `tcpdump` to discover upnp devices on your network.
 You can install tcpdump on any synology NAS by using he integrated synology diagnostic tools.
 
 Just execute as root via SSH `synogear install` to install the diagnostic tools.
 See documentation here: [FAQ-synogear](https://github.com/SynoCommunity/spksrc/wiki/FAQ-synogear).  
-Synogear also installs a few other useful linux/busybox commands.
+Synogear also installs a few other useful Linux/busybox commands.
 I have installed the diagnostic tools (synogear) on every synology device that i own.
 
 **Change en0 to your network adapter name** (wait a few seconds until the devices get discovered)
@@ -321,7 +335,7 @@ I have installed the diagnostic tools (synogear) on every synology device that i
 
 Then you need to find your device ip and catch the location URL.
 
-With the `curl` command (or the browser of your choice) you can then search for the `modelNumber` in the device xml configuration:
+With the `curl` command (or the browser of your choice) you can then search for the `modelNumber` in the device XML configuration:
 
 `curl http://192.168.1.122:1400/xml/device_description.xml | grep modelNumber`
 
@@ -361,6 +375,7 @@ Both processes are running with the low-privilege user `airconnect`.
 ### Configuration
 
 If you would like to tweak the AirConnect configuration you can also use the AirConnect configuration file.
+
 > Before continuing please check the [official readme](https://github.com/philippe44/AirConnect#config-file-parameters) for more information.
 > I'm not going to explain how it generally works here.
 
@@ -369,31 +384,31 @@ If you would like to tweak the AirConnect configuration you can also use the Air
 #### airupnp
 
 ```markdown
-v1.6.3 (Jan  8 2024 @ 18:24:27)
+v1.6.3 (Jan 8 2024 @ 18:24:27)
 See -t for license terms
 Usage: [options]
-  -b <ip|iface>[:<port>] network interface or interface and UPnP port to use
-  -a <port>[:<count>] set inbound port and range for RTP and HTTP
-  -c <mp3[:<rate>]|flac[:0..9]|wav|pcm> audio format send to player
-  -g <-3|-1|0>  HTTP content-length mode (-3:chunked, -1:none, 0:fixed)
-  -u <version> set the maximum UPnP version for search (default 1)
-  -x <config file> read config from file (default is ./config.xml)
-  -i <config file> discover players, save <config file> and exit
-  -I    auto save config at every network scan
-  -l <[rtp][:http][:f]> RTP and HTTP latency (ms), ':f' forces silence fill
-  -r    let timing reference drift (no click)
-  -f <logfile>  write debug to logfile
-  -p <pid file>  write PID in file
-  -N <format>  transform device name using C format (%s=name)
-  -m <n1,n2...>  exclude devices whose model include tokens
-  -n <m1,m2,...> exclude devices whose name includes tokens
-  -o <m1,m2,...> include only listed models; overrides -m and -n (use <NULL> if player don't return a model)
-  -d <log>=<level> Set logging level, logs: all|raop|main|util|upnp, level: error|warn|info|debug|sdebug
-  -z    Daemonize
-  -Z    NOT interactive
-  -k    Immediate exit on SIGQUIT and SIGTERM
-  -t    License terms
-  --noflush  ignore flush command (wait for teardown to stop)
+-b <ip|iface>[:<port>] network interface or interface and UPnP port to use
+-a <port>[:<count>] set inbound port and range for RTP and HTTP
+-c <mp3[:<rate>]|flac[:0..9]|wav|pcm> audio format send to player
+-g <-3|-1|0> HTTP content-length mode (-3:chunked, -1:none, 0:fixed)
+-u <version> set the maximum UPnP version for search (default 1)
+-x <config file> read config from file (default is ./config.xml)
+-i <config file> discover players, save <config file> and exit
+-I auto save config at every network scan
+-l <[rtp][:http][:f]> RTP and HTTP latency (ms), ':f' forces silence fill
+-r let timing reference drift (no click)
+-f <logfile> write debug to logfile
+-p <pid file> write PID in file
+-N <format> transform device name using C format (%s=name)
+-m <n1,n2...> exclude devices whose model include tokens
+-n <m1,m2,...> exclude devices whose name includes tokens
+-o <m1,m2,...> include only listed models; overrides -m and -n (use <NULL> if player don't return a model)
+-d <log>=<level> Set logging level, logs: all|raop|main|util|upnp, level: error|warn|info|debug|sdebug
+-z Daemonize
+-Z NOT interactive
+-k Immediate exit on SIGQUIT and SIGTERM
+-t License terms
+--noflush ignore flush command (wait for teardown to stop)
 
 Build options: LINUX
 ```
@@ -401,27 +416,27 @@ Build options: LINUX
 #### aircast
 
 ```markdown
-v1.6.3 (Jan  8 2024 @ 18:24:45)
+v1.6.3 (Jan 8 2024 @ 18:24:45)
 See -t for license terms
 Usage: [options]
-  -b <ip|iface>  network address or interface to bind to
-  -a <port>[:<count>] set inbound port and range for RTP and HTTP
-  -c <mp3[:<rate>]|aac[:<rate>]|flac[:0..9]|wav> audio format send to player
-  -v <0..1>   group MediaVolume factor
-  -x <config file> read config from file (default is ./config.xml)
-  -i <config file> discover players, save <config file> and exit
-  -I    auto save config at every network scan
-  -N <format>  transform device name using C format (%s=name)
-  -l <[rtp][:http][:f]> RTP and HTTP latency (ms), ':f' forces silence fill
-  -r    let timing reference drift (no click)
-  -f <logfile>  Write debug to logfile
-  -p <pid file>  write PID in file
-  -d <log>=<level> Set logging level, logs: all|raop|main|util|cast, level: error|warn|info|debug|sdebug
-  -z    Daemonize
-  -Z    NOT interactive
-  -k    Immediate exit on SIGQUIT and SIGTERM
-  -t    License terms
-  --noflush  ignore flush command (wait for teardown to stop)
+-b <ip|iface> network address or interface to bind to
+-a <port>[:<count>] set inbound port and range for RTP and HTTP
+-c <mp3[:<rate>]|aac[:<rate>]|flac[:0..9]|wav> audio format send to player
+-v <0..1> group MediaVolume factor
+-x <config file> read config from file (default is ./config.xml)
+-i <config file> discover players, save <config file> and exit
+-I auto save config at every network scan
+-N <format> transform device name using C format (%s=name)
+-l <[rtp][:http][:f]> RTP and HTTP latency (ms), ':f' forces silence fill
+-r let timing reference drift (no click)
+-f <logfile> Write debug to logfile
+-p <pid file> write PID in file
+-d <log>=<level> Set logging level, logs: all|raop|main|util|cast, level: error|warn|info|debug|sdebug
+-z Daemonize
+-Z NOT interactive
+-k Immediate exit on SIGQUIT and SIGTERM
+-t License terms
+--noflush ignore flush command (wait for teardown to stop)
 
 Build options: LINUX
 ```
@@ -436,7 +451,7 @@ Build options: LINUX
 
 By default the config file will **not** being used as long as the file is not created (And you are not running on debug log level).
 
-The file is **not** created by default.  
+The file is **not** created by default.
 
 - Config File location for airupnp
   - `/volume1/airconnect/config.xml`
@@ -579,7 +594,7 @@ If you get an error message that the package **cannot be installed** or **update
 please **uninstall the old version** first (`Package Center -> AirConnect -> Uninstall`) and then install the new version.
 
 Uninstalling also removes the old scripts, references and configurations (only the logfile remains).
-Sometimes it can happen that the problem is already fixed with this.  
+Sometimes it can happen that the problem is already fixed with this.
 
 If the normal uninstallation also does not work, please cleanup the old package using SSH with root permissions:
 
@@ -618,12 +633,12 @@ You must ensure that the communication within your network supports multicast. E
 So make sure that multicast is allowed on your router,
 your switches and your firewall and configure settings like IGMP snooping + IGMP proxy so that the communication is guaranteed.
 
-For testing, please deactive igmp snooping everywhere if you have activated it.  
+For testing, please deactivate igmp snooping everywhere if you have activated it.
 
 I have activated but properly configured igmp snooping and igmp proxy + different VLANs. It will work with AirConnect, if properly configured.
 
 - When players disappear regularly, it might be that your router is filtering out multicast packets.
-  - For example and testing, for a Asus AC-RT68U, you have to login by ssh and run
+  - For example and testing, for a Asus AC-RT68U, you have to login by SSH and run
     - `echo 0 > /sys/class/net/br0/bridge/multicast_snooping` but it does not stay after a reboot.
 - Lots of users seems to have problems with Unify and broadcasting / finding players.
   - Here is a guide [ubnt-sonos](https://www.neilgrogan.com/ubnt-sonos/) made by somebody who fixes the issue for his Sonos environment
@@ -656,4 +671,4 @@ then [install it again](#install-via-gui-package-center).
 ## Credits
 
 Credits go to [@bandesz](https://github.com/bandesz) for the initial work and idea of a Synology package for AirConnect
-and of course to [philippe44](https://github.com/philippe44) for this great AirConnect application.  
+and of course to [philippe44](https://github.com/philippe44) for this great AirConnect application.

@@ -1,0 +1,6 @@
+[flake8]
+# black formats to 88 columns and intentionally adds whitespace before ':'
+# in slices (E203) - both are black's documented flake8-compatibility
+# settings, not project-specific opinions.
+max-line-length = 88
+extend-ignore = E203

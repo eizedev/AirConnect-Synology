@@ -1,0 +1,4 @@
+{
+  "threshold": 0,
+  "ignore": [".github/ISSUE_TEMPLATE/**"]
+}

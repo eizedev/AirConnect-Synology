@@ -5,3 +5,8 @@ package.tgz
 /dist
 src/dsm7/bin/**
 src/dsm/bin/**
+
+# Local AI assistant config/memory - must never be published in this public repo
+CLAUDE.md
+AGENTS.md
+.claude/
