@@ -11,22 +11,29 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Known issues
 
-- **The installer's auto-detected default IP can be wrong on multi-homed devices,
-  including some router setups** - it picks the source address of the machine's
-  default route, which is not necessarily the LAN-facing address (e.g. confirmed on a
-  real SRM router configured with a VPN/mesh interface as its default route: the
-  detection correctly ran but returned that VPN interface's address, not the LAN IP).
-  The wizard field is editable, so this doesn't block installation, but the pre-filled
-  default may need to be corrected manually on such setups. Not fixed - flagged as a
-  known limitation of the detection heuristic rather than silently worked around,
-  since a robust fix would need a considered decision about which interface to
-  prefer, not a quick patch.
-- **Whether `AIRUPNP_PORT` reliably gets its default value (49154) on every install
-  path is still unconfirmed.** In SRM CLI-install testing it came back empty even
-  after the IP-detection bug below was fixed, and the earlier changelog draft
-  speculated this was a CLI-vs-GUI wizard difference - that speculation was **not
-  validated** and has been removed pending an actual re-test; treat the real cause as
-  still open.
+- **On a real Synology router (RT2600ac/SRM), installing via the `synopkg` command
+  line never populates the installer wizard's values at all** - `AIRUPNP_PORT` and
+  `SYNO_IP` both come back completely empty in `airconnect.conf`, even after fixing
+  the `grep -P` crash below (confirmed: the underlying IP-detection command works
+  correctly when run directly on the same device, but its result never reaches
+  `postinst`). Since this affects `AIRUPNP_PORT` too - a plain hardcoded default
+  ("49154") that doesn't depend on any command at all - the most likely explanation is
+  that the wizard step itself doesn't run for a command-line install on SRM, not a bug
+  in either field's own default-value logic. Not root-caused at the `synopkg`/SRM
+  level (closed-source). **Whether a real install through the actual Package Center
+  GUI on SRM works correctly is unknown** - the GUI runs the wizard interactively,
+  which the CLI-only testing used here cannot exercise at all. Needs a real GUI-based
+  install test on an SRM device to resolve either way.
+- **Separately, and only observable once the point above is resolved: the installer's
+  auto-detected default IP may be wrong on multi-homed devices, including some router
+  setups.** The detection picks the source address of the machine's default route,
+  which is not necessarily the LAN-facing address. Directly confirmed by running the
+  detection command (not the full installer, per the point above) on the same real SRM
+  router: it correctly returned that device's VPN/mesh interface address, not its LAN
+  IP. The wizard field is editable, so this wouldn't block installation on its own -
+  but a robust fix needs a considered decision about which interface to prefer on an
+  ambiguous multi-homed setup, not a quick patch, so it's flagged rather than guessed
+  at.
 
 ### Fixed
 
