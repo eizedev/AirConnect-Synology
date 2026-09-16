@@ -11,16 +11,36 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Known issues
 
-- **On Synology routers (SRM), installing via the `synopkg` command line does not
-  populate the installer wizard's default values** (`AIRUPNP_PORT`, `SYNO_IP` end up
-  empty in `airconnect.conf`, so the package correctly refuses to start rather than
-  misbehaving). Confirmed on a real RT2600ac. Not yet established whether this also
-  affects a normal install through the Package Center **GUI** (which runs the wizard
-  interactively) - the GUI is the real install path most users take, and this may be a
-  CLI-testing artifact rather than a user-facing bug. If you hit a fresh SRM install
-  that starts with an empty port, please open an issue with your SRM version.
+- **The installer's auto-detected default IP can be wrong on multi-homed devices,
+  including some router setups** - it picks the source address of the machine's
+  default route, which is not necessarily the LAN-facing address (e.g. confirmed on a
+  real SRM router configured with a VPN/mesh interface as its default route: the
+  detection correctly ran but returned that VPN interface's address, not the LAN IP).
+  The wizard field is editable, so this doesn't block installation, but the pre-filled
+  default may need to be corrected manually on such setups. Not fixed - flagged as a
+  known limitation of the detection heuristic rather than silently worked around,
+  since a robust fix would need a considered decision about which interface to
+  prefer, not a quick patch.
+- **Whether `AIRUPNP_PORT` reliably gets its default value (49154) on every install
+  path is still unconfirmed.** In SRM CLI-install testing it came back empty even
+  after the IP-detection bug below was fixed, and the earlier changelog draft
+  speculated this was a CLI-vs-GUI wizard difference - that speculation was **not
+  validated** and has been removed pending an actual re-test; treat the real cause as
+  still open.
 
 ### Fixed
+
+- **The installer's IP auto-detection could crash silently on Synology routers (SRM),
+  leaving the "IP of your Synology device" field blank instead of pre-filled.** It
+  used `grep -P` (PCRE) to parse `ip route` output; BusyBox's `grep` on SRM (and
+  presumably on any Synology model that ships BusyBox instead of GNU grep) doesn't
+  support `-P` at all and errors with "invalid option -- 'P'" - silently, since the
+  script has no `set -e`, so the failure produced an empty IP instead of a visible
+  error. Fixed by switching to the same `sed`-based approach the legacy DSM 5/6
+  package's installer already used (which doesn't need PCRE) - confirmed by direct
+  testing that this produces the identical, correct result on real DSM hardware
+  (DS415+) and now also works without erroring on SRM (RT2600ac), where it previously
+  crashed outright.
 
 - **Package Center could report AirConnect as "stopped" while it was actually running
   healthy (DSM).** Both `airconnect_status()` (the status check) and
