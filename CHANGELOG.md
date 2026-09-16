@@ -9,6 +9,17 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Known issues
+
+- **On Synology routers (SRM), installing via the `synopkg` command line does not
+  populate the installer wizard's default values** (`AIRUPNP_PORT`, `SYNO_IP` end up
+  empty in `airconnect.conf`, so the package correctly refuses to start rather than
+  misbehaving). Confirmed on a real RT2600ac. Not yet established whether this also
+  affects a normal install through the Package Center **GUI** (which runs the wizard
+  interactively) - the GUI is the real install path most users take, and this may be a
+  CLI-testing artifact rather than a user-facing bug. If you hit a fresh SRM install
+  that starts with an empty port, please open an issue with your SRM version.
+
 ### Fixed
 
 - **Package Center could report AirConnect as "stopped" while it was actually running
