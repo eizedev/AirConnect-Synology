@@ -6,7 +6,8 @@ config handling. For changes to `airupnp`/`aircast` themselves, see the upstream
 (bundled in each release). Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). Entries before 1.11.3 are
 condensed from the [GitHub Releases](https://github.com/eizedev/AirConnect-Synology/releases)
-history, which remains the canonical source for full release notes.
+history, which remains the canonical source for full release notes. Issue/discussion
+links are included where a change traces back to one, so reports stay findable.
 
 ## [Unreleased]
 
@@ -14,11 +15,21 @@ Verified end-to-end on real hardware: fresh GUI install on a Synology router
 (RT2600ac/SRM), and an upgrade from a real, previously-installed 1.8.3 on a DS923+
 (DSM), config preserved.
 
+### Added
+- `AIRUPNP_PORTRANGE` config option: a fixed port range for airupnp's per-device
+  RTP/HTTP streams, so firewall rules have something fixed to allow instead of random
+  OS-assigned ports. Passed through as airupnp's `-a` flag. Default `49155:128`.
+  ([#142](https://github.com/eizedev/AirConnect-Synology/issues/142))
+
 ### Fixed
 - Package Center could report AirConnect as "stopped" while it was actually running
   (`start-stop-status` used bare `ps`, which can't see daemonized processes on DSM).
   Now probes at runtime which `ps` invocation works, since DSM and SRM need opposite
-  approaches (SRM's BusyBox `ps` errors on the `aux` flag DSM requires).
+  approaches (SRM's BusyBox `ps` errors on the `aux` flag DSM requires). Likely
+  explains several long-standing "shows stopped after install" reports
+  ([discussion #50](https://github.com/eizedev/AirConnect-Synology/discussions/50),
+  [#85](https://github.com/eizedev/AirConnect-Synology/issues/85)), though not
+  confirmed retroactively for those specific reports.
 - Package installation could fail outright on Synology routers (SRM) and leave the
   device unable to reinstall: every lifecycle script and `install_uifile.sh` were
   tracked in git as non-executable, which DSM tolerates but SRM does not. Fixed for
@@ -42,29 +53,44 @@ Verified end-to-end on real hardware: fresh GUI install on a Synology router
   automatically; `airconnect.log` auto-rotates at 50MB; new
   `AIRUPNP_CONTENTLENGTH_MODE` config option; default latency lowered to `50:500`
   (existing configs not touched - update manually); fixed a corrupted-binary release
-  caused by a `release-downloader` bug (thanks @seiry).
+  caused by a `release-downloader` bug
+  ([#107](https://github.com/eizedev/AirConnect-Synology/issues/107),
+  [#108](https://github.com/eizedev/AirConnect-Synology/pull/108), thanks @seiry).
+  Playback-latency work tracked in
+  [#79](https://github.com/eizedev/AirConnect-Synology/issues/79).
 - **1.6.3 / 1.7.0** (2024-01) - first (preliminary) GitHub Actions build automation.
 - **1.2.2** (2023-10-01) - no packaging changes; tracked upstream AirConnect only.
 - **1.1.0-1.1.7** (2023-04 to 2023-08) - `armv5` build re-added; upstream aircast
   volume-control fix.
-- **1.0.13** (2022-12-16) - AirConnect 1.0 support; new architectures `epyc7002`,
-  `r1000`, `broadwellnkv2` (DS923+ and newer); static builds added for `armv5`,
-  `armv6`, `x86`, `x86_64`.
+- **1.0.13** (2022-12-16) - AirConnect 1.0 support
+  ([#57](https://github.com/eizedev/AirConnect-Synology/issues/57)); new
+  architectures `epyc7002`, `r1000`, `broadwellnkv2` (DS923+ and newer); static
+  builds added for `armv5`, `armv6`, `x86`, `x86_64`.
 - **0.2.51.2** (2021-11 to 2022-02) - security fix for CVE-2017-12087 (upstream);
-  default AirPlay-device filter extended (Samsung HW-N950, Devialet Expert Pro 140,
-  Fitzwilliam) - filter is not touched on upgrade, only on fresh installs.
+  default AirPlay-device filter extended: Samsung HW-N950
+  ([#52](https://github.com/eizedev/AirConnect-Synology/issues/52)), Devialet Expert
+  Pro 140 ([#46](https://github.com/eizedev/AirConnect-Synology/issues/46)),
+  Fitzwilliam ([#47](https://github.com/eizedev/AirConnect-Synology/issues/47)) -
+  filter is not touched on upgrade, only on fresh installs.
 - **0.2.50.5 "dsm7" series** (2021-07 to 2021-08) - the DSM 7 rewrite: packages run
   under a dedicated `airconnect` user instead of root; integrated Package Center
   install wizard; `airconnect.conf` config file; dedicated `airconnect` shared folder
-  for log/config access via File Station. Breaking change - required uninstalling the
-  old package first.
+  for log/config access via File Station
+  ([#22](https://github.com/eizedev/AirConnect-Synology/issues/22),
+  [#16](https://github.com/eizedev/AirConnect-Synology/issues/16)). Breaking change -
+  required uninstalling the old package first.
 - **0.2.43.x - 0.2.44.x** (2021-01 to 2021-03) - `v1000`/`geminilake`/`purley`
   architecture support (DS1821+, DS1621+, and newer Celeron/Xeon models); local
-  network interface detection fixes; log size cap lowered to 10MB; fixed a bug where
-  Chromecast devices would disappear.
+  network interface detection fixes
+  ([#11](https://github.com/eizedev/AirConnect-Synology/issues/11)); startup
+  device-redetection removed pending a better fix
+  ([#16](https://github.com/eizedev/AirConnect-Synology/issues/16)); log size cap
+  lowered to 10MB; fixed a bug where Chromecast devices would disappear.
 - **0.2.41.0** (2020-12-09) - default filter added for Sonos devices with native
   AirPlay support, to stop them appearing twice (the `FILTER_AIRPLAY2_DEVICES`
-  mechanism still in use today).
+  mechanism still in use today;
+  [#7](https://github.com/eizedev/AirConnect-Synology/issues/7), thanks
+  @nathangoodman).
 - **0.2.28.x** (2020-10-28) - `aarch64-static`/`arm-static` builds added.
 - **0.2.26.0 → 0.2.26.1** (2020-05-26/28) - a same-week regression: low-privileged-user
   installs core-dumped on startup; fixed within two days.
