@@ -1,0 +1,8 @@
+skip-check:
+  # upstream-check.yml's check-for-update job genuinely needs both
+  # contents:write (create-pull-request pushes a branch) and
+  # pull-requests:write (to open the PR) - it's not a blanket write-all,
+  # just two specific scopes the job actually uses, and checkov's inline
+  # #checkov:skip comment is known not to be honored for this check
+  # (bridgecrewio/checkov#6216), so it's suppressed here instead.
+  - CKV2_GHA_1

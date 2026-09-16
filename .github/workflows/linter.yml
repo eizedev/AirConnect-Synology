@@ -8,9 +8,9 @@ name: Lint Code Base
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 permissions: read-all
 jobs:
   run-lint:
@@ -34,3 +34,18 @@ jobs:
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: "master"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Ruff's own formatter and Black are both enabled by default and
+          # disagree on some edge cases (super-linter's own docs warn about
+          # running both) - Black already covers formatting, ruff (lint)
+          # stays on separately.
+          VALIDATE_PYTHON_RUFF_FORMAT: false
+          # Biome targets JS/TS/CSS/etc., none of which this repo has; the
+          # only file it actually touches is JSON, already covered by
+          # JSON_PRETTIER, so it's pure redundant noise here.
+          VALIDATE_BIOME_FORMAT: false
+          VALIDATE_BIOME_LINT: false
+          # Both findings jscpd reports are duplication by design, not
+          # copy-paste bugs: src/dsm and src/dsm7 are separate package
+          # generations that intentionally share most of their logic, and
+          # the ISSUE_TEMPLATE files are near-duplicates on purpose.
+          VALIDATE_JSCPD: false

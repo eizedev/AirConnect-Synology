@@ -213,7 +213,7 @@ If you encounter any problems, please read the [troubleshooting](#troubleshootin
     - All log entries of the AirConnect application (airupnp + aircast) are also written into this log file.
   - This is the first place to look for errors.
 - **Synology Service Log File**
-  - The _synology dsm package logfile_ ist located at `/var/log/packages/AirConnect.log`
+  - The _synology dsm package logfile_ is located at `/var/log/packages/AirConnect.log`
   - This logfile is used from DSM/Synology for all installation/uninstallation/update purposes
   - In general you will only use it for debugging purposes
 
@@ -633,7 +633,7 @@ You must ensure that the communication within your network supports multicast. E
 So make sure that multicast is allowed on your router,
 your switches and your firewall and configure settings like IGMP snooping + IGMP proxy so that the communication is guaranteed.
 
-For testing, please deactive igmp snooping everywhere if you have activated it.
+For testing, please deactivate igmp snooping everywhere if you have activated it.
 
 I have activated but properly configured igmp snooping and igmp proxy + different VLANs. It will work with AirConnect, if properly configured.
 

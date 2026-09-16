@@ -41,6 +41,11 @@ jobs:
       - name: Determine whether this run should publish a release
         id: release_tag
         run: |
+          # shellcheck disable=SC2193
+          # False positive: shellcheck's GitHub-expression placeholder
+          # substitution makes the elif below look like a literal-vs-literal
+          # comparison; github.ref is a real runtime value that can
+          # legitimately match or not match the refs/tags/* glob.
           if [ -n "${{ inputs.release_tag }}" ]; then
             TAG="${{ inputs.release_tag }}"
           elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
