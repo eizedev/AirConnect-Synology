@@ -54,6 +54,8 @@ check_one() {
 
     if ! tar -tf "$spk" >/dev/null 2>&1; then
         fail "not a valid tar archive"
+        rm -rf "$workdir"
+        trap - EXIT
         return
     fi
     tar -xf "$spk" -C "$workdir"
