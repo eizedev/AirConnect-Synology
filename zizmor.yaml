@@ -1,9 +1,0 @@
-rules:
-  # This repo pins actions by version tag (and Dependabot keeps those
-  # current), not by commit SHA, except calibreapp/image-actions - the one
-  # action Dependabot can't track because it was previously pinned to
-  # @main - which is hash-pinned explicitly. Hash-pinning every action
-  # repo-wide is a real, separate hardening project, not something to
-  # half-do as a side effect of a lint pass.
-  unpinned-uses:
-    disable: true
