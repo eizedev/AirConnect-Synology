@@ -136,8 +136,8 @@ For all the Synology **Routers** running Synology SRM you should use the **ARM**
 If the normal ARM package is not working on your device, please try **ARM Static** (ARMv7 Static) instead.
 
 The packages are named `dsm7-*`, but the same package works on SRM (Synology's router
-OS) as well as DSM 7 - confirmed on a real router (RT2600ac), install through to a
-running `airupnp`/`aircast`.
+OS) as well as DSM 7 - confirmed on a real router (RT2600ac, SRM 1.3.2-9366 Update 2),
+install through to a running `airupnp`/`aircast`.
 
 > **Check the pre-filled IP during install if your router has a VPN, mesh, or other
 > non-LAN default route.** The installer wizard's "IP of your Synology device" field is
