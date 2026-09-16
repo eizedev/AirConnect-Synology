@@ -135,6 +135,18 @@ site.
 For all the Synology **Routers** running Synology SRM you should use the **ARM** (ARMv7 - dakota, ipq806x, northstarplus) version.
 If the normal ARM package is not working on your device, please try **ARM Static** (ARMv7 Static) instead.
 
+The packages are named `dsm7-*`, but the same package works on SRM (Synology's router
+OS) as well as DSM 7 - confirmed on a real router (RT2600ac, SRM 1.2.4), install through
+to a running `airupnp`/`aircast`.
+
+> **Check the pre-filled IP during install if your router has a VPN, mesh, or other
+> non-LAN default route.** The installer wizard's "IP of your Synology device" field is
+> auto-detected from your router's default route, which on such setups may not be your
+> LAN address (e.g. a Tailscale/VPN interface's IP instead). If AirConnect isn't
+> reachable after install, check the IP in `airconnect.conf` and correct it to your
+> router's actual LAN IP if needed - the field is editable during install, or you can
+> edit `airconnect.conf` afterward and restart the package.
+
 #### Static packages
 
 On some devices, dependencies that are necessary to run `airupnp` or `aircast` are not available (mostly on older devices).
