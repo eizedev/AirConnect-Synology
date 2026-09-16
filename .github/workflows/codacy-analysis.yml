@@ -50,8 +50,15 @@ jobs:
           # This will handover control about PR rejection to the GitHub side
           max-allowed-issues: 2147483647
 
+      # Codacy's CLI emits one results.sarif with a separate run per
+      # underlying tool, none tagged with a distinct automationDetails.id -
+      # since 2025-07-22 the upload step below rejects that outright
+      # instead of merging them (see script header for the changelog link).
+      - name: Assign a SARIF category per tool
+        run: python3 .github/scripts/sarif_categorize.py results.sarif results.categorized.sarif
+
       # Upload the SARIF file generated in the previous step
       - name: Upload SARIF results file
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: results.sarif
+          sarif_file: results.categorized.sarif

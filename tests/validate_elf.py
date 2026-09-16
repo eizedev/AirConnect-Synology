@@ -93,13 +93,9 @@ class ElfParseError(Exception):
     """Raised when a binary doesn't look like a well-formed ELF file."""
 
 
-def parse_elf(
-    data,
-):  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
-    """Parse the subset of ELF structures this tool needs. Raises
-    ElfParseError on anything that doesn't look like a well-formed ELF file
-    - that failure mode is deliberate: a corrupted binary (like issue #107)
-    should show up as a hard failure, not a silently empty report."""
+def _read_elf_header(data):
+    """Parse the fixed-size ELF header. Returns the fields the rest of
+    parse_elf needs to walk the program/section header tables."""
     if len(data) < 64 or data[:4] != b"\x7fELF":
         raise ElfParseError("missing ELF magic (0x7f 'ELF') - not an ELF file")
 
@@ -129,13 +125,34 @@ def parse_elf(
     except struct.error as exc:
         raise ElfParseError(f"truncated ELF header: {exc}") from exc
 
+    return {
+        "endian": endian,
+        "is64": is64,
+        "ei_data": ei_data,
+        "e_machine": e_machine,
+        "e_phoff": e_phoff,
+        "e_phentsize": e_phentsize,
+        "e_phnum": e_phnum,
+        "e_shoff": e_shoff,
+        "e_shentsize": e_shentsize,
+        "e_shnum": e_shnum,
+        "e_shstrndx": e_shstrndx,
+    }
+
+
+def _scan_program_headers(data, header):  # pylint: disable=too-many-locals
+    """Walk the program header table for PT_INTERP (-> interp path) and
+    PT_NOTE/NT_GNU_ABI_TAG (-> declared minimum kernel version). The local
+    count is inherent to naming each unpacked binary field distinctly
+    rather than a control-flow problem - there's nothing left to extract."""
+    endian, is64 = header["endian"], header["is64"]
     interp = None
     min_kernel = None
     has_interp_segment = False
 
     try:
-        for i in range(e_phnum):
-            off = e_phoff + i * e_phentsize
+        for i in range(header["e_phnum"]):
+            off = header["e_phoff"] + i * header["e_phentsize"]
             if off + 4 > len(data):
                 raise ElfParseError(
                     f"program header {i} out of bounds (truncated file?)"
@@ -173,88 +190,113 @@ def parse_elf(
             f"truncated or malformed program header table: {exc}"
         ) from exc
 
-    # .gnu.version_r: walk the section table looking for the Verneed
-    # section, then chain through Verneed -> Vernaux records to collect
-    # every "GLIBC_x.y[.z]" version string the binary actually references.
+    return interp, min_kernel, has_interp_segment
+
+
+def _read_section_headers(data, header):
+    """Unpack the raw section header table into (name_off, type, link,
+    offset, size) tuples."""
+    endian, is64 = header["endian"], header["is64"]
+    sh_entries = []
+    for i in range(header["e_shnum"]):
+        off = header["e_shoff"] + i * header["e_shentsize"]
+        if is64:
+            sh_name, sh_type = struct.unpack_from(endian + "II", data, off)
+            sh_link = struct.unpack_from(endian + "I", data, off + 0x28)[0]
+            sh_offset, sh_size = struct.unpack_from(endian + "QQ", data, off + 0x18)
+        else:
+            sh_name, sh_type = struct.unpack_from(endian + "II", data, off)
+            sh_link = struct.unpack_from(endian + "I", data, off + 0x18)[0]
+            sh_offset, sh_size = struct.unpack_from(endian + "II", data, off + 0x10)
+        sh_entries.append((sh_name, sh_type, sh_link, sh_offset, sh_size))
+    return sh_entries
+
+
+def _scan_glibc_versions(data, header):  # pylint: disable=too-many-locals
+    """Walk the section table looking for the Verneed section, then chain
+    through Verneed -> Vernaux records to collect every "GLIBC_x.y[.z]"
+    version string the binary actually references.
+
+    Informational only: any parse failure here degrades to an empty list
+    rather than failing binaries that otherwise parsed fine (e.g. static
+    builds, which legitimately have no version-needs section at all)."""
     glibc_versions = []
+    endian = header["endian"]
     try:
-        if e_shoff and e_shnum and e_shstrndx < e_shnum:
-            sh_entries = []
-            for i in range(e_shnum):
-                off = e_shoff + i * e_shentsize
-                if is64:
-                    sh_name, sh_type = struct.unpack_from(endian + "II", data, off)
-                    sh_link = struct.unpack_from(endian + "I", data, off + 0x28)[0]
-                    sh_offset, sh_size = struct.unpack_from(
-                        endian + "QQ", data, off + 0x18
-                    )
-                else:
-                    sh_name, sh_type = struct.unpack_from(endian + "II", data, off)
-                    sh_link = struct.unpack_from(endian + "I", data, off + 0x18)[0]
-                    sh_offset, sh_size = struct.unpack_from(
-                        endian + "II", data, off + 0x10
-                    )
-                sh_entries.append((sh_name, sh_type, sh_link, sh_offset, sh_size))
+        if not (
+            header["e_shoff"]
+            and header["e_shnum"]
+            and header["e_shstrndx"] < header["e_shnum"]
+        ):
+            return glibc_versions
 
-            shstr_off = sh_entries[e_shstrndx][3]
+        sh_entries = _read_section_headers(data, header)
+        shstr_off = sh_entries[header["e_shstrndx"]][3]
 
-            def read_str(strtab_off, str_off):
-                end = data.find(b"\x00", strtab_off + str_off)
-                if end == -1:
-                    end = len(data)
-                return data[strtab_off + str_off : end].decode(
-                    "ascii", errors="replace"
+        def read_str(strtab_off, str_off):
+            end = data.find(b"\x00", strtab_off + str_off)
+            if end == -1:
+                end = len(data)
+            return data[strtab_off + str_off : end].decode("ascii", errors="replace")
+
+        verneed_section = None
+        for name_off, sh_type, sh_link, sh_off, sh_size in sh_entries:
+            name = read_str(shstr_off, name_off)
+            if name == ".gnu.version_r" or sh_type == SHT_GNU_VERNEED:
+                verneed_section = (sh_link, sh_off, sh_size)
+                break
+
+        if verneed_section:
+            link_idx, vn_off, vn_size = verneed_section
+            dynstr_off = sh_entries[link_idx][3]
+            pos = vn_off
+            seen = set()
+            while pos < vn_off + vn_size and pos not in seen:
+                seen.add(pos)
+                _vn_file, vn_aux, vn_next = struct.unpack_from(
+                    endian + "III", data, pos + 4
                 )
-
-            verneed_section = None
-            for name_off, sh_type, sh_link, sh_off, sh_size in sh_entries:
-                name = read_str(shstr_off, name_off)
-                if name == ".gnu.version_r" or sh_type == SHT_GNU_VERNEED:
-                    verneed_section = (sh_link, sh_off, sh_size)
-                    break
-
-            if verneed_section:
-                link_idx, vn_off, vn_size = verneed_section
-                dynstr_off = sh_entries[link_idx][3]
-                pos = vn_off
-                seen = set()
-                while pos < vn_off + vn_size and pos not in seen:
-                    seen.add(pos)
-                    _vn_file, vn_aux, vn_next = struct.unpack_from(
-                        endian + "III", data, pos + 4
+                vn_cnt = struct.unpack_from(endian + "H", data, pos + 2)[0]
+                aux_pos = pos + vn_aux
+                for _ in range(vn_cnt):
+                    vna_name, vna_next = struct.unpack_from(
+                        endian + "II", data, aux_pos + 8
                     )
-                    vn_cnt = struct.unpack_from(endian + "H", data, pos + 2)[0]
-                    aux_pos = pos + vn_aux
-                    for _ in range(vn_cnt):
-                        vna_name, vna_next = struct.unpack_from(
-                            endian + "II", data, aux_pos + 8
-                        )
-                        verstr = read_str(dynstr_off, vna_name)
-                        if verstr.startswith("GLIBC_"):
-                            glibc_versions.append(verstr[len("GLIBC_") :])
-                        if vna_next == 0:
-                            break
-                        aux_pos += vna_next
-                    if vn_next == 0:
+                    verstr = read_str(dynstr_off, vna_name)
+                    if verstr.startswith("GLIBC_"):
+                        glibc_versions.append(verstr[len("GLIBC_") :])
+                    if vna_next == 0:
                         break
-                    pos += vn_next
+                    aux_pos += vna_next
+                if vn_next == 0:
+                    break
+                pos += vn_next
     except (struct.error, IndexError):
-        # .gnu.version_r is informational only (glibc-version reporting), so a
-        # malformed/truncated section table degrades to "unknown" rather than
-        # failing binaries that otherwise parsed fine (e.g. static builds,
-        # which legitimately have no version-needs section at all).
         glibc_versions = []
+    return glibc_versions
 
-    def version_key(v):
-        return tuple(int(p) for p in v.split(".") if p.isdigit())
 
+def version_key(v):
+    """Sort key for "x.y.z"-style version strings, numeric per component."""
+    return tuple(int(p) for p in v.split(".") if p.isdigit())
+
+
+def parse_elf(data):
+    """Parse the subset of ELF structures this tool needs. Raises
+    ElfParseError on anything that doesn't look like a well-formed ELF file
+    - that failure mode is deliberate: a corrupted binary (like issue #107)
+    should show up as a hard failure, not a silently empty report."""
+    header = _read_elf_header(data)
+    interp, min_kernel, has_interp_segment = _scan_program_headers(data, header)
+    glibc_versions = _scan_glibc_versions(data, header)
     max_glibc = max(glibc_versions, key=version_key, default=None)
+    e_machine = header["e_machine"]
 
     return {
         "e_machine": e_machine,
         "e_machine_name": EM_MACHINE_NAMES.get(e_machine, f"unknown(0x{e_machine:x})"),
-        "class": "64-bit" if is64 else "32-bit",
-        "endian": "little" if ei_data == 1 else "big",
+        "class": "64-bit" if header["is64"] else "32-bit",
+        "endian": "little" if header["ei_data"] == 1 else "big",
         "is_dynamic": has_interp_segment,
         "interp": interp,
         "min_kernel": min_kernel,
