@@ -33,6 +33,14 @@ user takes, after fixing the IP field's misleading VPN-interface default by hand
 
 ### Fixed
 
+- **`preupgrade`/`postupgrade` logged to the wrong file during package upgrades.**
+  Both scripts referenced `$AIRCONNECT_USER` without ever setting it (unlike
+  `postinst` and `start-stop-status`, which both derive it correctly); with no
+  `set -eu` in these two scripts, this silently expanded to an empty string instead
+  of erroring, sending their log output to `log/.log` instead of
+  `log/airconnect.log`. Fixed by deriving it the same way the other scripts already
+  do. Applies to both the DSM 7 and legacy DSM 5/6 packages.
+
 - **The installer's IP auto-detection could crash silently on Synology routers (SRM),
   leaving the "IP of your Synology device" field blank instead of pre-filled.** It
   used `grep -P` (PCRE) to parse `ip route` output; BusyBox's `grep` on SRM (and
