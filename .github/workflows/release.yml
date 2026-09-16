@@ -2,7 +2,10 @@
 name: Creating Release of latest AirConnect binaries
 on:
   push:
+    branches: [master]
+    tags: ["*"]
   pull_request:
+    branches: [master]
   workflow_dispatch:
 
 permissions:
@@ -22,49 +25,101 @@ jobs:
       - uses: actions/checkout@v6
         with:
           path: "."
-      - name: Get latest AirConnect release
+
+      - name: Read pinned upstream AirConnect version
+        id: upstream
+        run: |
+          {
+            echo "version=$(jq -r .version upstream.json)"
+            echo "tag=$(jq -r .tag upstream.json)"
+            echo "asset=$(jq -r .asset upstream.json)"
+            echo "sha256=$(jq -r .sha256 upstream.json)"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Download pinned AirConnect release
         id: get_release
         uses: robinraju/release-downloader@v1.12
         with:
           repository: "philippe44/AirConnect"
-          latest: true
+          tag: ${{ steps.upstream.outputs.tag }}
           tarBall: false
           zipBall: false
           fileName: "AirConnect*.zip"
           out-file-path: "src/dsm7/bin"
           extract: true
+
+      - name: Verify downloaded release checksum
+        id: verify_checksum
+        env:
+          EXPECTED_SHA256: ${{ steps.upstream.outputs.sha256 }}
+          UPSTREAM_TAG: ${{ steps.upstream.outputs.tag }}
+          UPSTREAM_ASSET: ${{ steps.upstream.outputs.asset }}
+        run: |
+          # release-downloader with extract:true removes the archive after
+          # unpacking, so re-fetch just the zip to checksum the exact bytes
+          # GitHub served - this is what issue #107 would have caught before
+          # a corrupted release shipped to users.
+          curl -sL -o /tmp/verify.zip \
+            "https://github.com/philippe44/AirConnect/releases/download/${UPSTREAM_TAG}/${UPSTREAM_ASSET}"
+          ACTUAL_SHA256=$(sha256sum /tmp/verify.zip | awk '{print $1}')
+          echo "expected: ${EXPECTED_SHA256}"
+          echo "actual:   ${ACTUAL_SHA256}"
+          if [ "$ACTUAL_SHA256" != "$EXPECTED_SHA256" ]; then
+            echo "::error::Checksum mismatch for AirConnect ${UPSTREAM_TAG} - refusing to build a release from this download. If upstream intentionally re-published this tag, update the sha256 in upstream.json after verifying the new contents yourself."
+            exit 1
+          fi
+          rm -f /tmp/verify.zip
+
       - name: Validate downloaded Release
         id: validate_release
         run: |
-          RELEASE_VERSION=${{ steps.get_release.outputs.tag_name }}
-          RELEASE_FILES=${{ fromJson(steps.get_release.outputs.downloaded_files)[0] }}
-          echo "Using AirConnect version '${RELEASE_VERSION}'"
-          echo "Using downloaded file: '${RELEASE_FILES}'"
+          echo "Using AirConnect version '${{ steps.upstream.outputs.tag }}' (pinned in upstream.json)"
           ls -ltR "${GITHUB_WORKSPACE}"/src/dsm7/bin/
 
       - name: Running shellcheck
         id: validate_code
         run: cd "${GITHUB_WORKSPACE}"/src/dsm7; make shellcheck
 
-      - name: Test packaging of x86_64 architecture
-        id: test_packaging
-        run: cd "${GITHUB_WORKSPACE}"/src/dsm7; RELEASE_VERSION=${{ steps.get_release.outputs.tag_name }} ARCH=x86_64 make build
-
       - name: Create packages of ALL architectures
         id: create_packages
-        run: cd "${GITHUB_WORKSPACE}"/src/dsm7; RELEASE_VERSION=${{ steps.get_release.outputs.tag_name }} make build-all
+        env:
+          RELEASE_VERSION: ${{ steps.upstream.outputs.tag }}
+        run: cd "${GITHUB_WORKSPACE}"/src/dsm7; make build-all
 
       - name: Cleanup target
         id: clean_target
         run: cd "${GITHUB_WORKSPACE}"/src/dsm7; make clean
 
-      - name: Validate created packages (dist)
+      - name: Validate created packages (structure + ELF)
         id: validate_created_packages
-        run: ls -ltR "${GITHUB_WORKSPACE}"/src/dsm7/dist/
+        run: |
+          ls -ltR "${GITHUB_WORKSPACE}"/src/dsm7/dist/
+          FAIL=0
+          for arch in arm arm-static armv5 armv5-static armv6 armv6-static \
+                      aarch64 aarch64-static x86 x86-static x86_64 x86_64-static \
+                      powerpc powerpc-static; do
+            # the trailing [0-9] anchors the version so e.g. "arm" doesn't
+            # glob-match "arm-static"'s package too
+            spk=$(ls src/dsm7/dist/AirConnect-dsm7-"${arch}"-[0-9]*.spk 2>/dev/null | head -n1)
+            if [ -z "$spk" ]; then
+              echo "::error::No .spk found for arch ${arch}"
+              FAIL=1
+              continue
+            fi
+            echo "::group::Validating ${spk}"
+            sh tests/validate_spk.sh "$spk" || FAIL=1
+            workdir=$(mktemp -d)
+            tar -xf "$spk" -C "$workdir"
+            tar -xzf "$workdir/package.tgz" -C "$workdir"
+            python3 tests/validate_elf.py --arch "${arch}" "$workdir/airupnp" "$workdir/aircast" || FAIL=1
+            rm -rf "$workdir"
+            echo "::endgroup::"
+          done
+          exit "$FAIL"
 
       - name: Creating GitHub Release
         id: create_release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             src/dsm7/dist/*.spk
@@ -74,7 +129,7 @@ jobs:
 
       - name: Upload releases to artifacts
         id: upload_releases
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: releases
           path: src/dsm7/dist/
