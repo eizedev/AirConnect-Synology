@@ -9,31 +9,27 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+All three fixes below were verified together end-to-end via a real Package Center
+install on a Synology router (RT2600ac/SRM): install, wizard, start, and a running
+`airupnp`/`aircast` all worked correctly through the actual GUI install path a real
+user takes, after fixing the IP field's misleading VPN-interface default by hand (see
+"Known issues" below).
+
 ### Known issues
 
-- **On a real Synology router (RT2600ac/SRM), installing via the `synopkg` command
-  line never populates the installer wizard's values at all** - `AIRUPNP_PORT` and
-  `SYNO_IP` both come back completely empty in `airconnect.conf`, even after fixing
-  the `grep -P` crash below (confirmed: the underlying IP-detection command works
-  correctly when run directly on the same device, but its result never reaches
-  `postinst`). Since this affects `AIRUPNP_PORT` too - a plain hardcoded default
-  ("49154") that doesn't depend on any command at all - the most likely explanation is
-  that the wizard step itself doesn't run for a command-line install on SRM, not a bug
-  in either field's own default-value logic. Not root-caused at the `synopkg`/SRM
-  level (closed-source). **Whether a real install through the actual Package Center
-  GUI on SRM works correctly is unknown** - the GUI runs the wizard interactively,
-  which the CLI-only testing used here cannot exercise at all. Needs a real GUI-based
-  install test on an SRM device to resolve either way.
-- **Separately, and only observable once the point above is resolved: the installer's
-  auto-detected default IP may be wrong on multi-homed devices, including some router
-  setups.** The detection picks the source address of the machine's default route,
-  which is not necessarily the LAN-facing address. Directly confirmed by running the
-  detection command (not the full installer, per the point above) on the same real SRM
-  router: it correctly returned that device's VPN/mesh interface address, not its LAN
-  IP. The wizard field is editable, so this wouldn't block installation on its own -
-  but a robust fix needs a considered decision about which interface to prefer on an
-  ambiguous multi-homed setup, not a quick patch, so it's flagged rather than guessed
-  at.
+- **The installer's auto-detected default IP can be wrong on multi-homed devices,
+  including some router setups - confirmed, not just suspected.** The detection picks
+  the source address of the machine's default route, which is not necessarily the
+  LAN-facing address. Directly confirmed via a real Package Center install on an SRM
+  router configured with a VPN/mesh interface as its default route: the wizard
+  correctly rendered and pre-filled the "IP of your Synology device" field, but with
+  that VPN interface's address rather than the device's LAN IP - the field had to be
+  corrected by hand before completing the install. The field is editable, so this
+  doesn't block installation, but the pre-filled default can be actively misleading on
+  such setups. Not fixed - flagged as a known limitation of the detection heuristic
+  rather than silently worked around, since a robust fix needs a considered decision
+  about which interface to prefer on an ambiguous multi-homed setup, not a quick
+  patch.
 
 ### Fixed
 
