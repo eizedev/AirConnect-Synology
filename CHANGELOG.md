@@ -32,13 +32,17 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     processes to kill on SRM/routers either.
   - Applies to both the DSM 7 and legacy DSM 5/6 packages.
 
-### Known issues
-
-- **SRM (Synology router) package installation is currently unreliable** and not yet
-  root-caused: on a real RT2600ac, one install attempt "succeeded" per Package Center
-  but never actually created `airconnect.conf` or wrote a log (so the package correctly
-  refused to start, rather than silently misbehaving); a second attempt on the same,
-  freshly-cleaned device failed the install outright. Until this is understood, router
-  users should expect installation to potentially require more than one attempt, and
-  are encouraged to report their exact SRM version and the install failure code if they
-  hit this.
+- **Package installation could fail outright on Synology routers (SRM), and leave the
+  device unable to reinstall afterward.** All lifecycle scripts (`preinst`, `postinst`,
+  etc.) and `WIZARD_UIFILES/install_uifile.sh` were tracked in git as non-executable
+  (mode `644`) instead of `755` - harmless on DSM, which invokes them via an
+  interpreter, but fatal on SRM. Root-caused on a real RT2600ac via
+  `/var/log/messages`:
+  ```
+  process.cpp:219 Failed to run .../WIZARD_UIFILES/install_uifile.sh, ret=[-1], Permission denied
+  pkgtool.cpp:2430 AirConnect can't run
+  pkgstartstop.cpp:216 Package target path broken, AirConnect
+  ```
+  That failure left the package registration broken, which then made a subsequent
+  clean install attempt on the same device fail too. Fixed by setting the executable
+  bit on every script in both the DSM 7 and legacy DSM 5/6 packages.
