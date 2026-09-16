@@ -247,6 +247,7 @@ AIRUPNP_LATENCY="50:500"
 AIRUPNP_LOGLEVEL="all=info"
 AIRUPNP_CONTENTLENGTH_MODE=0
 AIRUPNP_PORT=49154
+AIRUPNP_PORTRANGE="49155:128"
 FILTER_AIRPLAY2_DEVICES="<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam,2.2.6,AllShare1.0"
 SYNO_IP="<your synology ip>"
 ```
@@ -261,6 +262,7 @@ SYNO_IP="<your synology ip>"
 | AIRUPNP_LOGLEVEL           | `<log>=<level>`                                  | Yes           | log=all,raop,main,util,upnp -- level=error,warn,info,debug,sdebug |
 | AIRUPNP_CONTENTLENGTH_MODE | `-3`or `-1`or `0`                                | Yes           | HTTP content-length mode (-3:chunked, -1:none, 0:fixed)           |
 | AIRUPNP_PORT               | `49154`                                          | Yes (airupnp) | Port on which airupnp should be started                           |
+| AIRUPNP_PORTRANGE          | `<port>:<count>`, e.g. `49155:128`               | No            | Fixed port range for the RTP/HTTP streams airupnp opens per device (useful for firewall rules, see [#142](https://github.com/eizedev/AirConnect-Synology/issues/142)). Leave empty to let the OS assign random ports. |
 | FILTER_AIRPLAY2_DEVICES    | `<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,...` | No            | See [Supported UPnP Speakers](#supported-upnp-speakers)           |
 | SYNO_IP                    | `192.168.1.100`                                  | Yes           | The ip on which aircast/airupnp will be started                   |
 

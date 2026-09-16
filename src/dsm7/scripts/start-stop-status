@@ -81,15 +81,16 @@ start_airconnect_on_ip() {
         echo "[$(date +'%T')] Linking airupnp configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}\"." >>"$LOG"
         ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}" "${CONFIG_UPNP_DESTINATION}"
         echo "[$(date +'%T')] Starting airupnp on ${SYNO_IP}:${AIRUPNP_PORT}" >>"$LOG"
-        if [ -n "${FILTER_AIRPLAY2_DEVICES}" ] && [ -n "${AIRUPNP_LATENCY}" ]; then
-            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -g "${AIRUPNP_CONTENTLENGTH_MODE}" -l "${AIRUPNP_LATENCY}" -x "${CONFIG_UPNP_DESTINATION}" -o "${FILTER_AIRPLAY2_DEVICES}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
-        elif [ -n "${FILTER_AIRPLAY2_DEVICES}" ]; then
-            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -g "${AIRUPNP_CONTENTLENGTH_MODE}" -x "${CONFIG_UPNP_DESTINATION}" -o "${FILTER_AIRPLAY2_DEVICES}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
-        elif [ -n "${AIRUPNP_LATENCY}" ]; then
-            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -g "${AIRUPNP_CONTENTLENGTH_MODE}" -l "${AIRUPNP_LATENCY}" -x "${CONFIG_UPNP_DESTINATION}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
-        else
-            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -g "${AIRUPNP_CONTENTLENGTH_MODE}" -x "${CONFIG_UPNP_DESTINATION}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
-        fi
+        AIRUPNP_EXTRA_ARGS=""
+        # FILTER_AIRPLAY2_DEVICES/AIRUPNP_LATENCY/AIRUPNP_PORTRANGE are always
+        # single tokens (comma-separated model codes, "N:M" pairs) with no
+        # embedded whitespace, so unquoted expansion below is safe and avoids
+        # a combinatorial explosion of if/elif branches for every optional flag.
+        [ -n "${FILTER_AIRPLAY2_DEVICES}" ] && AIRUPNP_EXTRA_ARGS="${AIRUPNP_EXTRA_ARGS} -o ${FILTER_AIRPLAY2_DEVICES}"
+        [ -n "${AIRUPNP_LATENCY}" ] && AIRUPNP_EXTRA_ARGS="${AIRUPNP_EXTRA_ARGS} -l ${AIRUPNP_LATENCY}"
+        [ -n "${AIRUPNP_PORTRANGE}" ] && AIRUPNP_EXTRA_ARGS="${AIRUPNP_EXTRA_ARGS} -a ${AIRUPNP_PORTRANGE}"
+        # shellcheck disable=SC2086
+        "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -g "${AIRUPNP_CONTENTLENGTH_MODE}" -x "${CONFIG_UPNP_DESTINATION}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" ${AIRUPNP_EXTRA_ARGS} 2>&1
         echo "[$(date +'%T')] Linking aircast configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}\"." >>"$LOG"
         ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}" "${CONFIG_CAST_DESTINATION}"
         echo "[$(date +'%T')] Starting aircast on ${SYNO_IP}" >>"$LOG"
@@ -121,15 +122,16 @@ start_airconnect_on_ip() {
         echo "[$(date +'%T')] Linking airupnp configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}\"." >>"$LOG"
         ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}" "${CONFIG_UPNP_DESTINATION}"
         echo "[$(date +'%T')] Starting airupnp on ${SYNO_IP}:${AIRUPNP_PORT}" >>"$LOG"
-        if [ -n "${FILTER_AIRPLAY2_DEVICES}" ] && [ -n "${AIRUPNP_LATENCY}" ]; then
-            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -g "${AIRUPNP_CONTENTLENGTH_MODE}" -l "${AIRUPNP_LATENCY}" -x "${CONFIG_UPNP_DESTINATION}" -o "${FILTER_AIRPLAY2_DEVICES}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
-        elif [ -n "${FILTER_AIRPLAY2_DEVICES}" ]; then
-            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -g "${AIRUPNP_CONTENTLENGTH_MODE}" -x "${CONFIG_UPNP_DESTINATION}" -o "${FILTER_AIRPLAY2_DEVICES}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
-        elif [ -n "${AIRUPNP_LATENCY}" ]; then
-            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -g "${AIRUPNP_CONTENTLENGTH_MODE}" -l "${AIRUPNP_LATENCY}" -x "${CONFIG_UPNP_DESTINATION}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
-        else
-            "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -g "${AIRUPNP_CONTENTLENGTH_MODE}" -x "${CONFIG_UPNP_DESTINATION}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
-        fi
+        AIRUPNP_EXTRA_ARGS=""
+        # FILTER_AIRPLAY2_DEVICES/AIRUPNP_LATENCY/AIRUPNP_PORTRANGE are always
+        # single tokens (comma-separated model codes, "N:M" pairs) with no
+        # embedded whitespace, so unquoted expansion below is safe and avoids
+        # a combinatorial explosion of if/elif branches for every optional flag.
+        [ -n "${FILTER_AIRPLAY2_DEVICES}" ] && AIRUPNP_EXTRA_ARGS="${AIRUPNP_EXTRA_ARGS} -o ${FILTER_AIRPLAY2_DEVICES}"
+        [ -n "${AIRUPNP_LATENCY}" ] && AIRUPNP_EXTRA_ARGS="${AIRUPNP_EXTRA_ARGS} -l ${AIRUPNP_LATENCY}"
+        [ -n "${AIRUPNP_PORTRANGE}" ] && AIRUPNP_EXTRA_ARGS="${AIRUPNP_EXTRA_ARGS} -a ${AIRUPNP_PORTRANGE}"
+        # shellcheck disable=SC2086
+        "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -g "${AIRUPNP_CONTENTLENGTH_MODE}" -x "${CONFIG_UPNP_DESTINATION}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" ${AIRUPNP_EXTRA_ARGS} 2>&1
     elif [ "${AIRCAST_ENABLED}" = 1 ]; then
         if [ -z "${AIRCAST_LOGLEVEL}" ]; then
             echo "[$(date +'%T')] Loglevel for AIRCAST cannot be found! Please uninstall the package and reinstall it again (or set AIRCAST_LOGLEVEL in \"${AIRCONNECT_CONFIG}\")!" >>"$LOG"
