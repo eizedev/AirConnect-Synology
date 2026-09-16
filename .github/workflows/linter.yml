@@ -34,7 +34,3 @@ jobs:
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: "master"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # The repo's shell scripts have always used 4-space indentation;
-          # shfmt's own default (tabs) would otherwise want to reformat
-          # every line of every touched script.
-          SHFMT_OPTS: "-i 4"
