@@ -9,11 +9,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
-All three fixes below were verified together end-to-end via a real Package Center
-install on a Synology router (RT2600ac/SRM): install, wizard, start, and a running
-`airupnp`/`aircast` all worked correctly through the actual GUI install path a real
-user takes, after fixing the IP field's misleading VPN-interface default by hand (see
-"Known issues" below).
+All fixes below were verified together end-to-end via real Package Center installs on
+real hardware: a fresh install through the GUI on a Synology router (RT2600ac/SRM;
+install, wizard, start, and a running `airupnp`/`aircast`, after correcting the IP
+field's misleading VPN-interface default by hand - see "Known issues" below), and a
+real **upgrade** from an actual, previously-installed AirConnect 1.8.3 on a DS923+
+(DSM): the existing configuration was preserved exactly, the log file is now correctly
+named, and `synopkg status` correctly reports the package as running, matching the
+real, healthy `airupnp`/`aircast` processes.
 
 ### Known issues
 
