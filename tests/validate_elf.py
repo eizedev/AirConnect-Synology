@@ -24,7 +24,8 @@ referenced.
 Usage:
     validate_elf.py --arch <make-arch-name> <path> [<path> ...]
     validate_elf.py --arch arm target/airupnp target/aircast
-    validate_elf.py --arch x86_64-static target/airupnp target/aircast --json-out report.json
+    validate_elf.py --arch x86_64-static target/airupnp target/aircast \
+        --json-out report.json
 
 Exit status: 0 if every file passes the hard checks (ELF magic present,
 parseable, machine type matches the requested architecture, static/dynamic
@@ -89,10 +90,12 @@ SHT_GNU_VERNEED = 0x6FFFFFFE
 
 
 class ElfParseError(Exception):
-    pass
+    """Raised when a binary doesn't look like a well-formed ELF file."""
 
 
-def parse_elf(data):
+def parse_elf(
+    data,
+):  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
     """Parse the subset of ELF structures this tool needs. Raises
     ElfParseError on anything that doesn't look like a well-formed ELF file
     - that failure mode is deliberate: a corrupted binary (like issue #107)
@@ -114,14 +117,14 @@ def parse_elf(data):
         if is64:
             _e_type, e_machine = struct.unpack_from(endian + "HH", data, 0x10)
             e_phoff, e_shoff = struct.unpack_from(endian + "QQ", data, 0x20)
-            e_phentsize, e_phnum, e_shentsize, e_shnum, e_shstrndx = (
-                struct.unpack_from(endian + "HHHHH", data, 0x36)
+            e_phentsize, e_phnum, e_shentsize, e_shnum, e_shstrndx = struct.unpack_from(
+                endian + "HHHHH", data, 0x36
             )
         else:
             _e_type, e_machine = struct.unpack_from(endian + "HH", data, 0x10)
             e_phoff, e_shoff = struct.unpack_from(endian + "II", data, 0x1C)
-            e_phentsize, e_phnum, e_shentsize, e_shnum, e_shstrndx = (
-                struct.unpack_from(endian + "HHHHH", data, 0x2A)
+            e_phentsize, e_phnum, e_shentsize, e_shnum, e_shstrndx = struct.unpack_from(
+                endian + "HHHHH", data, 0x2A
             )
     except struct.error as exc:
         raise ElfParseError(f"truncated ELF header: {exc}") from exc
@@ -134,7 +137,9 @@ def parse_elf(data):
         for i in range(e_phnum):
             off = e_phoff + i * e_phentsize
             if off + 4 > len(data):
-                raise ElfParseError(f"program header {i} out of bounds (truncated file?)")
+                raise ElfParseError(
+                    f"program header {i} out of bounds (truncated file?)"
+                )
             p_type = struct.unpack_from(endian + "I", data, off)[0]
 
             if is64:
@@ -152,7 +157,9 @@ def parse_elf(data):
             elif p_type == PT_NOTE:
                 pos, end = p_offset, p_offset + p_filesz
                 while pos < end - 12 and pos + 12 <= len(data):
-                    namesz, descsz, notetype = struct.unpack_from(endian + "III", data, pos)
+                    namesz, descsz, notetype = struct.unpack_from(
+                        endian + "III", data, pos
+                    )
                     name = data[pos + 12 : pos + 12 + namesz].split(b"\x00")[0]
                     descoff = pos + 12 + ((namesz + 3) // 4) * 4
                     if name == b"GNU" and notetype == NT_GNU_ABI_TAG and descsz >= 16:
@@ -162,7 +169,9 @@ def parse_elf(data):
                         min_kernel = f"{kmaj}.{kmin}.{ksub}"
                     pos = descoff + ((descsz + 3) // 4) * 4
     except (struct.error, IndexError) as exc:
-        raise ElfParseError(f"truncated or malformed program header table: {exc}") from exc
+        raise ElfParseError(
+            f"truncated or malformed program header table: {exc}"
+        ) from exc
 
     # .gnu.version_r: walk the section table looking for the Verneed
     # section, then chain through Verneed -> Vernaux records to collect
@@ -193,7 +202,9 @@ def parse_elf(data):
                 end = data.find(b"\x00", strtab_off + str_off)
                 if end == -1:
                     end = len(data)
-                return data[strtab_off + str_off : end].decode("ascii", errors="replace")
+                return data[strtab_off + str_off : end].decode(
+                    "ascii", errors="replace"
+                )
 
             verneed_section = None
             for name_off, sh_type, sh_link, sh_off, sh_size in sh_entries:
@@ -209,7 +220,7 @@ def parse_elf(data):
                 seen = set()
                 while pos < vn_off + vn_size and pos not in seen:
                     seen.add(pos)
-                    vn_file, vn_aux, vn_next = struct.unpack_from(
+                    _vn_file, vn_aux, vn_next = struct.unpack_from(
                         endian + "III", data, pos + 4
                     )
                     vn_cnt = struct.unpack_from(endian + "H", data, pos + 2)[0]
@@ -227,7 +238,7 @@ def parse_elf(data):
                     if vn_next == 0:
                         break
                     pos += vn_next
-    except (struct.error, IndexError) as exc:
+    except (struct.error, IndexError):
         # .gnu.version_r is informational only (glibc-version reporting), so a
         # malformed/truncated section table degrades to "unknown" rather than
         # failing binaries that otherwise parsed fine (e.g. static builds,
@@ -253,6 +264,7 @@ def parse_elf(data):
 
 
 def check_binary(path, arch):
+    """Parse one binary and check it against ARCH_EXPECTATIONS[arch]."""
     result = {"path": path, "arch": arch, "ok": True, "errors": [], "warnings": []}
 
     try:
@@ -316,8 +328,13 @@ def check_binary(path, arch):
 
 
 def main():
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--arch", required=True, help="Makefile ARCH= value this binary was built for")
+    """CLI entry point: validate_elf.py --arch <name> <path> [<path> ...]."""
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    ap.add_argument(
+        "--arch", required=True, help="Makefile ARCH= value this binary was built for"
+    )
     ap.add_argument("paths", nargs="+", help="binary file(s) to validate")
     ap.add_argument("--json-out", help="write the full JSON report to this path")
     args = ap.parse_args()
@@ -341,7 +358,7 @@ def main():
             print(f"       error: {e}")
 
     if args.json_out:
-        with open(args.json_out, "w") as f:
+        with open(args.json_out, "w", encoding="utf-8") as f:
             json.dump(results, f, indent=2)
 
     if not all(r["ok"] for r in results):

@@ -5,12 +5,12 @@ test coverage at all before this - CI only ran `shellcheck` and an `ls`. That
 gap is exactly how issue #107 happened: a corrupted binary from a broken
 unzip step shipped in a release and nobody noticed until users reported it.
 
-| Script | What it catches | Would have caught #107? |
-|---|---|---|
-| `validate_elf.py` | Corrupted/wrong-architecture binaries: ELF magic, machine type, static/dynamic, min-kernel note, glibc symbol versions | Yes - a non-ELF file fails immediately |
+| Script            | What it catches                                                                                                                                                                        | Would have caught #107?                                                         |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `validate_elf.py` | Corrupted/wrong-architecture binaries: ELF magic, machine type, static/dynamic, min-kernel note, glibc symbol versions                                                                 | Yes - a non-ELF file fails immediately                                          |
 | `validate_spk.sh` | Malformed `.spk` structure, missing/invalid `INFO` fields, unsubstituted `#VERSION#`-style placeholders, missing/non-executable payload binaries or lifecycle scripts, corrupted icons | Yes, at the package-structure level (validate_elf.py catches the binary itself) |
-| `qemu_smoke.sh` | Binaries that can't actually execute on their target architecture/kernel | planned, not yet written |
-| `scripts/` | Installer script bugs (postinst/postupgrade/start-stop-status) against a mocked `SYNOPKG_*` environment | planned, not yet written |
+| `qemu_smoke.sh`   | Binaries that can't actually execute on their target architecture/kernel                                                                                                               | planned, not yet written                                                        |
+| `scripts/`        | Installer script bugs (postinst/postupgrade/start-stop-status) against a mocked `SYNOPKG_*` environment                                                                                | planned, not yet written                                                        |
 
 ## validate_elf.py
 
@@ -49,10 +49,9 @@ actual compatibility approach is a runtime probe at install time
 the only thing that reflects the real, per-device, per-patch-level
 situation.
 
-Findings recorded from real measurements so far live in the project's
-`synology-kernel-compat` memory entry, not in this repo (see the project
-CLAUDE.md/memory for how that's organized) - this README stays about what
-the tooling does, not about specific version numbers, which go stale.
+Findings recorded from real measurements so far are tracked separately from
+this repository, not in the code itself - this readme stays about what the
+tooling does, not about specific version numbers, which go stale.
 
 ## validate_spk.sh
 
@@ -83,7 +82,7 @@ sh tests/validate_spk.sh dist/AirConnect-dsm7-x86_64-1.11.3-20260916.spk
 ```
 
 **Real finding from running this against the current 1.8.3 release**: all
-seven lifecycle scripts under `src/dsm7/scripts/` are tracked in git as
+seven lifecycle scripts under `src/dsm7/scripts/` are tracked in Git as
 mode `100644` (non-executable) instead of `100755` - confirmed with
 `git ls-files -s src/dsm7/scripts/` - and the built `.spk` inherits that.
 Flagged for the maintainer to decide on rather than fixed here, since it

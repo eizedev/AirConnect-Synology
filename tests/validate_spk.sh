@@ -129,8 +129,8 @@ check_one() {
             [ -x "$sp" ] || fail "scripts/$script is not executable"
             first_line=$(head -n1 "$sp")
             case "$first_line" in
-                '#!'*) : ;;
-                *) fail "scripts/$script has no shebang line (found: '$first_line')" ;;
+            '#!'*) : ;;
+            *) fail "scripts/$script has no shebang line (found: '$first_line')" ;;
             esac
         done
     fi
@@ -179,4 +179,4 @@ if [ "$FAIL" -eq 1 ]; then
     echo "RESULT: FAIL"
     exit 1
 fi
-echo "RESULT: OK$( [ "$WARN" -eq 1 ] && echo ' (with warnings)' )"
+echo "RESULT: OK$([ "$WARN" -eq 1 ] && echo ' (with warnings)')"

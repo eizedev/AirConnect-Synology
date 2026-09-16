@@ -7,6 +7,18 @@ on:
   pull_request:
     branches: [master]
   workflow_dispatch:
+  # Lets upstream-check.yml invoke this workflow directly in the same run,
+  # after it pushes a new tag - a tag pushed with the default GITHUB_TOKEN
+  # does NOT trigger other workflows' `on: push: tags` (GitHub suppresses
+  # that to prevent recursive runs), so relying on the push trigger alone
+  # would silently never publish anything. release_tag lets the caller say
+  # "this run IS a release, for this tag" explicitly instead.
+  workflow_call:
+    inputs:
+      release_tag:
+        description: "Treat this run as a release for this tag (used by upstream-check.yml)"
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -25,6 +37,25 @@ jobs:
       - uses: actions/checkout@v6
         with:
           path: "."
+
+      - name: Determine whether this run should publish a release
+        id: release_tag
+        run: |
+          if [ -n "${{ inputs.release_tag }}" ]; then
+            TAG="${{ inputs.release_tag }}"
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            TAG="${{ github.ref_name }}"
+          else
+            TAG=""
+          fi
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          if [ -n "$TAG" ]; then
+            echo "is_release=true" >> "$GITHUB_OUTPUT"
+            echo "Publishing a release for tag ${TAG}"
+          else
+            echo "is_release=false" >> "$GITHUB_OUTPUT"
+            echo "Build/validate only - not a release (no tag)"
+          fi
 
       - name: Read pinned upstream AirConnect version
         id: upstream
@@ -72,8 +103,10 @@ jobs:
 
       - name: Validate downloaded Release
         id: validate_release
+        env:
+          UPSTREAM_TAG: ${{ steps.upstream.outputs.tag }}
         run: |
-          echo "Using AirConnect version '${{ steps.upstream.outputs.tag }}' (pinned in upstream.json)"
+          echo "Using AirConnect version '${UPSTREAM_TAG}' (pinned in upstream.json)"
           ls -ltR "${GITHUB_WORKSPACE}"/src/dsm7/bin/
 
       - name: Running shellcheck
@@ -100,7 +133,7 @@ jobs:
                       powerpc powerpc-static; do
             # the trailing [0-9] anchors the version so e.g. "arm" doesn't
             # glob-match "arm-static"'s package too
-            spk=$(ls src/dsm7/dist/AirConnect-dsm7-"${arch}"-[0-9]*.spk 2>/dev/null | head -n1)
+            spk=$(find src/dsm7/dist -maxdepth 1 -name "AirConnect-dsm7-${arch}-[0-9]*.spk" 2>/dev/null | head -n1)
             if [ -z "$spk" ]; then
               echo "::error::No .spk found for arch ${arch}"
               FAIL=1
@@ -121,6 +154,7 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v3
         with:
+          tag_name: ${{ steps.release_tag.outputs.tag }}
           files: |
             src/dsm7/dist/*.spk
           discussion_category_name: Releases
@@ -128,7 +162,7 @@ jobs:
             Packaging changes: see [CHANGELOG.md](https://github.com/eizedev/AirConnect-Synology/blob/master/CHANGELOG.md).
             Upstream AirConnect ${{ steps.upstream.outputs.tag }} changes: see the [AirConnect CHANGELOG](https://github.com/philippe44/AirConnect/blob/master/CHANGELOG).
           generate_release_notes: true
-        if: startsWith(github.ref, 'refs/tags/')
+        if: steps.release_tag.outputs.is_release == 'true'
 
       - name: Upload releases to artifacts
         id: upload_releases

@@ -16,6 +16,7 @@ Verified end-to-end on real hardware: fresh GUI install on a Synology router
 (DSM), config preserved.
 
 ### Added
+
 - `AIRUPNP_PORTRANGE` config option: a fixed port range for airupnp's per-device
   RTP/HTTP streams, so firewall rules have something fixed to allow instead of random
   OS-assigned ports. Passed through as airupnp's `-a` flag. Default `49155:128`.
@@ -27,6 +28,7 @@ Verified end-to-end on real hardware: fresh GUI install on a Synology router
   merging the PR is still a human decision.
 
 ### Fixed
+
 - Package Center could report AirConnect as "stopped" while it was actually running
   (`start-stop-status` used bare `ps`, which can't see daemonized processes on DSM).
   Now probes at runtime which `ps` invocation works, since DSM and SRM need opposite
@@ -37,7 +39,7 @@ Verified end-to-end on real hardware: fresh GUI install on a Synology router
   confirmed retroactively for those specific reports.
 - Package installation could fail outright on Synology routers (SRM) and leave the
   device unable to reinstall: every lifecycle script and `install_uifile.sh` were
-  tracked in git as non-executable, which DSM tolerates but SRM does not. Fixed for
+  tracked in Git as non-executable, which DSM tolerates but SRM does not. Fixed for
   all scripts in both the DSM 7 and legacy DSM 5/6 packages.
 - The installer's IP auto-detection crashed silently on SRM (`grep -P`, unsupported by
   BusyBox `grep`), leaving the IP field blank. Switched to the portable `sed` approach
@@ -46,6 +48,7 @@ Verified end-to-end on real hardware: fresh GUI install on a Synology router
   sending their log output to `log/.log` instead of `log/airconnect.log`.
 
 ### Known issues
+
 - The installer's auto-detected default IP can be wrong on multi-homed devices
   (confirmed: a router with a VPN/mesh interface as its default route got that
   interface's IP pre-filled, not its LAN IP). The field is editable, so this doesn't

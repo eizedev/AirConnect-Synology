@@ -1,14 +1,20 @@
 ---
 name: Upstream AirConnect version bump
 
-# Two-stage, human-in-the-loop upstream update flow:
+# Human-in-the-loop upstream update flow, three stages:
 #   1. check-for-update: runs weekly, compares the pinned version in
 #      upstream.json against philippe44/AirConnect's latest release. If
 #      newer, computes the new checksum and opens a PR - never merges it.
-#   2. tag-and-release: runs when a PR that touched upstream.json is merged
-#      to master (by a human, in Package Center). Creates and pushes the
-#      next release tag, which triggers release.yml's existing build,
-#      validate, and publish pipeline.
+#   2. tag: runs when a PR that touched upstream.json is merged to master
+#      (by a human, reviewing and clicking merge on GitHub). Creates and
+#      pushes the next release tag.
+#   3. release: invokes release.yml directly as a reusable workflow (NOT by
+#      relying on the tag push above to trigger it) in the same run, so it
+#      builds, validates, and publishes. A tag pushed with the default
+#      GITHUB_TOKEN does not trigger other workflows' `on: push: tags` -
+#      GitHub suppresses that specifically to prevent recursive workflow
+#      runs - so a direct workflow_call is what actually makes "merge the
+#      PR" the only manual step, instead of silently publishing nothing.
 #
 # This intentionally never auto-merges the version-bump PR - a human
 # reviews and merges it (see AirConnect-Synology project history: #106 and
@@ -26,22 +32,26 @@ on:
     paths:
       - upstream.json
 
-permissions:
-  contents: write
-  pull-requests: write
-
 jobs:
   check-for-update:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v6
 
       - name: Compare upstream release to pinned version
         id: check
+        env:
+          # Passed via env instead of interpolated directly into the curl
+          # command line, so the token never appears in a process listing
+          # or in the script's own text (checkov CKV_GHA_3).
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           CURRENT_TAG=$(jq -r .tag upstream.json)
-          LATEST=$(curl -sL -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          LATEST=$(curl -sL -H "Authorization: Bearer ${GH_TOKEN}" \
             "https://api.github.com/repos/philippe44/AirConnect/releases/latest")
           LATEST_TAG=$(echo "$LATEST" | jq -r .tag_name)
 
@@ -109,9 +119,13 @@ jobs:
           commit-message: "chore(upstream): bump pinned AirConnect to ${{ steps.check.outputs.new_tag }}"
           body-path: /tmp/pr_body.md
 
-  tag-and-release:
+  tag:
     if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      tag: ${{ steps.create_tag.outputs.tag }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -119,6 +133,7 @@ jobs:
           fetch-depth: 0
 
       - name: Create and push the next release tag
+        id: create_tag
         run: |
           VERSION=$(jq -r .version upstream.json)
           TAG="${VERSION}-$(date +%Y%m%d)"
@@ -132,4 +147,24 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git tag -a "$TAG" -m "AirConnect ${VERSION}"
           git push origin "$TAG"
-          echo "Pushed tag ${TAG} - release.yml will build and publish it."
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "Pushed tag ${TAG}."
+
+  # Invokes release.yml directly (as a reusable workflow) instead of relying
+  # on the tag push above to trigger it via `on: push: tags` - a push made
+  # with the default GITHUB_TOKEN does not trigger other workflows (GitHub
+  # suppresses that to prevent recursive runs), so that trigger alone would
+  # silently never fire. This call happens in the same overall run instead.
+  release:
+    needs: tag
+    uses: ./.github/workflows/release.yml
+    with:
+      release_tag: ${{ needs.tag.outputs.tag }}
+    secrets: inherit
+    permissions:
+      contents: write
+      discussions: write
+      packages: write
+      deployments: write
+      statuses: write
+      actions: read
