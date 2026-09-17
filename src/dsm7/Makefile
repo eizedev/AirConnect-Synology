@@ -56,13 +56,13 @@ dist/AirConnect-dsm7-${ARCH}-${VERSION}.spk: target/package.tgz target/scripts t
 
 .PHONY: arm
 arm:
-	$(eval export INFO_ARCH=ipq806x armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k hi3535 dakota ipq806x northstarplus)
+	$(eval export INFO_ARCH=ipq806x armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k hi3535 dakota northstarplus hawkeye)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
 .PHONY: arm-static
 arm-static:
-	$(eval export INFO_ARCH=ipq806x armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k hi3535 dakota ipq806x northstarplus noarch)
+	$(eval export INFO_ARCH=ipq806x armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k hi3535 dakota northstarplus hawkeye noarch)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
@@ -92,49 +92,49 @@ armv6-static:
 
 .PHONY: aarch64
 aarch64:
-	$(eval export INFO_ARCH=rtd1296 rtd1619b armada37xx)
+	$(eval export INFO_ARCH=rtd1296 rtd1619b armada37xx cypress)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
 .PHONY: aarch64-static
 aarch64-static:
-	$(eval export INFO_ARCH=rtd1296 rtd1619b armada37xx noarch)
+	$(eval export INFO_ARCH=rtd1296 rtd1619b armada37xx cypress noarch)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
 .PHONY: powerpc
 powerpc:
-	$(eval export INFO_ARCH=qoriq Ppc853x)
+	$(eval export INFO_ARCH=qoriq ppc853x)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
 .PHONY: powerpc-static
 powerpc-static:
-	$(eval export INFO_ARCH=qoriq Ppc853x noarch)
+	$(eval export INFO_ARCH=qoriq ppc853x noarch)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
 .PHONY: x86
 x86:
-	$(eval export INFO_ARCH=x86 cedarview bromolow evansport braswell broadwell dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap)
+	$(eval export INFO_ARCH=x86 cedarview bromolow evansport braswell broadwell dockerx64 kvmx64 denverton grantley broadwellnk broadwellntbap)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
 .PHONY: x86-static
 x86-static:
-	$(eval export INFO_ARCH=x86 cedarview bromolow evansport braswell broadwell dockerx64 kvmx64 denverton grantley broadwellnk Broadwellntbap)
+	$(eval export INFO_ARCH=x86 cedarview bromolow evansport braswell broadwell dockerx64 kvmx64 denverton grantley broadwellnk broadwellntbap)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
 .PHONY: x86_64
 x86_64:
-	$(eval export INFO_ARCH=x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 epyc7002 r1000 kvmx64 denverton grantley broadwellnk broadwellnkv2 Broadwellntbap v1000 geminilake purley)
+	$(eval export INFO_ARCH=x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 epyc7002 r1000 r1000nk kvmx64 denverton grantley broadwellnk broadwellnkv2 broadwellntbap v1000 v1000nk geminilake geminilakenk purley)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
 .PHONY: x86_64-static
 x86_64-static:
-	$(eval export INFO_ARCH=x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 epyc7002 r1000 kvmx64 denverton grantley broadwellnk broadwellnkv2 Broadwellntbap v1000 geminilake purley)
+	$(eval export INFO_ARCH=x86_64 x64 cedarview bromolow avoton braswell broadwell apollolake dockerx64 epyc7002 r1000 r1000nk kvmx64 denverton grantley broadwellnk broadwellnkv2 broadwellntbap v1000 v1000nk geminilake geminilakenk purley)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
