@@ -100,12 +100,26 @@ if [ "$SYNOPKG_PKG_STATUS" = "INSTALL" ]; then
         # it somehow already has content, leave it alone entirely rather
         # than force-deleting it.
         if [ -d "${AIRCONNECT_SHARE_DIR}" ]; then
-            if [ -z "$(ls -A "${AIRCONNECT_SHARE_DIR}" 2>/dev/null)" ]; then
+            # @eaDir (Synology's own metadata dir, auto-created on every
+            # shared folder) and .DS_Store/Thumbs.db/desktop.ini (created
+            # just by browsing the folder in Finder/Explorer) don't count
+            # as real content - a folder with only these is still "empty".
+            # Globs instead of ls|grep so a filename with a newline or other
+            # odd character can't confuse this.
+            SHARE_REAL_CONTENTS=""
+            for entry in "${AIRCONNECT_SHARE_DIR}"/* "${AIRCONNECT_SHARE_DIR}"/.[!.]*; do
+                [ -e "$entry" ] || continue
+                entry_name=$(basename "$entry")
+                case "$entry_name" in
+                '@eaDir' | '.DS_Store' | 'Thumbs.db' | 'desktop.ini') ;;
+                *) SHARE_REAL_CONTENTS="${SHARE_REAL_CONTENTS}${entry_name} " ;;
+                esac
+            done
+            if [ -z "${SHARE_REAL_CONTENTS}" ]; then
                 echo "[$(date +'%T')] Removing unused, empty shared folder \"airconnect\" (not opted in)" >>"$LOG"
                 synoshare --del TRUE airconnect >>"$LOG" 2>&1 || true
             else
-                # shellcheck disable=SC2012
-                echo "[$(date +'%T')] Shared folder \"airconnect\" already has content - leaving it in place despite not opting in (contents: $(ls -A "${AIRCONNECT_SHARE_DIR}" 2>/dev/null | tr '\n' ' '))" >>"$LOG"
+                echo "[$(date +'%T')] Shared folder \"airconnect\" already has content - leaving it in place despite not opting in (contents: ${SHARE_REAL_CONTENTS})" >>"$LOG"
             fi
         fi
     fi
