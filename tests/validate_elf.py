@@ -232,6 +232,7 @@ def _scan_glibc_versions(data, header):  # pylint: disable=too-many-locals
         shstr_off = sh_entries[header["e_shstrndx"]][3]
 
         def read_str(strtab_off, str_off):
+            """Read a NUL-terminated string at strtab_off + str_off."""
             end = data.find(b"\x00", strtab_off + str_off)
             if end == -1:
                 end = len(data)
@@ -274,9 +275,9 @@ def _scan_glibc_versions(data, header):  # pylint: disable=too-many-locals
     return glibc_versions
 
 
-def version_key(v):
+def version_key(version):
     """Sort key for "x.y.z"-style version strings, numeric per component."""
-    return tuple(int(p) for p in v.split(".") if p.isdigit())
+    return tuple(int(p) for p in version.split(".") if p.isdigit())
 
 
 def parse_elf(data):
@@ -308,14 +309,14 @@ def check_binary(path, arch):
     result = {"path": path, "arch": arch, "ok": True, "errors": [], "warnings": []}
 
     try:
-        with open(path, "rb") as f:
-            data = f.read()
+        with open(path, "rb") as bin_file:
+            data = bin_file.read()
     except OSError as exc:
         result["ok"] = False
         result["errors"].append(f"cannot read file: {exc}")
         return result
 
-    if len(data) == 0:
+    if not data:
         result["ok"] = False
         result["errors"].append("file is empty")
         return result
@@ -369,39 +370,39 @@ def check_binary(path, arch):
 
 def main():
     """CLI entry point: validate_elf.py --arch <name> <path> [<path> ...]."""
-    ap = argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    ap.add_argument(
+    parser.add_argument(
         "--arch", required=True, help="Makefile ARCH= value this binary was built for"
     )
-    ap.add_argument("paths", nargs="+", help="binary file(s) to validate")
-    ap.add_argument("--json-out", help="write the full JSON report to this path")
-    args = ap.parse_args()
+    parser.add_argument("paths", nargs="+", help="binary file(s) to validate")
+    parser.add_argument("--json-out", help="write the full JSON report to this path")
+    args = parser.parse_args()
 
     results = [check_binary(p, args.arch) for p in args.paths]
 
-    for r in results:
-        status = "OK" if r["ok"] else "FAIL"
-        print(f"[{status}] {r['path']} (arch={r['arch']})")
-        if r["ok"] and "e_machine_name" in r:
+    for result in results:
+        status = "OK" if result["ok"] else "FAIL"
+        print(f"[{status}] {result['path']} (arch={result['arch']})")
+        if result["ok"] and "e_machine_name" in result:
             print(
-                f"       {r['e_machine_name']}, {r['class']}, "
-                f"{'dynamic' if r['is_dynamic'] else 'static'}, "
-                f"min_kernel={r['min_kernel']}, "
-                f"max_glibc={r['max_glibc_required']}, "
-                f"interp={r['interp']}"
+                f"       {result['e_machine_name']}, {result['class']}, "
+                f"{'dynamic' if result['is_dynamic'] else 'static'}, "
+                f"min_kernel={result['min_kernel']}, "
+                f"max_glibc={result['max_glibc_required']}, "
+                f"interp={result['interp']}"
             )
-        for w in r["warnings"]:
-            print(f"       warning: {w}")
-        for e in r["errors"]:
-            print(f"       error: {e}")
+        for warning in result["warnings"]:
+            print(f"       warning: {warning}")
+        for error in result["errors"]:
+            print(f"       error: {error}")
 
     if args.json_out:
-        with open(args.json_out, "w", encoding="utf-8") as f:
-            json.dump(results, f, indent=2)
+        with open(args.json_out, "w", encoding="utf-8") as out_file:
+            json.dump(results, out_file, indent=2)
 
-    if not all(r["ok"] for r in results):
+    if not all(result["ok"] for result in results):
         sys.exit(1)
 
 
