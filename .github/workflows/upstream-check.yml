@@ -132,23 +132,56 @@ jobs:
           ref: master
           fetch-depth: 0
 
-      - name: Create and push the next release tag
+      - name: Update CHANGELOG.md and push the next release tag
         id: create_tag
         run: |
           VERSION=$(jq -r .version upstream.json)
           TAG="${VERSION}-$(date +%Y%m%d)"
+          RELEASE_DATE=$(date +%Y-%m-%d)
 
           if git rev-parse "$TAG" >/dev/null 2>&1; then
             echo "::error::Tag ${TAG} already exists - not pushing again. If this is a genuine same-day re-bump, tag manually with a disambiguating suffix."
             exit 1
           fi
 
+          # Whatever accumulated under [Unreleased] (manual packaging-change
+          # entries added since the last release) becomes this release's
+          # section, same as a manual release. If nothing accumulated - the
+          # common case for a pure upstream version bump with no packaging
+          # script changes - fall back to a minimal generated note instead
+          # of leaving the release without any CHANGELOG.md entry at all,
+          # which is how this used to ship (a purely manual step that was
+          # easy to forget for pure bumps).
+          UNRELEASED_BODY=$(awk '/^## \[Unreleased\]/{f=1;next}/^## \[/{f=0}f' CHANGELOG.md)
+          if [ -n "$(echo "$UNRELEASED_BODY" | tr -d '[:space:]')" ]; then
+            STUB=""
+          else
+            STUB="Upstream AirConnect updated to ${VERSION}. See the [upstream CHANGELOG](https://github.com/philippe44/AirConnect/blob/master/CHANGELOG) for details."
+          fi
+
+          awk -v tag="$TAG" -v date="$RELEASE_DATE" -v stub="$STUB" '
+            /^## \[Unreleased\]/ {
+              print
+              print ""
+              print "## [" tag "] - " date
+              if (stub != "") {
+                print ""
+                print stub
+              }
+              next
+            }
+            { print }
+          ' CHANGELOG.md > CHANGELOG.md.new
+          mv CHANGELOG.md.new CHANGELOG.md
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git commit -m "docs: add release date to CHANGELOG for ${TAG}"
           git tag -a "$TAG" -m "AirConnect ${VERSION}"
-          git push origin "$TAG"
+          git push origin master "$TAG"
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-          echo "Pushed tag ${TAG}."
+          echo "Pushed tag ${TAG} with CHANGELOG.md update."
 
   # Invokes release.yml directly (as a reusable workflow) instead of relying
   # on the tag push above to trigger it via `on: push: tags` - a push made
