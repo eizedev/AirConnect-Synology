@@ -97,7 +97,13 @@ on a real RT2600ac.
 
    ![AirConnect installation - connection step](doc/res/installation_connection.png)
 
-6. Finish the wizard. AirConnect starts automatically; your Sonos/UPnP and Chromecast
+6. Optional - leave unchecked unless you specifically want to edit
+   `airconnect.conf`/config files or view the log from your computer without SSH (see
+   [Editing files from your PC](#editing-files-from-your-pc)):
+
+   ![AirConnect installation - shared folder step](doc/res/shared_folder_wizard.png)
+
+7. Finish the wizard. AirConnect starts automatically; your Sonos/UPnP and Chromecast
    devices should appear as AirPlay targets within a few seconds.
 
 > **DSM 5/6:** see [doc/ARCHITECTURES.md](doc/ARCHITECTURES.md#older-dsm-56-devices) -
@@ -124,10 +130,8 @@ links"** during install or upgrade (off by default; upgrading shows the same opt
 again, preselected with your current choice, so you can change your mind later without
 reinstalling). This links `airconnect.conf`, the log, and (if present)
 `config.xml`/`config-cast.xml` into the package's `airconnect` shared folder.
-Unchecking it again removes just those links - never deletes the real files.
-
-<!-- TODO screenshot: install/upgrade wizard step showing the "Enable
-     shared-folder links" checkbox - doc/res/shared_folder_wizard.png -->
+Unchecking it again removes just those links - never deletes the real files. See
+[step 6](#install-via-package-center) above for what this looks like during install.
 
 **Works over SMB only** - map the shared folder from Windows, Mac, or Linux (e.g.
 `smb://<your-nas>/airconnect`); confirmed working, including editing and saving
