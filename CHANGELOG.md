@@ -11,6 +11,8 @@ links are included where a change traces back to one, so reports stay findable.
 
 ## [Unreleased]
 
+## [1.11.3-20260917] - 2026-09-17
+
 ### Changed
 
 - The `airconnect` shared folder is no longer used by default. Editing
