@@ -53,9 +53,14 @@ if [ -f "${AIRCONNECT_CONFIG}" ]; then
     # the shared folder itself if either of those (or anything else real)
     # is still there, since their *real* file can legitimately live inside
     # the shared folder if the user placed a custom one there. Runs here
-    # (not in start-stop-status) because this script runs as root (see
-    # conf/privilege) and can actually call synoshare; start-stop-status
-    # runs unprivileged and confirmed cannot ("Permission denied").
+    # rather than in start-stop-status because that's where the toggle
+    # transition is detected; removing individual symlinks doesn't need
+    # elevated privilege (the "airconnect" group already has rw on the
+    # folder via data-share). Deregistering the folder itself would need
+    # synoshare, which needs root - DSM 7 refuses to even install a
+    # package whose privilege config lets any script run as root
+    # (confirmed on real hardware), so that part isn't automatable here;
+    # see the README for the manual SSH command if wanted.
     if [ "${NEW_SHARED_FOLDER_LINKS_ENABLED}" = "0" ]; then
         AIRCONNECT_DESTINATION="${SYNOPKG_PKGDEST_VOL}/airconnect"
         if [ -d "${AIRCONNECT_DESTINATION}" ]; then
@@ -77,8 +82,7 @@ if [ -f "${AIRCONNECT_CONFIG}" ]; then
                 esac
             done
             if [ -z "${SHARE_REAL_CONTENTS}" ]; then
-                echo "[$(date +'%T')] Removing unused, empty shared folder \"airconnect\" (not opted in)" >>"${LOG}"
-                synoshare --del TRUE airconnect >>"${LOG}" 2>&1 || true
+                echo "[$(date +'%T')] Symlinks removed - the (now empty, unused) \"airconnect\" shared folder itself stays registered; see the README for how to remove it manually if wanted." >>"${LOG}"
             else
                 echo "[$(date +'%T')] Shared folder \"airconnect\" still has content after removing this package's own symlinks - leaving it in place (contents: ${SHARE_REAL_CONTENTS})" >>"${LOG}"
                 echo "The \"airconnect\" shared folder was kept because it still contains: ${SHARE_REAL_CONTENTS}(this package's own config/log links were removed)" >>"${SYNOPKG_TEMP_LOGFILE}"

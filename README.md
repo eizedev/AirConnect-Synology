@@ -293,11 +293,19 @@ upgrading shows the same option again, preselected with your current choice, so 
 can change your mind without reinstalling). This links these files into the package's
 `airconnect` shared folder.
 
-Unchecking it again removes just those two links - never `config.xml`/`config-cast.xml`,
-and never the shared folder itself if you've placed a custom `config.xml`/`config-cast.xml`
-there (see [Command-Line Arguments](#command-line-arguemts) for what those are for). If the
-folder still has content after removing the links, it's left in place and Package Center
-shows a note saying so; an empty folder is removed entirely.
+Unchecking it again removes just those two links - never `config.xml`/`config-cast.xml`
+themselves, if you've placed a custom one there (see [Command-Line Arguments](#command-line-arguemts)
+for what those are for). If the folder still has content after removing the links, it's
+left in place and Package Center shows a note saying so.
+
+> The "airconnect" shared folder itself always exists once you've installed this package,
+> whether or not you ever check this option - Synology's own package framework creates it
+> unconditionally and gives packages no supported way to remove it again (not even when
+> nothing is linked into it). This is a deliberate Synology restriction: a package
+> removing a shared folder on its own could destroy real user data, so the platform
+> simply doesn't allow it - not a bug in this package. If you don't want the folder
+> around at all, remove it yourself: `Control Panel` - `Shared Folder`, or via SSH with
+> `sudo synoshare --del TRUE airconnect` (see [Troubleshooting](#cannot-be-installed-or-upgrade-from-an-older-version)).
 
 **Works over SMB only** - map the shared folder from Windows, Mac, or Linux (e.g.
 `smb://<your-nas>/airconnect` in Finder, or a mapped network drive on Windows); confirmed
