@@ -64,3 +64,10 @@ jobs:
           # bug, and not worth a config file per tool to keep suppressing.
           VALIDATE_CHECKOV: false
           VALIDATE_GITHUB_ACTIONS_ZIZMOR: false
+          # Flags correctly-spelled words against a fixed house-style
+          # dictionary unrelated to this repo (e.g. wants "trade-off" over
+          # "tradeoff", lowercase "readme" over the actual filename
+          # "README") - not a spelling or grammar check, just a style
+          # opinion with no config file in this repo to tune it. Actual
+          # spelling is already covered separately by SPELL_CODESPELL.
+          VALIDATE_NATURAL_LANGUAGE: false
