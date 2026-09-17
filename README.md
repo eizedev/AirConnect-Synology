@@ -233,14 +233,18 @@ If you encounter any problems, please read the [troubleshooting](#troubleshootin
 
 > Only available for DSM 7 packages!
 >
-> You cannot view/edit the file with FileStation due to a limitation in synology DMS (Symbolik links) by default
+> File Station cannot display this file at all (it doesn't support symlinks, full stop -
+> not a setting you can change). See [Editing airconnect.conf using your PC](#editing-airconnectconf-using-your-pc)
+> for what does work.
 >
 > Please keep in mind, that if you upgrade your existing AirConnect-Synology package no changes will be made to the `airconnect.conf` file.
 > If you want to overwrite your `airconnect.conf` configuration with the default one, please uninstall and install the package again.
 > You can also copy the default values found below to your configuration file.
 
 Starting with release `0.2.50.5-20210801` you can customize the configuration of AirConnect-Synology by using the config file at
-`/volume1/airconnect/airconnect.conf`.  
+`/volume1/@appstore/AirConnect/airconnect.conf` (edit via SSH; also reachable at
+`/volume1/airconnect/airconnect.conf` over SMB if you checked **"Enable shared-folder
+links"** during installation or upgrade - see [Editing airconnect.conf using your PC](#editing-airconnectconf-using-your-pc)).  
 Please **stop** the package **before** changing the configuration.  
 If you have edited the configuration while AirConnect is running please **restart** the AirConnect package.
 
@@ -695,7 +699,9 @@ For additional information, please check the following issues in the official Ai
 #### Debug DSM 7
 
 If you want to see more logs then change the AIRCAST_LOGLEVEL or AIRUPNP_LOGLEVEL from
-`all=info` in `/volume1/airconnect/airconnect.conf` to `all=debug` and restart the package.
+`all=info` to `all=debug` in `airconnect.conf` (`/volume1/@appstore/AirConnect/airconnect.conf`
+via SSH, or `/volume1/airconnect/airconnect.conf` over SMB - see [airconnect.conf](#airconnectconf))
+and restart the package.
 
 #### DSM 5 and 6
 
