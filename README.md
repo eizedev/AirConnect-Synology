@@ -106,6 +106,17 @@ on a real RT2600ac.
 7. Finish the wizard. AirConnect starts automatically; your Sonos/UPnP and Chromecast
    devices should appear as AirPlay targets within a few seconds.
 
+> **Verifying your download (optional):** every [release](https://github.com/eizedev/AirConnect-Synology/releases)
+> includes a `SHA256SUMS` file alongside the `.spk` packages, covering every
+> architecture - you'll only have the one you downloaded, so check just that line
+> rather than the whole file (which would otherwise report the other architectures as
+> missing): `grep <your-file>.spk SHA256SUMS | sha256sum -c -` (on macOS:
+> `grep <your-file>.spk SHA256SUMS | shasum -a 256 -c -`). Should print `OK`. Most
+> people don't need this; it's here for anyone who wants to confirm a download wasn't
+> corrupted or tampered with in transit.
+
+<!-- -->
+
 > **DSM 5/6:** see [doc/ARCHITECTURES.md](doc/ARCHITECTURES.md#older-dsm-56-devices) -
 > different (frozen) package line, same Manual Install steps.
 
