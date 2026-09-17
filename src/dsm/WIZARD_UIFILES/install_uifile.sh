@@ -88,7 +88,7 @@ tee "$SYNOPKG_TEMP_LOGFILE" <<EOF
                 ]
             },
             {
-                "desc": "<strong style='color:red'>Note:</strong> to actually browse these links over SMB, you also need to enable 'allow symlinks' under <em>Control Panel - File Services - SMB - Advanced Settings</em> on your Synology device - a device-wide setting, not specific to this package. See the <a target='_blank' href='https://github.com/eizedev/AirConnect-Synology#readme'>documentation</a> for details and a screenshot. Leave this off if you're unsure - you can always reach these files via SSH instead."
+                "desc": "<strong style='color:red'>Note:</strong> works over SMB only - map the shared folder from Windows, Mac, or Linux (e.g. smb://&lt;your-nas&gt;/airconnect). Not supported via File Station (can't display symlinks) or AFP (no equivalent setting). You also need to enable 'allow symlinks' under <em>Control Panel - File Services - SMB - Advanced Settings</em> on your Synology device - a device-wide setting, not specific to this package. See the <a target='_blank' href='https://github.com/eizedev/AirConnect-Synology#readme'>documentation</a> for details and a screenshot. Leave this off if you're unsure - you can always reach these files via SSH instead."
             }
         ]
     }
