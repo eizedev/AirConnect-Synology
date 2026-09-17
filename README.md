@@ -157,8 +157,7 @@ shown here:
 > enabled shared-folder links - unless you check **"Delete the contents..."** in the
 > uninstall dialog, since there's no point backing up something about to be deleted.
 
-<!-- TODO screenshot: uninstall wizard step showing the "Delete the
-     contents..." checkbox - doc/res/uninstall_wizard.png -->
+![AirConnect uninstall - optional cleanup step](doc/res/uninstall_wizard.png)
 
 ## Logs
 
