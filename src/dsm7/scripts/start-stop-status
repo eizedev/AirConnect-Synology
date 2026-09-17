@@ -39,9 +39,12 @@ else
     PS_ALL_CMD="ps"
 fi
 
+# Match on the full install path, not just the bare binary name, so this
+# never picks up an unrelated process that happens to have "airupnp" or
+# "aircast" as a substring somewhere in its own command line.
 # shellcheck disable=SC2009,SC2086
 get_pid() {
-    PID=$($PS_ALL_CMD | grep -E 'airupnp|aircast' | grep -v grep | awk '{print $2}')
+    PID=$($PS_ALL_CMD | grep -E "${SYNOPKG_PKGDEST}/(airupnp|aircast)" | grep -v grep | awk '{print $2}')
 }
 
 start_airconnect_on_ip() {
@@ -60,7 +63,10 @@ start_airconnect_on_ip() {
 
     if [ "${AIRUPNP_ENABLED}" = 1 ] && [ "${AIRCAST_ENABLED}" = 1 ]; then
         if [ -n "${AIRUPNP_PORT}" ]; then
-            if netstat -tln | grep :"${AIRUPNP_PORT}"; then
+            # Anchored so e.g. port 4915 doesn't false-positive on an
+            # unrelated 49154/49150 listener (netstat's Local Address
+            # column always has whitespace right after the port number).
+            if netstat -tln | grep -E ":${AIRUPNP_PORT}([[:space:]]|\$)"; then
                 echo "[$(date +'%T')] Your selected port ${AIRUPNP_PORT} is already in use." >>"$LOG"
                 echo "[$(date +'%T')] Please check what is running on the port and try again." >>"$LOG"
                 echo "[$(date +'%T')] Port ${AIRUPNP_PORT} already in use. Please check what is running on the port and try again." >>"$SYNOPKG_TEMP_LOGFILE"
@@ -101,7 +107,10 @@ start_airconnect_on_ip() {
         fi
     elif [ "${AIRUPNP_ENABLED}" = 1 ]; then
         if [ -n "${AIRUPNP_PORT}" ]; then
-            if netstat -tln | grep :"${AIRUPNP_PORT}"; then
+            # Anchored so e.g. port 4915 doesn't false-positive on an
+            # unrelated 49154/49150 listener (netstat's Local Address
+            # column always has whitespace right after the port number).
+            if netstat -tln | grep -E ":${AIRUPNP_PORT}([[:space:]]|\$)"; then
                 echo "[$(date +'%T')] Your selected port ${AIRUPNP_PORT} is already in use." >>"$LOG"
                 echo "[$(date +'%T')] Please check what is running on the port and try again." >>"$LOG"
                 echo "[$(date +'%T')] Port ${AIRUPNP_PORT} already in use. Please check what is running on the port and try again." >>"$SYNOPKG_TEMP_LOGFILE"
@@ -181,6 +190,16 @@ stop_airconnect() {
         return 0
     fi
     sleep 10
+
+    # A process that ignores SIGTERM would otherwise leave the package stuck
+    # "still running" forever, blocking stop/uninstall/upgrade. Escalate once.
+    get_pid
+    if [ -n "${PID}" ]; then
+        echo "[$(date +'%T')] Stop: process(es) still running 10s after SIGTERM (pid(s): ${PID}), sending SIGKILL." >>"$LOG"
+        # shellcheck disable=SC2086
+        kill -9 $PID
+        sleep 1
+    fi
 
     if [ "${AIRUPNP_ENABLED}" = 1 ] && [ "${AIRCAST_ENABLED}" = 1 ]; then
         # pgrep not available by default on synology devices
