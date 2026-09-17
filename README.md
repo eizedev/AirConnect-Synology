@@ -208,14 +208,15 @@ If you encounter any problems, please read the [troubleshooting](#troubleshootin
 ### Logfiles
 
 - **AirConnect-Synology and AirConnect Log File**
-  - The _AirConnect application logfile_ is located at `/volume1/airconnect/log/airconnect.log` (default location)
-    - This is a symlink of `/volume1/@appstore/AirConnect/log/airconnect.log`
-  - You can open it using the Synology **FileStation** by navigating to `airconnect` - `log`
-    - You can also open it after login with SSH to your NAS/Router: `sudo /usr/syno/bin/synopkg log AirConnect`
+  - The _AirConnect application logfile_ is located at `/volume1/@appstore/AirConnect/log/airconnect.log`
+    (default location; adjust `/volume1` if your package is installed on a different volume)
+  - You can open it after logging in with SSH to your NAS/Router: `sudo /usr/syno/bin/synopkg log AirConnect`
     - or by using a command-line utility like
-      - **more** (`more /volume1/airconnect/log/airconnect`)
-      - **tail** (`tail -100 /volume1/airconnect/log/airconnect`)
-    - If you get a `permission denied`, you should use the full path, f.e. `more /volume1/@appstore/AirConnect/log/airconnect.log`
+      - **more** (`more /volume1/@appstore/AirConnect/log/airconnect.log`)
+      - **tail** (`tail -100 /volume1/@appstore/AirConnect/log/airconnect.log`)
+  - If you checked **"Enable shared-folder links"** during installation or upgrade, this file is also
+    linked at `/volume1/airconnect/<packagename-lowercase>.log`, reachable over SMB without SSH
+    (see [Editing airconnect.conf using your PC](#editing-airconnectconf-using-your-pc) for details).
   - This log file is written by the AirConnect-Synology package.
     - All log entries of the AirConnect application (airupnp + aircast) are also written into this log file.
   - This is the first place to look for errors.
@@ -232,14 +233,18 @@ If you encounter any problems, please read the [troubleshooting](#troubleshootin
 
 > Only available for DSM 7 packages!
 >
-> You cannot view/edit the file with FileStation due to a limitation in synology DMS (Symbolik links) by default
+> File Station cannot display this file at all (it doesn't support symlinks, full stop -
+> not a setting you can change). See [Editing airconnect.conf using your PC](#editing-airconnectconf-using-your-pc)
+> for what does work.
 >
 > Please keep in mind, that if you upgrade your existing AirConnect-Synology package no changes will be made to the `airconnect.conf` file.
 > If you want to overwrite your `airconnect.conf` configuration with the default one, please uninstall and install the package again.
 > You can also copy the default values found below to your configuration file.
 
 Starting with release `0.2.50.5-20210801` you can customize the configuration of AirConnect-Synology by using the config file at
-`/volume1/airconnect/airconnect.conf`.  
+`/volume1/@appstore/AirConnect/airconnect.conf` (edit via SSH; also reachable at
+`/volume1/airconnect/airconnect.conf` over SMB if you checked **"Enable shared-folder
+links"** during installation or upgrade - see [Editing airconnect.conf using your PC](#editing-airconnectconf-using-your-pc)).  
 Please **stop** the package **before** changing the configuration.  
 If you have edited the configuration while AirConnect is running please **restart** the AirConnect package.
 
@@ -279,8 +284,45 @@ Configuration options with `Mandatory = Yes` must exist in the configuration. Op
 
 ### Editing airconnect.conf using your PC
 
-If you want to edit your `airconnect.conf` file from your computer using a network share (SMB),
-you need to `allow symlinks` in your SMB configuration on your synology NAS device.
+By default, the package does **not** link its config/log files into any shared folder -
+edit `airconnect.conf` directly in the package directory via SSH.
+
+If you'd rather edit `airconnect.conf` (and view the log) from your computer instead,
+check **"Enable shared-folder links"** during installation or upgrade (off by default;
+upgrading shows the same option again, preselected with your current choice, so you
+can change your mind without reinstalling). This links these files into the package's
+`airconnect` shared folder.
+
+Unchecking it again removes just those two links - never `config.xml`/`config-cast.xml`
+themselves, if you've placed a custom one there (see [Command-Line Arguments](#command-line-arguemts)
+for what those are for). If the folder still has content after removing the links, it's
+left in place and Package Center shows a note saying so.
+
+> The "airconnect" shared folder itself always exists once you've installed this package,
+> whether or not you ever check this option - Synology's own package framework creates it
+> unconditionally and gives packages no supported way to remove it again (not even when
+> nothing is linked into it). This is a deliberate Synology restriction: a package
+> removing a shared folder on its own could destroy real user data, so the platform
+> simply doesn't allow it - not a bug in this package. If you don't want the folder
+> around at all, remove it yourself:
+>
+> - **GUI**: `Control Panel` - `Shared Folder` - select `airconnect` - `Delete`
+> - **SSH**: `sudo synoshare --del TRUE airconnect` (see [Troubleshooting](#cannot-be-installed-or-upgrade-from-an-older-version))
+
+**On uninstall**, this shared folder also doubles as a backup location: `airconnect.conf`
+and the log are always copied there first (as real files, not symlinks), regardless of
+whether you ever enabled shared-folder links - the package directory where they normally
+live gets removed as part of uninstalling, so without this they'd be gone for good.
+Skipped if you check **"Delete the contents..."** in the uninstall dialog, since there's
+no point backing up something about to be deleted anyway.
+
+**Works over SMB only** - map the shared folder from Windows, Mac, or Linux (e.g.
+`smb://<your-nas>/airconnect` in Finder, or a mapped network drive on Windows); confirmed
+working, including editing `airconnect.conf` and saving it back. **Not supported via File
+Station** (it can't display symlinks at all) **or AFP** (no equivalent setting exists -
+the files show up but macOS reports the original item can't be found). To actually
+browse them over SMB you also need to `allow symlinks` in your SMB configuration on your
+Synology device - a device-wide setting, not specific to this package:
 
 `Settings/Control Panel` - `File Services` - `SMB` - `Advanced Settings`
 
@@ -450,10 +492,12 @@ Build options: LINUX
 
 ### airupnp and aircast configuration
 
-> You cannot view/edit the file with FileStation due to a limitation in synology DMS (Symbolik links) by default
+> File Station cannot display these files at all (it doesn't support symlinks, full
+> stop - not a setting you can change).
 >
-> Hint: If you want to filter/include/exclude speakers in the configuration file or `airupnp`
-> you need to disable the default filter in `airconnect.conf` using `FILTER_AIRPLAY2_DEVICES=`.
+> Hint: If you want the device list in this file (rather than the built-in filter) to
+> decide which speakers `airupnp` picks up, you need to disable the default filter in
+> `airconnect.conf` using `FILTER_AIRPLAY2_DEVICES=`.
 > See also [airconnect.conf](#airconnectconf). The default filter will overwrite any filter in the `config.xml` file of airupnp.
 
 By default the config file will **not** being used as long as the file is not created (And you are not running on debug log level).
@@ -461,9 +505,13 @@ By default the config file will **not** being used as long as the file is not cr
 The file is **not** created by default.
 
 - Config File location for airupnp
-  - `/volume1/airconnect/config.xml`
+  - `/volume1/@appstore/AirConnect/config.xml` - always here, edit via SSH regardless of
+    the shared-folder setting
+  - also reachable at `/volume1/airconnect/config.xml` over SMB if you checked
+    **"Enable shared-folder links"** (see [Editing airconnect.conf using your PC](#editing-airconnectconf-using-your-pc))
 - Config File location for aircast
-  - `/volume1/airconnect/config-cast.xml`
+  - `/volume1/@appstore/AirConnect/config-cast.xml` (same as above)
+  - also reachable at `/volume1/airconnect/config-cast.xml` over SMB if enabled
 
 You can create each of these files manually or a reference version can be generated using the `-i [config file name]` command-line parameter.
 For the following example i am using the default configuration you can find above in the [How it works](#how-it-works) section.
@@ -482,8 +530,13 @@ stopped and the resulted configuration will be written to the defined config fil
 
 #### Editing config files using your PC
 
-If you want to edit your `config.xml` or `config-cast.xml` file from your computer using a network share (SMB) you need to
-`allow symlinks` in your SMB configuration on your synology NAS device.
+By default the package does not link `config.xml`/`config-cast.xml` into any shared
+folder - place/edit them directly in the package directory via SSH.
+
+If you checked **"Enable shared-folder links"** during installation or upgrade, you can
+instead edit them from your computer over SMB (not File Station, not AFP - see
+[Editing airconnect.conf using your PC](#editing-airconnectconf-using-your-pc) for why).
+You'll also need to `allow symlinks` in your SMB configuration on your Synology device:
 
 `Settings/Control Panel` - `File Services` - `SMB` - `Advanced Settings`
 
@@ -600,7 +653,10 @@ You can find the built packages in the **dist** directory.
 If you get an error message that the package **cannot be installed** or **updated** or **started** when updating AirConnect-Synology,
 please **uninstall the old version** first (`Package Center -> AirConnect -> Uninstall`) and then install the new version.
 
-Uninstalling also removes the old scripts, references and configurations (only the logfile remains).
+Uninstalling also removes the old scripts, references and configurations. Unless you
+checked **"Delete the contents..."** during uninstall, `airconnect.conf` and the log are
+backed up into the `airconnect` shared folder first (see
+[Editing airconnect.conf using your PC](#editing-airconnectconf-using-your-pc)).
 Sometimes it can happen that the problem is already fixed with this.
 
 If the normal uninstallation also does not work, please cleanup the old package using SSH with root permissions:
@@ -663,7 +719,9 @@ For additional information, please check the following issues in the official Ai
 #### Debug DSM 7
 
 If you want to see more logs then change the AIRCAST_LOGLEVEL or AIRUPNP_LOGLEVEL from
-`all=info` in `/volume1/airconnect/airconnect.conf` to `all=debug` and restart the package.
+`all=info` to `all=debug` in `airconnect.conf` (`/volume1/@appstore/AirConnect/airconnect.conf`
+via SSH, or `/volume1/airconnect/airconnect.conf` over SMB - see [airconnect.conf](#airconnectconf))
+and restart the package.
 
 #### DSM 5 and 6
 

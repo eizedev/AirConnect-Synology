@@ -1,3 +1,20 @@
 #!/bin/sh
 
+if [ "$SYNOPKG_PKG_STATUS" = "UNINSTALL" ]; then
+    # Off by default (see WIZARD_UIFILES/uninstall_uifile.sh). Only clears
+    # the shared folder's *contents* - removing the folder/registration
+    # itself would need synoshare (root), and DSM 7 refuses to even
+    # install a package whose privilege config lets any script run as
+    # root (confirmed on real hardware), so that part isn't automatable
+    # here. ${VAR:?} aborts rather than risk expanding to nothing.
+    # See the README for the manual SSH command for a fully clean removal.
+    # shellcheck disable=SC2154
+    if [ "${pkgwizard_delete_shared_folder}" = "true" ]; then
+        AIRCONNECT_SHARE_DIR="${SYNOPKG_PKGDEST_VOL}/airconnect"
+        if [ -d "${AIRCONNECT_SHARE_DIR}" ]; then
+            rm -rf "${AIRCONNECT_SHARE_DIR:?}"/* "${AIRCONNECT_SHARE_DIR:?}"/.[!.]* 2>/dev/null || true
+        fi
+    fi
+fi
+
 exit 0

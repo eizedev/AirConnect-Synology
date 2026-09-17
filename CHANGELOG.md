@@ -11,6 +11,60 @@ links are included where a change traces back to one, so reports stay findable.
 
 ## [Unreleased]
 
+## [1.11.3-20260917] - 2026-09-17
+
+### Changed
+
+- The `airconnect` shared folder is no longer used by default. Editing
+  `airconnect.conf`/`config.xml`/`config-cast.xml` and viewing the log over SMB without
+  SSH required enabling "allow symlinks" for SMB device-wide - a security tradeoff that
+  shouldn't be forced on everyone just to install this package, most of whom never touch
+  either file. A new install-wizard option, **"Enable shared-folder links", off by
+  default**, lets you opt in if you want that convenience; nothing is linked into the
+  shared folder unless checked. Note this only controls the _links_ - the empty
+  `airconnect` folder itself is still created on every install regardless of the
+  checkbox (Synology's `data-share` resource provisions it unconditionally, above the
+  package's own scripts, with no supported way to make that conditional - see the
+  README for why, and for the manual removal steps if you don't want it at all). The
+  link option reappears on every upgrade, preselected with your current choice, so it
+  can be changed later without reinstalling. Confirmed working end-to-end
+  over real SMB (Finder/Windows Explorer), including editing `airconnect.conf` and
+  saving it back; **not** supported via File Station (doesn't display symlinks at all)
+  or AFP (no equivalent setting exists there). Addresses
+  [discussion #132](https://github.com/eizedev/AirConnect-Synology/discussions/132).
+- Replaced the syslog-ng-based log mirror (`etc/airconnect.conf`, a static config that
+  could only ever write to a hardcoded `/volume1/...` path regardless of which volume
+  the package was actually installed on, at world-writable `0666`) with a plain symlink
+  into the shared folder, created only when the option above is enabled. The package's
+  own `log/` directory is now always readable via SSH regardless of that setting (it was
+  previously owner-only `0700` for no principled reason - nothing in the log is more
+  sensitive than what's already in `airconnect.conf`, which was already world-readable).
+- Added an uninstall-wizard option, **off by default**, to delete the _contents_ of the
+  shared folder. The folder/registration itself persists either way - Synology's
+  packaging system gives no unprivileged way to remove a shared folder it created (its
+  own `data-share` resource documents this as deliberate: removing a folder
+  automatically "might delete the user's personal data"), so this is the most that's
+  achievable without an SSH step. Also, **on every uninstall regardless of this
+  setting**, `airconnect.conf` and the log are copied into the shared folder first (real
+  files, not symlinks) before the package directory where they normally live is removed
+  - otherwise they'd be gone with no way back even for installs that never used shared-
+    folder links, unlike the old syslog-ng mirror this replaced, which kept an independent
+    copy of the log for exactly this reason.
+
+### Fixed
+
+- `get_pid()` matched bare `airupnp`/`aircast` against the whole process table with no
+  path scoping, so `stop_airconnect()` could in principle kill an unrelated process that
+  merely had one of those strings somewhere in its own command line. Now matches on the
+  full install path instead.
+- `stop_airconnect()` sent SIGTERM, waited 10s, and would then just report "still
+  running" forever if the process ignored it - never escalating, leaving the package
+  stuck unable to stop, uninstall, or upgrade against a hung process. Now sends SIGKILL
+  if anything's still up after the wait.
+- The port-in-use check (`netstat -tln | grep :"$PORT"`) was an unanchored substring
+  match: port `4915` would false-positive against an unrelated listener on `49154` or
+  `49150`, refusing to start over a port that wasn't actually in use.
+
 ## [1.11.3-20260916] - 2026-09-16
 
 Verified end-to-end on real hardware: fresh GUI install on a Synology router

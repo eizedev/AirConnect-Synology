@@ -1,8 +1,8 @@
 .DS_Store
 package.tgz
 *.spk
-/target
-/dist
+target/
+dist/
 src/dsm7/bin/**
 src/dsm/bin/**
 

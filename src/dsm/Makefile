@@ -19,10 +19,9 @@ target/package.tgz: target
 	chmod +x target/airupnp
 	curl -s -L https://github.com/philippe44/AirConnect/raw/${REPO_REVISION}/bin/aircast-${ARCH} -o target/aircast
 	chmod +x target/aircast
-	cp -a etc target/etc
 	cp -a log target/log
-	cd target && tar czf package.tgz airupnp aircast etc/ log/
-	rm -r target/airupnp target/aircast target/etc target/log
+	cd target && tar czf package.tgz airupnp aircast log/
+	rm -r target/airupnp target/aircast target/log
 
 target/scripts: target
 	cp -a scripts target

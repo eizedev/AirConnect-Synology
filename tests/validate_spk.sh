@@ -113,7 +113,6 @@ check_one() {
                     fail "$bin is not executable in package.tgz"
                 fi
             done
-            [ -d "$pdir/etc" ] || warn "package.tgz missing etc/ (airconnect.conf template, syslog config)"
             [ -d "$pdir/log" ] || warn "package.tgz missing log/ placeholder directory"
         fi
     fi

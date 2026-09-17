@@ -3,7 +3,7 @@
 if [ "$SYNOPKG_PKG_STATUS" = "INSTALL" ]; then
     AIRCONNECT_CONFIG_FILE="airconnect.conf"
     AIRCONNECT_CONFIG="${SYNOPKG_PKGDEST}/${AIRCONNECT_CONFIG_FILE}"
-    AIRCONNECT_USER="$(echo "${SYNOPKG_PKGNAME}" | awk '{print tolower($_)}')"
+    AIRCONNECT_USER="$(echo "${SYNOPKG_PKGNAME}" | awk '{print tolower($0)}')"
     LOG="${SYNOPKG_PKGDEST}/log/${AIRCONNECT_USER}.log"
 
     echo "[$(date +'%T')] #### Start postinst... ####" >>"${LOG}"
@@ -84,6 +84,37 @@ if [ "$SYNOPKG_PKG_STATUS" = "INSTALL" ]; then
     # shellcheck disable=SC2154
     echo "[$(date +'%T')] Setting SYNO_IP=\"${pkgwizard_ip}\" in \"${AIRCONNECT_CONFIG}\"" >>"$LOG"
     echo "SYNO_IP=\"${pkgwizard_ip}\"" >>"${AIRCONNECT_CONFIG}"
+
+    # Off by default: linking config/log files into the "airconnect" shared
+    # folder requires the user to also enable SMB symlink-following
+    # device-wide, which is a real security tradeoff beyond this one
+    # package - see the wizard step and README. conf/resource's data-share
+    # creates the (empty) shared folder unconditionally regardless of this
+    # choice - Synology has no supported way to make that conditional - so
+    # if the user didn't opt in, deregister it again here (fresh install
+    # only, guaranteed nothing has been placed in it yet). Uses synoshare,
+    # the same command already documented as the manual cleanup step under
+    # Troubleshooting in the README, so this is known-working for this
+    # exact share name, not a guess.
+    # shellcheck disable=SC2154
+    if [ "${pkgwizard_create_shared_folder}" = "true" ]; then
+        echo "[$(date +'%T')] Setting AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED=1 in \"${AIRCONNECT_CONFIG}\" (opted in via wizard)" >>"$LOG"
+        echo "AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED=1" >>"${AIRCONNECT_CONFIG}"
+    else
+        echo "[$(date +'%T')] Setting AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED=0 in \"${AIRCONNECT_CONFIG}\"" >>"$LOG"
+        echo "AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED=0" >>"${AIRCONNECT_CONFIG}"
+        # data-share (conf/resource) creates the "airconnect" shared folder
+        # unconditionally, regardless of this choice - Synology has no
+        # supported way to make that conditional, and DSM 7 actively
+        # refuses to install any package whose privilege config lets a
+        # script run as root (confirmed on real hardware: "Unable to
+        # install ... because it runs with root privileges"), so this
+        # script - which only ever runs unprivileged on DSM 7 - cannot call
+        # synoshare to deregister it either. The folder is left in place,
+        # empty and unused; see the README for the manual SSH command to
+        # remove it if wanted.
+        echo "[$(date +'%T')] Not opted in - the \"airconnect\" shared folder still exists (data-share always creates it) but is empty and unused; nothing is linked into it." >>"$LOG"
+    fi
 
     echo "[$(date +'%T')] #### Done postinst ####" >>"${LOG}"
 fi

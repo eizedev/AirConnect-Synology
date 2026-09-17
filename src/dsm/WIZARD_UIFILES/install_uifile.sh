@@ -72,6 +72,25 @@ tee "$SYNOPKG_TEMP_LOGFILE" <<EOF
                 ]
             }
         ]
+    },
+    {
+        "step_title": "Optional: Shared folder for GUI access",
+        "items": [
+            {
+                "type": "multiselect",
+                "desc": "Link config.xml/config-cast.xml, airconnect.conf and the log into a shared folder reachable over a network share (SMB) - lets you place a custom config.xml, edit airconnect.conf, or check the log from your computer without SSH. Most installs never need this - the defaults are already tuned to just work. Need something else made configurable here instead? Please open an issue.",
+                "subitems": [
+                    {
+                        "key": "pkgwizard_create_shared_folder",
+                        "desc": "Enable shared-folder links (off by default)",
+                        "defaultValue": false
+                    }
+                ]
+            },
+            {
+                "desc": "<strong style='color:red'>Note:</strong> works over SMB only - map the shared folder from Windows, Mac, or Linux (e.g. smb://&lt;your-nas&gt;/airconnect). Not supported via File Station (can't display symlinks) or AFP (no equivalent setting). You also need to enable 'allow symlinks' under <em>Control Panel - File Services - SMB - Advanced Settings</em> on your Synology device - a device-wide setting, not specific to this package. See the <a target='_blank' href='https://github.com/eizedev/AirConnect-Synology#readme'>documentation</a> for details and a screenshot. Leave this off if you're unsure - you can always reach these files via SSH instead."
+            }
+        ]
     }
 ];
 EOF

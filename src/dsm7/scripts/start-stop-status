@@ -39,9 +39,12 @@ else
     PS_ALL_CMD="ps"
 fi
 
+# Match on the full install path, not just the bare binary name, so this
+# never picks up an unrelated process that happens to have "airupnp" or
+# "aircast" as a substring somewhere in its own command line.
 # shellcheck disable=SC2009,SC2086
 get_pid() {
-    PID=$($PS_ALL_CMD | grep -E 'airupnp|aircast' | grep -v grep | awk '{print $2}')
+    PID=$($PS_ALL_CMD | grep -E "${SYNOPKG_PKGDEST}/(airupnp|aircast)" | grep -v grep | awk '{print $2}')
 }
 
 start_airconnect_on_ip() {
@@ -54,13 +57,38 @@ start_airconnect_on_ip() {
     if [ -f "${LOG}" ]; then
         [ "$(stat --printf '%s' "${LOG}")" -gt 52428800 ] && cp -p "${LOG}" "${LOGBACKUP}" && rm "${LOG}"
     fi
-    echo "[$(date +'%T')] Linking airconnect configuration to \"${AIRCONNECT_DESTINATION}/${AIRCONNECT_CONFIG_FILE}\"." >>"$LOG"
+    # The log directory is created owner-only (0700) by default, which
+    # blocks every other local user from reading it via SSH - there's no
+    # good reason for the log to be more locked down than airconnect.conf
+    # (already world-readable), so this loosens it unconditionally, not
+    # just when shared-folder links are enabled. Log rotation (LOGBACKUP
+    # above) creates a fresh file each time, so this runs on every start
+    # to keep re-applying it rather than once.
+    chmod 755 "${SYNOPKG_PKGDEST}/log" 2>>"$LOG" || true
+    [ -f "${LOG}" ] && { chmod 644 "${LOG}" 2>>"$LOG" || true; }
 
-    ln -fs "${AIRCONNECT_CONFIG}" "${AIRCONNECT_DESTINATION}/${AIRCONNECT_CONFIG_FILE}"
+    # Off by default (see postinst/AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED) -
+    # the shared folder exists either way (conf/resource's data-share), but
+    # only gets these links when the user opted in, since browsing them
+    # needs SMB symlink-following enabled device-wide. Cleanup for the
+    # not-opted-in case lives in postupgrade, not here: this script runs
+    # under conf/privilege's default "package" (unprivileged) user, which
+    # cannot call synoshare (confirmed: "Permission denied" on real
+    # hardware) - postupgrade runs as root (see conf/privilege) and is
+    # also the natural place for it, since that's when the toggle changes.
+    if [ "${AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED:-0}" = "1" ] && [ -d "${AIRCONNECT_DESTINATION}" ]; then
+        echo "[$(date +'%T')] Linking airconnect configuration to \"${AIRCONNECT_DESTINATION}/${AIRCONNECT_CONFIG_FILE}\"." >>"$LOG"
+        ln -fs "${AIRCONNECT_CONFIG}" "${AIRCONNECT_DESTINATION}/${AIRCONNECT_CONFIG_FILE}"
+        echo "[$(date +'%T')] Linking log to \"${AIRCONNECT_DESTINATION}/${AIRCONNECT_USER}.log\"." >>"$LOG"
+        ln -fs "${LOG}" "${AIRCONNECT_DESTINATION}/${AIRCONNECT_USER}.log"
+    fi
 
     if [ "${AIRUPNP_ENABLED}" = 1 ] && [ "${AIRCAST_ENABLED}" = 1 ]; then
         if [ -n "${AIRUPNP_PORT}" ]; then
-            if netstat -tln | grep :"${AIRUPNP_PORT}"; then
+            # Anchored so e.g. port 4915 doesn't false-positive on an
+            # unrelated 49154/49150 listener (netstat's Local Address
+            # column always has whitespace right after the port number).
+            if netstat -tln | grep -E ":${AIRUPNP_PORT}([[:space:]]|\$)"; then
                 echo "[$(date +'%T')] Your selected port ${AIRUPNP_PORT} is already in use." >>"$LOG"
                 echo "[$(date +'%T')] Please check what is running on the port and try again." >>"$LOG"
                 echo "[$(date +'%T')] Port ${AIRUPNP_PORT} already in use. Please check what is running on the port and try again." >>"$SYNOPKG_TEMP_LOGFILE"
@@ -78,8 +106,10 @@ start_airconnect_on_ip() {
             exit 150
         fi
 
-        echo "[$(date +'%T')] Linking airupnp configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}\"." >>"$LOG"
-        ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}" "${CONFIG_UPNP_DESTINATION}"
+        if [ "${AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED:-0}" = "1" ] && [ -d "${AIRCONNECT_DESTINATION}" ]; then
+            echo "[$(date +'%T')] Linking airupnp configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}\"." >>"$LOG"
+            ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}" "${CONFIG_UPNP_DESTINATION}"
+        fi
         echo "[$(date +'%T')] Starting airupnp on ${SYNO_IP}:${AIRUPNP_PORT}" >>"$LOG"
         AIRUPNP_EXTRA_ARGS=""
         # FILTER_AIRPLAY2_DEVICES/AIRUPNP_LATENCY/AIRUPNP_PORTRANGE are always
@@ -91,8 +121,10 @@ start_airconnect_on_ip() {
         [ -n "${AIRUPNP_PORTRANGE}" ] && AIRUPNP_EXTRA_ARGS="${AIRUPNP_EXTRA_ARGS} -a ${AIRUPNP_PORTRANGE}"
         # shellcheck disable=SC2086
         "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -g "${AIRUPNP_CONTENTLENGTH_MODE}" -x "${CONFIG_UPNP_DESTINATION}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" ${AIRUPNP_EXTRA_ARGS} 2>&1
-        echo "[$(date +'%T')] Linking aircast configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}\"." >>"$LOG"
-        ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}" "${CONFIG_CAST_DESTINATION}"
+        if [ "${AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED:-0}" = "1" ] && [ -d "${AIRCONNECT_DESTINATION}" ]; then
+            echo "[$(date +'%T')] Linking aircast configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}\"." >>"$LOG"
+            ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}" "${CONFIG_CAST_DESTINATION}"
+        fi
         echo "[$(date +'%T')] Starting aircast on ${SYNO_IP}" >>"$LOG"
         if [ -n "${AIRCAST_LATENCY}" ]; then
             "${SYNOPKG_PKGDEST}"/aircast -b "${SYNO_IP}" -l "${AIRCAST_LATENCY}" -x "${CONFIG_CAST_DESTINATION}" -z -f "${LOG}" -d "${AIRCAST_LOGLEVEL}" 2>&1
@@ -101,7 +133,10 @@ start_airconnect_on_ip() {
         fi
     elif [ "${AIRUPNP_ENABLED}" = 1 ]; then
         if [ -n "${AIRUPNP_PORT}" ]; then
-            if netstat -tln | grep :"${AIRUPNP_PORT}"; then
+            # Anchored so e.g. port 4915 doesn't false-positive on an
+            # unrelated 49154/49150 listener (netstat's Local Address
+            # column always has whitespace right after the port number).
+            if netstat -tln | grep -E ":${AIRUPNP_PORT}([[:space:]]|\$)"; then
                 echo "[$(date +'%T')] Your selected port ${AIRUPNP_PORT} is already in use." >>"$LOG"
                 echo "[$(date +'%T')] Please check what is running on the port and try again." >>"$LOG"
                 echo "[$(date +'%T')] Port ${AIRUPNP_PORT} already in use. Please check what is running on the port and try again." >>"$SYNOPKG_TEMP_LOGFILE"
@@ -119,8 +154,10 @@ start_airconnect_on_ip() {
             exit 150
         fi
 
-        echo "[$(date +'%T')] Linking airupnp configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}\"." >>"$LOG"
-        ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}" "${CONFIG_UPNP_DESTINATION}"
+        if [ "${AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED:-0}" = "1" ] && [ -d "${AIRCONNECT_DESTINATION}" ]; then
+            echo "[$(date +'%T')] Linking airupnp configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}\"." >>"$LOG"
+            ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}" "${CONFIG_UPNP_DESTINATION}"
+        fi
         echo "[$(date +'%T')] Starting airupnp on ${SYNO_IP}:${AIRUPNP_PORT}" >>"$LOG"
         AIRUPNP_EXTRA_ARGS=""
         # FILTER_AIRPLAY2_DEVICES/AIRUPNP_LATENCY/AIRUPNP_PORTRANGE are always
@@ -139,8 +176,10 @@ start_airconnect_on_ip() {
             exit 150
         fi
 
-        echo "[$(date +'%T')] Linking aircast configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}\"." >>"$LOG"
-        ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}" "${CONFIG_CAST_DESTINATION}"
+        if [ "${AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED:-0}" = "1" ] && [ -d "${AIRCONNECT_DESTINATION}" ]; then
+            echo "[$(date +'%T')] Linking aircast configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}\"." >>"$LOG"
+            ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}" "${CONFIG_CAST_DESTINATION}"
+        fi
         echo "[$(date +'%T')] Starting aircast on ${SYNO_IP}" >>"$LOG"
         if [ -n "${AIRCAST_LATENCY}" ]; then
             "${SYNOPKG_PKGDEST}"/aircast -b "${SYNO_IP}" -l "${AIRCAST_LATENCY}" -x "${CONFIG_CAST_DESTINATION}" -z -f "${LOG}" -d "${AIRCAST_LOGLEVEL}" 2>&1
@@ -181,6 +220,16 @@ stop_airconnect() {
         return 0
     fi
     sleep 10
+
+    # A process that ignores SIGTERM would otherwise leave the package stuck
+    # "still running" forever, blocking stop/uninstall/upgrade. Escalate once.
+    get_pid
+    if [ -n "${PID}" ]; then
+        echo "[$(date +'%T')] Stop: process(es) still running 10s after SIGTERM (pid(s): ${PID}), sending SIGKILL." >>"$LOG"
+        # shellcheck disable=SC2086
+        kill -9 $PID
+        sleep 1
+    fi
 
     if [ "${AIRUPNP_ENABLED}" = 1 ] && [ "${AIRCAST_ENABLED}" = 1 ]; then
         # pgrep not available by default on synology devices
