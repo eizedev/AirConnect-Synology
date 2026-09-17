@@ -45,9 +45,10 @@ router (SRM) platforms; the rest are NAS.
 Cross-checked 2026-09-17 against SynoCommunity's actively-maintained
 [`spksrc` architecture reference](https://raw.githubusercontent.com/SynoCommunity/spksrc/master/mk/spksrc.common/archs.mk),
 which surfaced real drift from three years of no re-verification: several current-
-generation models (`geminilakenk`, `v1000nk`, `r1000nk`) and router platforms
-(`hawkeye`, `cypress`) were missing entirely, and an `armv6` package (removed, see
-below) turned out to correspond to no real Synology hardware. See
+generation models - DS925+/DS1525+/DS1825+/RS2825RP+/RS2423RP+ (`v1000nk`),
+DS725+ (`r1000nk`), DS425+/DS225+/FS200T (`geminilakenk`) - and the routers WRX560
+(`hawkeye`) and RT6600ax (`cypress`) were missing entirely, and an `armv6` package
+(removed, see below) turned out to correspond to no real Synology hardware. See
 [issue #222](https://github.com/eizedev/AirConnect-Synology/issues/222) for the full
 before/after. Worth periodically re-checking against that same source as Synology
 ships new models.
@@ -67,9 +68,9 @@ ships new models.
 ## Synology Router (SRM)
 
 Most routers running Synology SRM use the **ARMv7** package
-(`AirConnect-dsm7-arm-${VERSION}`, covers `northstarplus`/`ipq806x`/`dakota`/`hawkeye`).
-If that doesn't work, try `arm-static`. A newer `cypress` platform is ARMv8 instead - use
-the **aarch64** package for that one.
+(`AirConnect-dsm7-arm-${VERSION}`, covers `northstarplus`/`ipq806x`/`dakota` and the
+WRX560's `hawkeye`). If that doesn't work, try `arm-static`. The RT6600ax's `cypress`
+platform is ARMv8 instead - use the **aarch64** package for that one.
 
 The packages are named `dsm7-*`, but the same package works on SRM as well as DSM 7 -
 confirmed on a real router (RT2600ac, SRM 1.3.2-9366 Update 2), install through to a
