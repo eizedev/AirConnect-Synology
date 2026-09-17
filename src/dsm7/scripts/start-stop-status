@@ -87,7 +87,9 @@ start_airconnect_on_ip() {
             synoshare --del TRUE airconnect >>"$LOG" 2>&1 || true
         else
             # shellcheck disable=SC2012
-            echo "[$(date +'%T')] Shared folder \"airconnect\" still has content after removing this package's own symlinks - leaving it in place (contents: $(ls -A "${AIRCONNECT_DESTINATION}" 2>/dev/null | tr '\n' ' '))" >>"$LOG"
+            SHARE_CONTENTS="$(ls -A "${AIRCONNECT_DESTINATION}" 2>/dev/null | tr '\n' ' ')"
+            echo "[$(date +'%T')] Shared folder \"airconnect\" still has content after removing this package's own symlinks - leaving it in place (contents: ${SHARE_CONTENTS})" >>"$LOG"
+            echo "The \"airconnect\" shared folder was kept because it still contains: ${SHARE_CONTENTS}(this package's own config/log links were removed)" >>"$SYNOPKG_TEMP_LOGFILE"
         fi
     fi
 

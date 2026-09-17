@@ -289,6 +289,12 @@ upgrading shows the same option again, preselected with your current choice, so 
 can change your mind without reinstalling). This links these files into the package's
 `airconnect` shared folder.
 
+Unchecking it again removes just those two links - never `config.xml`/`config-cast.xml`,
+and never the shared folder itself if you've placed a custom `config.xml`/`config-cast.xml`
+there (see [Command-Line Arguments](#command-line-arguemts) for what those are for). If the
+folder still has content after removing the links, it's left in place and Package Center
+shows a note saying so; an empty folder is removed entirely.
+
 **Works over SMB only** - map the shared folder from Windows, Mac, or Linux (e.g.
 `smb://<your-nas>/airconnect` in Finder, or a mapped network drive on Windows); confirmed
 working, including editing `airconnect.conf` and saving it back. **Not supported via File
