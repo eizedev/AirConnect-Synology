@@ -27,16 +27,34 @@ fi
 
 # pgrep not available by default on synology devices. Which `ps` invocation
 # lists ALL processes (not just ones with a controlling terminal) differs
-# between platforms: DSM's ps needs "aux" - without it, a daemonized (-z)
-# airupnp/aircast is invisible even while running, which used to make this
-# script report a healthy install as "stopped". The BusyBox ps on Synology
-# routers (SRM) goes the other way: it lists everything by default and
-# errors out on "aux" ("invalid option -- 'a'"). Probe once and use
-# whichever this system's ps actually accepts.
+# between platforms - and so does the shape of its output. All three points
+# below were measured on real hardware (DSM 7 on x86_64; SRM 1.3.2 with
+# BusyBox v1.16.1 on an RT2600ac):
+#
+# 1. Which invocation lists everything. DSM's ps needs "aux" - without it a
+#    daemonized (-z) airupnp/aircast is invisible even while running, which
+#    used to make this script report a healthy install as "stopped".
+#    BusyBox goes the other way: it lists everything by default and errors
+#    out on "aux" ("ps: invalid option -- 'a'").
+# 2. Which column holds the PID. "ps aux" prints USER first and PID second;
+#    BusyBox prints "PID USER VSZ STAT COMMAND", so the PID comes first.
+# 3. Whether the command line survives intact. BusyBox truncates COMMAND to
+#    78 characters unless "w" is passed (measured: 78 -> 131). An @appstore
+#    path plus arguments comes close enough to that limit for the
+#    path-anchored match in get_pid() to be at risk of being cut off.
+#
+# So: prefer "ps aux", fall back to "ps w", and only then to bare "ps".
+# The order matters. On DSM "ps w" also succeeds, but it is terminal-scoped
+# and would list almost nothing, so it must never win over "ps aux".
 if ps aux >/dev/null 2>&1; then
     PS_ALL_CMD="ps aux"
+    PS_PID_COL=2
+elif ps w >/dev/null 2>&1; then
+    PS_ALL_CMD="ps w"
+    PS_PID_COL=1
 else
     PS_ALL_CMD="ps"
+    PS_PID_COL=1
 fi
 
 # Match on the full install path, not just the bare binary name, so this
@@ -44,7 +62,7 @@ fi
 # "aircast" as a substring somewhere in its own command line.
 # shellcheck disable=SC2009,SC2086
 get_pid() {
-    PID=$($PS_ALL_CMD | grep -E "${SYNOPKG_PKGDEST}/(airupnp|aircast)" | grep -v grep | awk '{print $2}')
+    PID=$($PS_ALL_CMD | grep -E "${SYNOPKG_PKGDEST}/(airupnp|aircast)" | grep -v grep | awk -v col="${PS_PID_COL}" '{print $col}')
 }
 
 start_airconnect_on_ip() {
