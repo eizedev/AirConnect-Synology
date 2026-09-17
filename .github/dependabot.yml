@@ -9,3 +9,8 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+    cooldown:
+      # Wait a week before proposing an update to a newly published action
+      # version - a just-published release has had no time for anyone else
+      # to notice if it's malicious or broken.
+      default-days: 7

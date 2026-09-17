@@ -193,7 +193,11 @@ jobs:
     uses: ./.github/workflows/release.yml
     with:
       release_tag: ${{ needs.tag.outputs.tag }}
-    secrets: inherit
+    # No secrets: - release.yml doesn't reference any secrets.* (it only
+    # uses the automatic per-job GITHUB_TOKEN, which every job gets without
+    # needing to inherit or pass anything). `secrets: inherit` would grant
+    # it every repo secret unconditionally - unnecessary here regardless of
+    # trust level, since it's a same-repo reusable workflow, not third-party.
     permissions:
       contents: write
       discussions: write
