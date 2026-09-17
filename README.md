@@ -304,8 +304,10 @@ left in place and Package Center shows a note saying so.
 > nothing is linked into it). This is a deliberate Synology restriction: a package
 > removing a shared folder on its own could destroy real user data, so the platform
 > simply doesn't allow it - not a bug in this package. If you don't want the folder
-> around at all, remove it yourself: `Control Panel` - `Shared Folder`, or via SSH with
-> `sudo synoshare --del TRUE airconnect` (see [Troubleshooting](#cannot-be-installed-or-upgrade-from-an-older-version)).
+> around at all, remove it yourself:
+>
+> - **GUI**: `Control Panel` - `Shared Folder` - select `airconnect` - `Delete`
+> - **SSH**: `sudo synoshare --del TRUE airconnect` (see [Troubleshooting](#cannot-be-installed-or-upgrade-from-an-older-version))
 
 **Works over SMB only** - map the shared folder from Windows, Mac, or Linux (e.g.
 `smb://<your-nas>/airconnect` in Finder, or a mapped network drive on Windows); confirmed
