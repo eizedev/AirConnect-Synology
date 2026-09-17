@@ -3,5 +3,19 @@
         "run-as": "package"
     },
     "username": "airconnect",
-    "groupname": "airconnect"
+    "groupname": "airconnect",
+    "ctrl-script": [
+        {
+            "action": "postinst",
+            "run-as": "root"
+        },
+        {
+            "action": "postupgrade",
+            "run-as": "root"
+        },
+        {
+            "action": "postuninst",
+            "run-as": "root"
+        }
+    ]
 }

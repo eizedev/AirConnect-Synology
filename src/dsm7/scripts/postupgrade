@@ -35,16 +35,55 @@ if [ -f "${AIRCONNECT_CONFIG}" ]; then
     grep -v '^AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED=' "${AIRCONNECT_CONFIG}" >"${AIRCONNECT_CONFIG}.tmp" && mv "${AIRCONNECT_CONFIG}.tmp" "${AIRCONNECT_CONFIG}"
     # shellcheck disable=SC2154
     if [ "${pkgwizard_create_shared_folder}" = "true" ]; then
-        echo "AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED=1" >>"${AIRCONNECT_CONFIG}"
+        NEW_SHARED_FOLDER_LINKS_ENABLED=1
     elif [ -n "${pkgwizard_create_shared_folder}" ]; then
-        echo "AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED=0" >>"${AIRCONNECT_CONFIG}"
+        NEW_SHARED_FOLDER_LINKS_ENABLED=0
     elif [ -e "${SYNOPKG_PKGDEST_VOL}/airconnect/${AIRCONNECT_CONFIG_FILE}" ]; then
         # upgrade_uifile.sh didn't run for some reason - fall back to
         # whatever this install was already doing rather than silently
         # taking away access it was relying on.
-        echo "AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED=1" >>"${AIRCONNECT_CONFIG}"
+        NEW_SHARED_FOLDER_LINKS_ENABLED=1
     else
-        echo "AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED=0" >>"${AIRCONNECT_CONFIG}"
+        NEW_SHARED_FOLDER_LINKS_ENABLED=0
+    fi
+    echo "AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED=${NEW_SHARED_FOLDER_LINKS_ENABLED}" >>"${AIRCONNECT_CONFIG}"
+
+    # If shared-folder links are now off, clean up any symlinks left over
+    # from when they were on - never config.xml/config-cast.xml, and never
+    # the shared folder itself if either of those (or anything else real)
+    # is still there, since their *real* file can legitimately live inside
+    # the shared folder if the user placed a custom one there. Runs here
+    # (not in start-stop-status) because this script runs as root (see
+    # conf/privilege) and can actually call synoshare; start-stop-status
+    # runs unprivileged and confirmed cannot ("Permission denied").
+    if [ "${NEW_SHARED_FOLDER_LINKS_ENABLED}" = "0" ]; then
+        AIRCONNECT_DESTINATION="${SYNOPKG_PKGDEST_VOL}/airconnect"
+        if [ -d "${AIRCONNECT_DESTINATION}" ]; then
+            [ -L "${AIRCONNECT_DESTINATION}/${AIRCONNECT_CONFIG_FILE}" ] && rm -f "${AIRCONNECT_DESTINATION}/${AIRCONNECT_CONFIG_FILE}"
+            [ -L "${AIRCONNECT_DESTINATION}/${AIRCONNECT_USER}.log" ] && rm -f "${AIRCONNECT_DESTINATION}/${AIRCONNECT_USER}.log"
+            # @eaDir (Synology's own metadata dir, auto-created on every
+            # shared folder) and .DS_Store/Thumbs.db/desktop.ini (created
+            # just by browsing the folder in Finder/Explorer) don't count
+            # as real content - a folder with only these is still "empty".
+            # Globs instead of ls|grep so a filename with a newline or
+            # other odd character can't confuse this.
+            SHARE_REAL_CONTENTS=""
+            for entry in "${AIRCONNECT_DESTINATION}"/* "${AIRCONNECT_DESTINATION}"/.[!.]*; do
+                [ -e "$entry" ] || continue
+                entry_name=$(basename "$entry")
+                case "$entry_name" in
+                '@eaDir' | '.DS_Store' | 'Thumbs.db' | 'desktop.ini') ;;
+                *) SHARE_REAL_CONTENTS="${SHARE_REAL_CONTENTS}${entry_name} " ;;
+                esac
+            done
+            if [ -z "${SHARE_REAL_CONTENTS}" ]; then
+                echo "[$(date +'%T')] Removing unused, empty shared folder \"airconnect\" (not opted in)" >>"${LOG}"
+                synoshare --del TRUE airconnect >>"${LOG}" 2>&1 || true
+            else
+                echo "[$(date +'%T')] Shared folder \"airconnect\" still has content after removing this package's own symlinks - leaving it in place (contents: ${SHARE_REAL_CONTENTS})" >>"${LOG}"
+                echo "The \"airconnect\" shared folder was kept because it still contains: ${SHARE_REAL_CONTENTS}(this package's own config/log links were removed)" >>"${SYNOPKG_TEMP_LOGFILE}"
+            fi
+        fi
     fi
 fi
 
