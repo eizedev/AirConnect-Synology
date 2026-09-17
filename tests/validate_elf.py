@@ -71,8 +71,6 @@ ARCH_EXPECTATIONS = {
     "arm-static": {"machine": 40, "static": True, "float_abi": "hard"},
     "armv5": {"machine": 40, "static": False, "float_abi": "soft"},
     "armv5-static": {"machine": 40, "static": True, "float_abi": "soft"},
-    "armv6": {"machine": 40, "static": False, "float_abi": None},
-    "armv6-static": {"machine": 40, "static": True, "float_abi": None},
     "aarch64": {"machine": 183, "static": False, "float_abi": None},
     "aarch64-static": {"machine": 183, "static": True, "float_abi": None},
     "x86": {"machine": 3, "static": False, "float_abi": None},

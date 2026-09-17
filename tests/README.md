@@ -24,9 +24,8 @@ python3 tests/validate_elf.py --arch x86_64 target/airupnp target/aircast
 ```
 
 `--arch` must be one of the `ARCH=` values used by `src/dsm7/Makefile`
-(`arm`, `arm-static`, `armv5`, `armv5-static`, `armv6`, `armv6-static`,
-`aarch64`, `aarch64-static`, `x86`, `x86-static`, `x86_64`, `x86_64-static`,
-`powerpc`, `powerpc-static`).
+(`arm`, `arm-static`, `armv5`, `armv5-static`, `aarch64`, `aarch64-static`,
+`x86`, `x86-static`, `x86_64`, `x86_64-static`, `powerpc`, `powerpc-static`).
 
 Hard failures (non-zero exit): missing ELF magic, wrong machine type for the
 requested architecture, static/dynamic mismatch, and - only where directly

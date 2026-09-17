@@ -11,6 +11,19 @@ links are included where a change traces back to one, so reports stay findable.
 
 ## [Unreleased]
 
+### Changed
+
+- Re-verified the DSM 7 architecture matrix against SynoCommunity's `spksrc` reference
+  ([#222](https://github.com/eizedev/AirConnect-Synology/issues/222)): added missing
+  current-generation models (`geminilakenk`, `v1000nk`, `r1000nk`) and router platforms
+  (`hawkeye`, `cypress`), fixed a duplicate `ipq806x` entry, normalized casing.
+- Removed the separate `armv6` package (shipped up to and including
+  `1.11.3-20260917`). It wasn't a mistake - upstream added a real `armv6` binary in
+  AirConnect 1.0.9 - but no Synology device is actually ARMv6 (Kirkwood devices are
+  ARMv5), so it declared the same platform codes as `armv5` with no verified
+  guarantee the ARMv6 binary even runs on that hardware. Use `armv5` instead; open an
+  issue if you specifically need `armv6` back.
+
 ## [1.11.3-20260917] - 2026-09-17
 
 ### Changed

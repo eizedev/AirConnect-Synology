@@ -47,7 +47,7 @@ cd src/dsm7
 ARCH=x86_64 make clean build
 ```
 
-Possible values for `ARCH`: `arm arm-static armv5 armv5-static armv6 armv6-static aarch64
+Possible values for `ARCH`: `arm arm-static armv5 armv5-static aarch64
 aarch64-static x86 x86-static x86_64 x86_64-static powerpc powerpc-static`
 
 For every architecture at once:

@@ -78,18 +78,6 @@ armv5-static:
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
-.PHONY: armv6
-armv6:
-	$(eval export INFO_ARCH=88f6282 88f6281 88f628x)
-	$(eval export INFO_FIRMWARE=7.0-40000)
-	@true
-
-.PHONY: armv6-static
-armv6-static:
-	$(eval export INFO_ARCH=88f6282 88f6281 88f628x)
-	$(eval export INFO_FIRMWARE=7.0-40000)
-	@true
-
 .PHONY: aarch64
 aarch64:
 	$(eval export INFO_ARCH=rtd1296 rtd1619b armada37xx cypress)
