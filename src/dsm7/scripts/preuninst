@@ -1,3 +1,38 @@
 #!/bin/sh
 
+if [ "$SYNOPKG_PKG_STATUS" = "UNINSTALL" ]; then
+    # airconnect.conf and the log normally live only in the package
+    # directory, which the uninstall is about to wipe - unlike the old
+    # syslog-ng-based log mirror this replaced, a shared-folder symlink is
+    # not an independent copy, so without this they'd be gone with no way
+    # back, whether or not shared-folder links were ever enabled. The
+    # "airconnect" shared folder always exists regardless of that setting
+    # (see postinst), so it doubles as a safe place for a one-time,
+    # uninstall-time backup - real copies, not symlinks, so they survive
+    # on their own. Skipped if the user also asked to delete shared-folder
+    # contents, since there's no point backing up something about to be
+    # removed anyway.
+    # shellcheck disable=SC2154
+    if [ "${pkgwizard_delete_shared_folder}" != "true" ]; then
+        AIRCONNECT_USER="$(echo "${SYNOPKG_PKGNAME}" | awk '{print tolower($0)}')"
+        AIRCONNECT_SHARE_DIR="${SYNOPKG_PKGDEST_VOL}/airconnect"
+        if [ -d "${AIRCONNECT_SHARE_DIR}" ]; then
+            for pair in \
+                "${SYNOPKG_PKGDEST}/airconnect.conf:${AIRCONNECT_SHARE_DIR}/airconnect.conf" \
+                "${SYNOPKG_PKGDEST}/log/${AIRCONNECT_USER}.log:${AIRCONNECT_SHARE_DIR}/${AIRCONNECT_USER}.log" \
+                "${SYNOPKG_PKGDEST}/log/${AIRCONNECT_USER}.1.log:${AIRCONNECT_SHARE_DIR}/${AIRCONNECT_USER}.1.log"; do
+                src="${pair%%:*}"
+                dest="${pair##*:}"
+                if [ -f "${src}" ]; then
+                    # Drop the destination first in case it's still a
+                    # symlink from shared-folder links being enabled, so
+                    # this always ends up as a real, independent file.
+                    rm -f "${dest}" 2>/dev/null
+                    cp -p "${src}" "${dest}" 2>/dev/null
+                fi
+            done
+        fi
+    fi
+fi
+
 exit 0

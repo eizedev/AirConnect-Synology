@@ -309,6 +309,13 @@ left in place and Package Center shows a note saying so.
 > - **GUI**: `Control Panel` - `Shared Folder` - select `airconnect` - `Delete`
 > - **SSH**: `sudo synoshare --del TRUE airconnect` (see [Troubleshooting](#cannot-be-installed-or-upgrade-from-an-older-version))
 
+**On uninstall**, this shared folder also doubles as a backup location: `airconnect.conf`
+and the log are always copied there first (as real files, not symlinks), regardless of
+whether you ever enabled shared-folder links - the package directory where they normally
+live gets removed as part of uninstalling, so without this they'd be gone for good.
+Skipped if you check **"Delete the contents..."** in the uninstall dialog, since there's
+no point backing up something about to be deleted anyway.
+
 **Works over SMB only** - map the shared folder from Windows, Mac, or Linux (e.g.
 `smb://<your-nas>/airconnect` in Finder, or a mapped network drive on Windows); confirmed
 working, including editing `airconnect.conf` and saving it back. **Not supported via File
@@ -646,7 +653,10 @@ You can find the built packages in the **dist** directory.
 If you get an error message that the package **cannot be installed** or **updated** or **started** when updating AirConnect-Synology,
 please **uninstall the old version** first (`Package Center -> AirConnect -> Uninstall`) and then install the new version.
 
-Uninstalling also removes the old scripts, references and configurations (only the logfile remains).
+Uninstalling also removes the old scripts, references and configurations. Unless you
+checked **"Delete the contents..."** during uninstall, `airconnect.conf` and the log are
+backed up into the `airconnect` shared folder first (see
+[Editing airconnect.conf using your PC](#editing-airconnectconf-using-your-pc)).
 Sometimes it can happen that the problem is already fixed with this.
 
 If the normal uninstallation also does not work, please cleanup the old package using SSH with root permissions:
