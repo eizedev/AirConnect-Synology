@@ -126,6 +126,9 @@ reinstalling). This links `airconnect.conf`, the log, and (if present)
 `config.xml`/`config-cast.xml` into the package's `airconnect` shared folder.
 Unchecking it again removes just those links - never deletes the real files.
 
+<!-- TODO screenshot: install/upgrade wizard step showing the "Enable
+     shared-folder links" checkbox - doc/res/shared_folder_wizard.png -->
+
 **Works over SMB only** - map the shared folder from Windows, Mac, or Linux (e.g.
 `smb://<your-nas>/airconnect`); confirmed working, including editing and saving
 `airconnect.conf` directly. **Not supported via File Station** (can't display symlinks
@@ -149,6 +152,9 @@ shown here:
 > symlinks) before the package directory is removed - regardless of whether you ever
 > enabled shared-folder links - unless you check **"Delete the contents..."** in the
 > uninstall dialog, since there's no point backing up something about to be deleted.
+
+<!-- TODO screenshot: uninstall wizard step showing the "Delete the
+     contents..." checkbox - doc/res/uninstall_wizard.png -->
 
 ## Logs
 
