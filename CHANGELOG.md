@@ -22,6 +22,11 @@ links are included where a change traces back to one, so reports stay findable.
   genuinely different thing rather than an alternative - with AirConnect the phone stays
   in the audio chain, with SpotConnect the NAS holds the stream - and the two run side by
   side, so the note explains the difference rather than just linking.
+- A release tag ending in `-pre`, `-rc*`, `-beta*` or `-alpha*` is now published as a
+  GitHub pre-release automatically. Useful for putting a build in front of people without
+  it being picked up as the current version - `/releases/latest`, the release badges and
+  package-source feeds all skip pre-releases. Existing tags are unaffected: every tag this
+  project has ever used still publishes as a full release.
 
 ### Fixed
 

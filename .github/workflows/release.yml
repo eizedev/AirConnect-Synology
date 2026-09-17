@@ -62,9 +62,24 @@ jobs:
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
           if [ -n "$TAG" ]; then
             echo "is_release=true" >> "$GITHUB_OUTPUT"
-            echo "Publishing a release for tag ${TAG}"
+            # A tag ending in -pre / -rc.. / -beta.. / -alpha.. publishes as
+            # a GitHub pre-release. Without this, marking one is a manual
+            # step after the fact - easy to forget, and until it happens the
+            # release looks final to everyone watching, including the
+            # package-source feed.
+            case "$TAG" in
+            *-pre | *-pre.* | *-rc* | *-beta* | *-alpha*)
+              echo "is_prerelease=true" >> "$GITHUB_OUTPUT"
+              echo "Publishing ${TAG} as a PRE-RELEASE"
+              ;;
+            *)
+              echo "is_prerelease=false" >> "$GITHUB_OUTPUT"
+              echo "Publishing a release for tag ${TAG}"
+              ;;
+            esac
           else
             echo "is_release=false" >> "$GITHUB_OUTPUT"
+            echo "is_prerelease=false" >> "$GITHUB_OUTPUT"
             echo "Build/validate only - not a release (no tag)"
           fi
 
@@ -183,6 +198,7 @@ jobs:
         uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3
         with:
           tag_name: ${{ steps.release_tag.outputs.tag }}
+          prerelease: ${{ steps.release_tag.outputs.is_prerelease == 'true' }}
           files: |
             src/dsm7/dist/*.spk
             src/dsm7/dist/SHA256SUMS
