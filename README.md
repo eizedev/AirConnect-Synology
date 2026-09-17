@@ -287,9 +287,11 @@ If you'd rather edit `airconnect.conf` (and view the log) from your computer ove
 network share (SMB) instead, check **"Enable shared-folder links"** during installation
 (off by default). This links these files into the package's `airconnect` shared folder;
 confirmed working over SMB (e.g. `smb://<your-nas>/airconnect` in Finder, or a mapped
-network drive on Windows) - not confirmed over AFP. To actually browse them over SMB you
-also need to `allow symlinks` in your SMB configuration on your Synology device - a
-device-wide setting, not specific to this package:
+network drive on Windows). **Does not work over AFP** (the files show up but macOS
+reports the original item can't be found) - AFP has no equivalent to the SMB symlink
+setting below, so use SMB instead. To actually browse them over SMB you also need to
+`allow symlinks` in your SMB configuration on your Synology device - a device-wide
+setting, not specific to this package:
 
 `Settings/Control Panel` - `File Services` - `SMB` - `Advanced Settings`
 
