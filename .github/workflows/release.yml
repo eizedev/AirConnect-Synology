@@ -133,7 +133,7 @@ jobs:
         run: |
           ls -ltR "${GITHUB_WORKSPACE}"/src/dsm7/dist/
           FAIL=0
-          for arch in arm arm-static armv5 armv5-static armv6 armv6-static \
+          for arch in arm arm-static armv5 armv5-static \
                       aarch64 aarch64-static x86 x86-static x86_64 x86_64-static \
                       powerpc powerpc-static; do
             # the trailing [0-9] anchors the version so e.g. "arm" doesn't
