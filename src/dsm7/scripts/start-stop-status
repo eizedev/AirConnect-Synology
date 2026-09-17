@@ -66,6 +66,13 @@ start_airconnect_on_ip() {
         ln -fs "${AIRCONNECT_CONFIG}" "${AIRCONNECT_DESTINATION}/${AIRCONNECT_CONFIG_FILE}"
         echo "[$(date +'%T')] Linking log to \"${AIRCONNECT_DESTINATION}/${AIRCONNECT_USER}.log\"." >>"$LOG"
         ln -fs "${LOG}" "${AIRCONNECT_DESTINATION}/${AIRCONNECT_USER}.log"
+        # A symlink doesn't grant access on its own - the log directory is
+        # created owner-only (0700) by default, which blocks every other
+        # user from even traversing into it to follow the symlink, log
+        # rotation (LOGBACKUP above) creates fresh files each time, so this
+        # runs on every start to keep re-applying it rather than once.
+        chmod 755 "${SYNOPKG_PKGDEST}/log" 2>>"$LOG" || true
+        [ -f "${LOG}" ] && { chmod 644 "${LOG}" 2>>"$LOG" || true; }
     fi
 
     if [ "${AIRUPNP_ENABLED}" = 1 ] && [ "${AIRCAST_ENABLED}" = 1 ]; then
