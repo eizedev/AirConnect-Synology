@@ -103,8 +103,21 @@ if [ "$SYNOPKG_PKG_STATUS" = "INSTALL" ]; then
     else
         echo "[$(date +'%T')] Setting AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED=0 in \"${AIRCONNECT_CONFIG}\"" >>"$LOG"
         echo "AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED=0" >>"${AIRCONNECT_CONFIG}"
-        echo "[$(date +'%T')] Removing unused shared folder \"airconnect\" (not opted in)" >>"$LOG"
-        synoshare --del TRUE airconnect >>"$LOG" 2>&1 || true
+        AIRCONNECT_SHARE_DIR="${SYNOPKG_PKGDEST_VOL}/airconnect"
+        # Not opting in is not the same as asking to delete anything, so
+        # only remove the folder if it's verified empty (i.e. genuinely
+        # just-created by data-share, nothing placed in it by anyone). If
+        # it somehow already has content, leave it alone entirely rather
+        # than force-deleting it.
+        if [ -d "${AIRCONNECT_SHARE_DIR}" ]; then
+            if [ -z "$(ls -A "${AIRCONNECT_SHARE_DIR}" 2>/dev/null)" ]; then
+                echo "[$(date +'%T')] Removing unused, empty shared folder \"airconnect\" (not opted in)" >>"$LOG"
+                synoshare --del TRUE airconnect >>"$LOG" 2>&1 || true
+            else
+                # shellcheck disable=SC2012
+                echo "[$(date +'%T')] Shared folder \"airconnect\" already has content - leaving it in place despite not opting in (contents: $(ls -A "${AIRCONNECT_SHARE_DIR}" 2>/dev/null | tr '\n' ' '))" >>"$LOG"
+            fi
+        fi
     fi
 
     echo "[$(date +'%T')] #### Done postinst ####" >>"${LOG}"
