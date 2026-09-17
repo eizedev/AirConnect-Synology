@@ -20,6 +20,16 @@ A Synology package for [AirConnect](https://github.com/philippe44/AirConnect): i
 speakers just show up as AirPlay targets. One package covers both device families; you
 don't need to pick.
 
+🎵 **Want Spotify rather than AirPlay?** See
+[SpotConnect-Synology](https://github.com/eizedev/SpotConnect-Synology), the sibling
+package. It makes the same speakers appear in the Spotify app as real **Spotify Connect**
+devices, which is not the same thing as what you get here. With AirConnect your phone is a
+link in the audio chain, so the music stops when it leaves the Wi-Fi, and only Apple
+devices can send at all. With SpotConnect the NAS holds the stream and your phone is only
+a remote, so Android works too and anyone in the house can take over. The two are
+complementary and run side by side - AirConnect still covers everything that is not
+Spotify, plus Chromecast, which SpotConnect does not do at all.
+
 > 📦 **Also listed in [007revad's Synology Package Source](https://github.com/007revad/Synology_package_source).**
 > Add it once in Package Center (`Settings` → `Package Sources` → `Add` → Name
 > `007revad`, Location `https://spkrepo.007daver.workers.dev/`), then install/update
@@ -248,3 +258,5 @@ you want a different AirConnect version or are changing the packaging scripts. S
 - [@bandesz](https://github.com/bandesz) for the initial idea and work on a Synology
   package for AirConnect.
 - [philippe44](https://github.com/philippe44) for AirConnect itself.
+- Sibling project: [SpotConnect-Synology](https://github.com/eizedev/SpotConnect-Synology),
+  the same packaging approach applied to Spotify Connect.
