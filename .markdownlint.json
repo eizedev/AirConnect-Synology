@@ -12,5 +12,8 @@
   "MD010": {
     "code_blocks": false
   },
+  "MD049": {
+    "style": "underscore"
+  },
   "MD060": false
 }

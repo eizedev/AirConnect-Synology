@@ -23,7 +23,7 @@ links are included where a change traces back to one, so reports stay findable.
   the PID from a fixed column of `ps` output, but the two platforms disagree about which
   column that is: DSM's `ps aux` prints `USER` first and `PID` second, while the BusyBox
   `ps` used on SRM prints `PID USER VSZ STAT COMMAND`. On a router the stop path
-  therefore passed a *username* to `kill`, so neither the `SIGTERM` step nor the `SIGKILL`
+  therefore passed a _username_, not a PID, to `kill`, so neither the `SIGTERM` step nor the `SIGKILL`
   escalation could ever match a process, and the package reported "still running".
   Measured on an RT2600ac (SRM 1.3.2, BusyBox v1.16.1): the old code extracts `root`
   where a PID was expected. The `ps` invocation and its PID column are now determined
