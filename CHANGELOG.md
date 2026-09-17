@@ -11,6 +11,12 @@ links are included where a change traces back to one, so reports stay findable.
 
 ## [Unreleased]
 
+### Added
+
+- Releases now include a `SHA256SUMS` file alongside the `.spk` packages, so a download
+  can be checked for corruption or tampering in transit. See the README's Quick start
+  section for the verification command.
+
 ## [1.11.3-20260917b] - 2026-09-17
 
 ### Changed

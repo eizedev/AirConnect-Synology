@@ -171,6 +171,13 @@ jobs:
           fi
           exit "$FAIL"
 
+      - name: Generate SHA256SUMS
+        id: checksums
+        run: |
+          cd src/dsm7/dist
+          sha256sum -- *.spk > SHA256SUMS
+          cat SHA256SUMS
+
       - name: Creating GitHub Release
         id: create_release
         uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3
@@ -178,6 +185,7 @@ jobs:
           tag_name: ${{ steps.release_tag.outputs.tag }}
           files: |
             src/dsm7/dist/*.spk
+            src/dsm7/dist/SHA256SUMS
           discussion_category_name: Releases
           body: |
             Packaging changes: see [CHANGELOG.md](https://github.com/eizedev/AirConnect-Synology/blob/master/CHANGELOG.md).
