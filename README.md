@@ -471,10 +471,12 @@ Build options: LINUX
 
 ### airupnp and aircast configuration
 
-> You cannot view/edit the file with FileStation due to a limitation in synology DMS (Symbolik links) by default
+> File Station cannot display these files at all (it doesn't support symlinks, full
+> stop - not a setting you can change).
 >
-> Hint: If you want to filter/include/exclude speakers in the configuration file or `airupnp`
-> you need to disable the default filter in `airconnect.conf` using `FILTER_AIRPLAY2_DEVICES=`.
+> Hint: If you want the device list in this file (rather than the built-in filter) to
+> decide which speakers `airupnp` picks up, you need to disable the default filter in
+> `airconnect.conf` using `FILTER_AIRPLAY2_DEVICES=`.
 > See also [airconnect.conf](#airconnectconf). The default filter will overwrite any filter in the `config.xml` file of airupnp.
 
 By default the config file will **not** being used as long as the file is not created (And you are not running on debug log level).
@@ -482,9 +484,13 @@ By default the config file will **not** being used as long as the file is not cr
 The file is **not** created by default.
 
 - Config File location for airupnp
-  - `/volume1/airconnect/config.xml`
+  - `/volume1/@appstore/AirConnect/config.xml` - always here, edit via SSH regardless of
+    the shared-folder setting
+  - also reachable at `/volume1/airconnect/config.xml` over SMB if you checked
+    **"Enable shared-folder links"** (see [Editing airconnect.conf using your PC](#editing-airconnectconf-using-your-pc))
 - Config File location for aircast
-  - `/volume1/airconnect/config-cast.xml`
+  - `/volume1/@appstore/AirConnect/config-cast.xml` (same as above)
+  - also reachable at `/volume1/airconnect/config-cast.xml` over SMB if enabled
 
 You can create each of these files manually or a reference version can be generated using the `-i [config file name]` command-line parameter.
 For the following example i am using the default configuration you can find above in the [How it works](#how-it-works) section.
