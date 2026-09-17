@@ -40,16 +40,22 @@ jobs:
 
       - name: Determine whether this run should publish a release
         id: release_tag
+        env:
+          # Passed via env instead of interpolated directly into the run:
+          # script (Semgrep yaml.github-actions.security.run-shell-injection)
+          # - github.ref/ref_name reflect whatever ref triggered this run,
+          # so treating them as untrusted input here rather than splicing
+          # them straight into shell is the safer default even though
+          # nothing here is attacker-reachable today (no external forks
+          # trigger this workflow).
+          INPUT_RELEASE_TAG: ${{ inputs.release_tag }}
+          REF: ${{ github.ref }}
+          REF_NAME: ${{ github.ref_name }}
         run: |
-          # shellcheck disable=SC2193
-          # False positive: shellcheck's GitHub-expression placeholder
-          # substitution makes the elif below look like a literal-vs-literal
-          # comparison; github.ref is a real runtime value that can
-          # legitimately match or not match the refs/tags/* glob.
-          if [ -n "${{ inputs.release_tag }}" ]; then
-            TAG="${{ inputs.release_tag }}"
-          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
-            TAG="${{ github.ref_name }}"
+          if [ -n "$INPUT_RELEASE_TAG" ]; then
+            TAG="$INPUT_RELEASE_TAG"
+          elif [[ "$REF" == refs/tags/* ]]; then
+            TAG="$REF_NAME"
           else
             TAG=""
           fi

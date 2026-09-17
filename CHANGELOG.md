@@ -11,6 +11,8 @@ links are included where a change traces back to one, so reports stay findable.
 
 ## [Unreleased]
 
+## [1.11.3-20260917b] - 2026-09-17
+
 ### Changed
 
 - Re-verified the DSM 7 architecture matrix against SynoCommunity's `spksrc` reference
@@ -26,6 +28,22 @@ links are included where a change traces back to one, so reports stay findable.
   ARMv5), so it declared the same platform codes as `armv5` with no verified
   guarantee the ARMv6 binary even runs on that hardware. Use `armv5` instead; open an
   issue if you specifically need `armv6` back.
+- Packaging-repo CI hardening, no effect on the shipped packages themselves: replaced
+  Codacy (never actually configured, heavily overlapped with the existing linting
+  workflow) with a standalone, tokenless Semgrep scan; every third-party GitHub Action
+  across all workflows is now pinned to a commit SHA rather than a mutable tag.
+
+### Fixed
+
+- A release-automation script step interpolated GitHub-provided ref data directly into
+  a shell command instead of via an environment variable - not exploitable as written
+  (nothing external reaches it), but a real anti-pattern worth closing rather than
+  leaving in place.
+- Removed an unused `secrets: inherit` on an internal, same-repo workflow call that
+  doesn't reference any secrets in the first place.
+- Added a one-week Dependabot cooldown before adopting newly published action versions.
+- The README's lint-status badge linked to Super-Linter's generic marketplace listing
+  instead of this repo's own workflow runs - fixed to link to the actual runs.
 
 ## [1.11.3-20260917] - 2026-09-17
 
