@@ -16,7 +16,7 @@ tee "$SYNOPKG_TEMP_LOGFILE" <<EOF
         "items": [
             {
                 "type": "multiselect",
-                "desc": "Link config.xml/config-cast.xml, airconnect.conf and the log into a shared folder reachable over a network share (SMB) - lets you place a custom config.xml, edit airconnect.conf, or check the log from your computer without SSH. Most installs never need this - the defaults are already tuned to just work. Need something else made configurable here instead? Open an issue.",
+                "desc": "Link config.xml/config-cast.xml, airconnect.conf and the log into a shared folder reachable over a network share (SMB) - lets you place a custom config.xml, edit airconnect.conf, or check the log from your computer without SSH. Most installs never need this - the defaults are already tuned to just work. Need something else made configurable here instead? Please open an issue.",
                 "subitems": [
                     {
                         "key": "pkgwizard_create_shared_folder",

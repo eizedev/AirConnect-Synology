@@ -73,6 +73,22 @@ start_airconnect_on_ip() {
         # runs on every start to keep re-applying it rather than once.
         chmod 755 "${SYNOPKG_PKGDEST}/log" 2>>"$LOG" || true
         [ -f "${LOG}" ] && { chmod 644 "${LOG}" 2>>"$LOG" || true; }
+    elif [ -d "${AIRCONNECT_DESTINATION}" ]; then
+        # Not (or no longer) opted in: remove only the two symlinks this
+        # feature itself creates - never config.xml/config-cast.xml here,
+        # since (unlike these two) their *real* file can legitimately live
+        # inside the shared folder if the user placed a custom one there,
+        # and deleting the folder must never take that with it.
+        [ -L "${AIRCONNECT_DESTINATION}/${AIRCONNECT_CONFIG_FILE}" ] && rm -f "${AIRCONNECT_DESTINATION}/${AIRCONNECT_CONFIG_FILE}"
+        [ -L "${AIRCONNECT_DESTINATION}/${AIRCONNECT_USER}.log" ] && rm -f "${AIRCONNECT_DESTINATION}/${AIRCONNECT_USER}.log"
+        if [ -z "$(ls -A "${AIRCONNECT_DESTINATION}" 2>/dev/null)" ]; then
+            echo "[$(date +'%T')] Removing unused, empty shared folder \"airconnect\" (not opted in)" >>"$LOG"
+            # shellcheck disable=SC2012
+            synoshare --del TRUE airconnect >>"$LOG" 2>&1 || true
+        else
+            # shellcheck disable=SC2012
+            echo "[$(date +'%T')] Shared folder \"airconnect\" still has content after removing this package's own symlinks - leaving it in place (contents: $(ls -A "${AIRCONNECT_DESTINATION}" 2>/dev/null | tr '\n' ' '))" >>"$LOG"
+        fi
     fi
 
     if [ "${AIRUPNP_ENABLED}" = 1 ] && [ "${AIRCAST_ENABLED}" = 1 ]; then
