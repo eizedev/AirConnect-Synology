@@ -78,7 +78,7 @@ tee "$SYNOPKG_TEMP_LOGFILE" <<EOF
         "items": [
             {
                 "type": "multiselect",
-                "desc": "Link config files and the log into a shared folder, so you can view/edit them via File Station or a network share (SMB) without SSH.",
+                "desc": "Link config files and the log into a shared folder, so you can view/edit them via File Station or a network share (SMB) without SSH. Most installs never need this - the defaults are already tuned to just work. Only relevant if you'll regularly check the log or edit the config and don't want to do that over SSH. Need something else made configurable here instead? Open an issue.",
                 "subitems": [
                     {
                         "key": "pkgwizard_create_shared_folder",
