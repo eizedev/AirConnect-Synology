@@ -29,31 +29,48 @@ Ground truth, read directly from `src/dsm7/Makefile`'s `INFO_ARCH` per target - 
 exactly what each package declares as compatible in Package Center, not a hand-maintained
 copy that can drift.
 
-| Architecture group | Synology platform codes                                                                                                                                                                                                                           | Package                                                                  |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| ARMv5 / ARMv6      | `88f6282`, `88f6281`, `88f628x`                                                                                                                                                                                                                   | `AirConnect-dsm7-armv5-${VERSION}` or `AirConnect-dsm7-armv6-${VERSION}` |
-| ARMv7              | `ipq806x`, `armada370`, `armadaxp`, `armada375`, `armada38x`, `alpine`, `alpine4k`, `monaco`, `comcerto2k`, `hi3535`, `dakota`, `northstarplus`                                                                                                   | `AirConnect-dsm7-arm-${VERSION}`                                         |
-| ARMv8 / AArch64    | `rtd1296`, `rtd1619b`, `armada37xx`                                                                                                                                                                                                               | `AirConnect-dsm7-aarch64-${VERSION}`                                     |
-| PowerPC            | `qoriq`, `Ppc853x`                                                                                                                                                                                                                                | `AirConnect-dsm7-powerpc-${VERSION}`                                     |
-| Intel/AMD 32-bit   | `x86`, `cedarview`, `bromolow`, `evansport`, `braswell`, `broadwell`, `dockerx64`, `kvmx64`, `denverton`, `grantley`, `broadwellnk`, `Broadwellntbap`                                                                                             | `AirConnect-dsm7-x86-${VERSION}`                                         |
-| Intel/AMD 64-bit   | `x86_64`, `x64`, `cedarview`, `bromolow`, `avoton`, `braswell`, `broadwell`, `apollolake`, `dockerx64`, `epyc7002`, `r1000`, `kvmx64`, `denverton`, `grantley`, `broadwellnk`, `broadwellnkv2`, `Broadwellntbap`, `v1000`, `geminilake`, `purley` | `AirConnect-dsm7-x86_64-${VERSION}`                                      |
+| Architecture group | Synology platform codes                                                                                                                                                                                                                                                                 | Package                              |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| ARMv5              | `88f6282`, `88f6281`, `88f628x`                                                                                                                                                                                                                                                         | `AirConnect-dsm7-armv5-${VERSION}`   |
+| ARMv7              | `ipq806x`, `armada370`, `armadaxp`, `armada375`, `armada38x`, `alpine`, `alpine4k`, `monaco`, `comcerto2k`, `hi3535`, `dakota`, `northstarplus`, `hawkeye`                                                                                                                              | `AirConnect-dsm7-arm-${VERSION}`     |
+| ARMv8 / AArch64    | `rtd1296`, `rtd1619b`, `armada37xx`, `cypress`                                                                                                                                                                                                                                          | `AirConnect-dsm7-aarch64-${VERSION}` |
+| PowerPC            | `qoriq`, `ppc853x`                                                                                                                                                                                                                                                                      | `AirConnect-dsm7-powerpc-${VERSION}` |
+| Intel/AMD 32-bit   | `x86`, `cedarview`, `bromolow`, `evansport`, `braswell`, `broadwell`, `dockerx64`, `kvmx64`, `denverton`, `grantley`, `broadwellnk`, `broadwellntbap`                                                                                                                                   | `AirConnect-dsm7-x86-${VERSION}`     |
+| Intel/AMD 64-bit   | `x86_64`, `x64`, `cedarview`, `bromolow`, `avoton`, `braswell`, `broadwell`, `apollolake`, `dockerx64`, `epyc7002`, `r1000`, `r1000nk`, `kvmx64`, `denverton`, `grantley`, `broadwellnk`, `broadwellnkv2`, `broadwellntbap`, `v1000`, `v1000nk`, `geminilake`, `geminilakenk`, `purley` | `AirConnect-dsm7-x86_64-${VERSION}`  |
 
 Every group above also has a `-static` variant with the identical platform list - see
-[Static packages](#static-packages) for when to use it.
+[Static packages](#static-packages) for when to use it. `hawkeye`/`cypress` are Synology
+router (SRM) platforms; the rest are NAS.
 
-> **Known limitation, not yet resolved:** the `armv5` and `armv6` packages currently
-> declare the exact same Synology platform codes (verified directly in the Makefile),
-> so Package Center can't tell you which one your device actually needs - both will show
-> as installable. If you're on one of the affected Kirkwood-based devices, try `armv5`
-> first (it's the more common target for these); if `airupnp`/`aircast` won't start,
-> uninstall and try `armv6` or the static variant instead. This isn't guesswork we're
-> comfortable asserting a fix for without a verified source mapping actual device models
-> to the correct instruction set - tracked as a known gap rather than papered over.
+Cross-checked 2026-09-17 against SynoCommunity's actively-maintained
+[`spksrc` architecture reference](https://raw.githubusercontent.com/SynoCommunity/spksrc/master/mk/spksrc.common/archs.mk),
+which surfaced real drift from three years of no re-verification: several current-
+generation models - DS925+/DS1525+/DS1825+/RS2825RP+/RS2423RP+ (`v1000nk`),
+DS725+ (`r1000nk`), DS425+/DS225+/FS200T (`geminilakenk`) - and the routers WRX560
+(`hawkeye`) and RT6600ax (`cypress`) were missing entirely, and an `armv6` package
+(removed, see below) turned out to correspond to no real Synology hardware. See
+[issue #222](https://github.com/eizedev/AirConnect-Synology/issues/222) for the full
+before/after. Worth periodically re-checking against that same source as Synology
+ships new models.
+
+> **A separate `armv6` package existed up to and including release
+> `1.11.3-20260917` and has since been removed.** It wasn't a packaging mistake -
+> upstream AirConnect genuinely ships a distinct `armv6` binary, added in AirConnect
+> 1.0.9 (2022) - but neither Synology's own documentation nor SynoCommunity's
+> platform reference lists a single Synology device as ARMv6; Synology's Kirkwood
+> devices are ARMv5. The `armv6` package declared the same platform codes as `armv5`
+> purely for lack of a better option, offering an ARMv6-compiled binary to ARMv5TE
+> hardware with no verified guarantee it would even run correctly there. If you were
+> relying on the `armv6` package specifically (not just installed on a Kirkwood
+> device via `armv5`), please
+> [open an issue](https://github.com/eizedev/AirConnect-Synology/issues).
 
 ## Synology Router (SRM)
 
-Routers running Synology SRM use the **ARMv7** package (`AirConnect-dsm7-arm-${VERSION}`).
-If that doesn't work, try `arm-static`.
+Most routers running Synology SRM use the **ARMv7** package
+(`AirConnect-dsm7-arm-${VERSION}`, covers `northstarplus`/`ipq806x`/`dakota` and the
+WRX560's `hawkeye`). If that doesn't work, try `arm-static`. The RT6600ax's `cypress`
+platform is ARMv8 instead - use the **aarch64** package for that one.
 
 The packages are named `dsm7-*`, but the same package works on SRM as well as DSM 7 -
 confirmed on a real router (RT2600ac, SRM 1.3.2-9366 Update 2), install through to a

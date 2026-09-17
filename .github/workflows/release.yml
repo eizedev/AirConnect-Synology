@@ -133,18 +133,19 @@ jobs:
         run: |
           ls -ltR "${GITHUB_WORKSPACE}"/src/dsm7/dist/
           FAIL=0
-          for arch in arm arm-static armv5 armv5-static armv6 armv6-static \
-                      aarch64 aarch64-static x86 x86-static x86_64 x86_64-static \
-                      powerpc powerpc-static; do
-            # the trailing [0-9] anchors the version so e.g. "arm" doesn't
-            # glob-match "arm-static"'s package too
-            spk=$(find src/dsm7/dist -maxdepth 1 -name "AirConnect-dsm7-${arch}-[0-9]*.spk" 2>/dev/null | head -n1)
-            if [ -z "$spk" ]; then
-              echo "::error::No .spk found for arch ${arch}"
-              FAIL=1
-              continue
-            fi
-            echo "::group::Validating ${spk}"
+          COUNT=0
+          # Iterates over whatever build-all actually produced instead of a
+          # second hand-maintained arch list - a stale copy here is exactly
+          # what broke CI when armv6 was removed from the Makefile but this
+          # list still expected it. Arch is derived from the filename (the
+          # trailing -[0-9] marks where the date-suffixed version starts).
+          for spk in src/dsm7/dist/AirConnect-dsm7-*.spk; do
+            [ -e "$spk" ] || continue
+            COUNT=$((COUNT + 1))
+            base=$(basename "$spk" .spk)
+            arch=${base#AirConnect-dsm7-}
+            arch=${arch%%-[0-9]*}
+            echo "::group::Validating ${spk} (arch=${arch})"
             sh tests/validate_spk.sh "$spk" || FAIL=1
             workdir=$(mktemp -d)
             tar -xf "$spk" -C "$workdir"
@@ -153,6 +154,15 @@ jobs:
             rm -rf "$workdir"
             echo "::endgroup::"
           done
+          # Cross-check against the Makefile's own architecture targets, so a
+          # build-all that silently skips one still fails CI instead of just
+          # validating however many packages happened to show up.
+          EXPECTED=$(awk '/^\.PHONY: /{t=$2} /INFO_ARCH=/{print t}' src/dsm7/Makefile | wc -l | tr -d ' ')
+          echo "Validated ${COUNT} package(s), Makefile defines ${EXPECTED} architecture(s)."
+          if [ "$COUNT" -ne "$EXPECTED" ]; then
+            echo "::error::Built ${COUNT} .spk file(s) but the Makefile defines ${EXPECTED} architectures - build-all likely skipped one."
+            FAIL=1
+          fi
           exit "$FAIL"
 
       - name: Creating GitHub Release

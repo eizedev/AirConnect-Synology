@@ -200,9 +200,6 @@ What's changed in this package recently:
 
 ## Known limitations
 
-- The `armv5` and `armv6` packages currently declare the same Synology platform codes,
-  so Package Center can't tell you which one your device needs - see
-  [doc/ARCHITECTURES.md](doc/ARCHITECTURES.md#architecture-groups-dsm-7).
 - Whether very old hardware can run the current package isn't predictable from the
   model alone, and there's no automated compatibility check yet at install time - see
   [doc/TROUBLESHOOTING.md](doc/TROUBLESHOOTING.md#fatal-kernel-too-old--crashes-immediately-on-old-hardware).

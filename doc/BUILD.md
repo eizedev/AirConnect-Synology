@@ -47,7 +47,7 @@ cd src/dsm7
 ARCH=x86_64 make clean build
 ```
 
-Possible values for `ARCH`: `arm arm-static armv5 armv5-static armv6 armv6-static aarch64
+Possible values for `ARCH`: `arm arm-static armv5 armv5-static aarch64
 aarch64-static x86 x86-static x86_64 x86_64-static powerpc powerpc-static`
 
 For every architecture at once:
@@ -58,6 +58,52 @@ make clean build-all
 ```
 
 Built packages land in `dist/`.
+
+## Adding or removing an architecture
+
+`src/dsm7/Makefile` is the single source of truth for which architectures
+exist - each one is a `.PHONY` target that sets `INFO_ARCH` (the Synology
+platform codes it declares as compatible):
+
+```make
+.PHONY: x86_64
+x86_64:
+	$(eval export INFO_ARCH=x86_64 x64 cedarview ...)
+	$(eval export INFO_FIRMWARE=7.0-40000)
+	@true
+```
+
+`build.sh` (its `ARCH_LIST`) and `.github/workflows/release.yml` (its package
+validation step) both **derive** their list of architectures from the
+Makefile automatically, rather than keeping their own copy:
+
+```bash
+awk '/^\.PHONY: /{t=$2} /INFO_ARCH=/{print t}' Makefile
+```
+
+This walks the file line by line: whenever it sees a `.PHONY: <name>` line,
+it remembers `<name>`; whenever it then sees that target's `INFO_ARCH=`
+line, it prints the remembered name. Non-architecture `.PHONY` targets
+(`build`, `clean`, `clean-dist`, `clean-bin`, `build-all`, `shellcheck`) have
+no `INFO_ARCH=` line, so they're never matched - no separate exclude-list to
+maintain.
+
+`release.yml` additionally counts how many `.spk` files `make build-all`
+actually produced and compares that against this same derived list's
+length, so a build that silently skips an architecture fails CI instead of
+just validating whatever happened to show up.
+
+**Why this matters**: until 2026-09, both `build.sh` and `release.yml` kept
+their own hand-copied architecture list, separate from the Makefile. When
+the `armv6` target was removed from the Makefile
+([#222](https://github.com/eizedev/AirConnect-Synology/issues/222)),
+`release.yml`'s stale copy still expected an `armv6` package and failed CI
+looking for a file that was never going to exist. Adding or removing an
+architecture now only ever means editing the Makefile - `build.sh` and
+`release.yml` pick it up automatically. You'll still want to update this
+file's `ARCH=` list below and
+[doc/ARCHITECTURES.md](ARCHITECTURES.md#architecture-groups-dsm-7) by hand,
+since those are prose for humans, not something a script parses.
 
 ## The legacy DSM 5/6 package
 

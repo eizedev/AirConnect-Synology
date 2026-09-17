@@ -6,7 +6,11 @@ rm -r -f dist
 
 set -eu
 
-ARCH_LIST="arm arm-static armv5 armv5-static armv6 armv6-static aarch64 aarch64-static x86 x86-static x86_64 x86_64-static powerpc powerpc-static"
+# Derived from the Makefile itself (every target that sets INFO_ARCH is a
+# real architecture build) instead of a second hand-maintained copy of the
+# list - a stale copy here is exactly what broke CI when armv6 was removed
+# from the Makefile but a separate hardcoded list elsewhere still expected it.
+ARCH_LIST=$(awk '/^\.PHONY: /{t=$2} /INFO_ARCH=/{print t}' Makefile)
 MAKE=$(which make)
 
 for arch in ${ARCH_LIST}; do
