@@ -17,6 +17,28 @@ links are included where a change traces back to one, so reports stay findable.
   can be checked for corruption or tampering in transit. See the README's Quick start
   section for the verification command.
 
+### Fixed
+
+- **Stopping the package could never work on Synology routers (SRM).** `get_pid()` read
+  the PID from a fixed column of `ps` output, but the two platforms disagree about which
+  column that is: DSM's `ps aux` prints `USER` first and `PID` second, while the BusyBox
+  `ps` used on SRM prints `PID USER VSZ STAT COMMAND`. On a router the stop path
+  therefore passed a *username* to `kill`, so neither the `SIGTERM` step nor the `SIGKILL`
+  escalation could ever match a process, and the package reported "still running".
+  Measured on an RT2600ac (SRM 1.3.2, BusyBox v1.16.1): the old code extracts `root`
+  where a PID was expected. The `ps` invocation and its PID column are now determined
+  together.
+- On SRM, the process lookup now uses `ps w` rather than bare `ps`. BusyBox truncates the
+  command line to 78 characters without it (measured: 78 → 131), and the lookup matches
+  on the package's full install path, which together with its arguments can run past that
+  limit and silently stop matching.
+
+  DSM behaviour is unchanged by both fixes: `ps aux` is still preferred and still read
+  from column 2. `ps w` is only ever reached where `ps aux` is rejected, because on DSM
+  `ps w` succeeds but lists only the current terminal's processes. Verified on DS923+
+  (DSM 7.4.1), DS415+ (DSM 7.1.1) and RT2600ac: each picks the expected invocation and
+  extracts a numeric PID.
+
 ## [1.11.3-20260917b] - 2026-09-17
 
 ### Changed
