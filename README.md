@@ -215,8 +215,8 @@ If you encounter any problems, please read the [troubleshooting](#troubleshootin
       - **more** (`more /volume1/@appstore/AirConnect/log/airconnect.log`)
       - **tail** (`tail -100 /volume1/@appstore/AirConnect/log/airconnect.log`)
   - If you checked **"Enable shared-folder links"** during installation, this file is also linked at
-    `/volume1/airconnect/<packagename-lowercase>.log`, so you can open it via Synology **FileStation** by navigating to
-    `airconnect` (see [Editing airconnect.conf using your PC](#editing-airconnectconf-using-your-pc)).
+    `/volume1/airconnect/<packagename-lowercase>.log`, reachable over a network share (SMB) without SSH
+    (see [Editing airconnect.conf using your PC](#editing-airconnectconf-using-your-pc)).
   - This log file is written by the AirConnect-Synology package.
     - All log entries of the AirConnect application (airupnp + aircast) are also written into this log file.
   - This is the first place to look for errors.
@@ -281,15 +281,15 @@ Configuration options with `Mandatory = Yes` must exist in the configuration. Op
 ### Editing airconnect.conf using your PC
 
 By default, the package does **not** link its config/log files into any shared folder -
-edit `airconnect.conf` directly in the package directory via SSH, or use File Station on
-the package's own log folder.
+edit `airconnect.conf` directly in the package directory via SSH.
 
 If you'd rather edit `airconnect.conf` (and view the log) from your computer over a
 network share (SMB) instead, check **"Enable shared-folder links"** during installation
-(off by default). This links these files into the package's `airconnect` shared folder,
-but to actually browse them over SMB you also need to `allow symlinks` in your SMB
-configuration on your Synology device - a device-wide setting, not specific to this
-package:
+(off by default). This links these files into the package's `airconnect` shared folder;
+confirmed working over SMB (e.g. `smb://<your-nas>/airconnect` in Finder, or a mapped
+network drive on Windows) - not confirmed over AFP. To actually browse them over SMB you
+also need to `allow symlinks` in your SMB configuration on your Synology device - a
+device-wide setting, not specific to this package:
 
 `Settings/Control Panel` - `File Services` - `SMB` - `Advanced Settings`
 
