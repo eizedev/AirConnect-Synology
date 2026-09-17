@@ -13,14 +13,9 @@ packaging scripts (`scripts/`), the install/upgrade/uninstall wizards
 
 ## Building and testing locally
 
-See [doc/BUILD.md](doc/BUILD.md) for the full build steps. In short:
-
-```bash
-cd src/dsm7
-make shellcheck
-ARCH=x86_64 make clean build   # or: make clean build-all
-sh tests/validate_spk.sh dist/AirConnect-dsm7-x86_64-*.spk
-```
+See [doc/BUILD.md](doc/BUILD.md) for the build steps, and [tests/README.md](tests/README.md)
+for what the automated checks (`validate_spk.sh`, `validate_elf.py`) actually verify and
+why each one exists.
 
 Shell scripts in this repo target portable POSIX `sh` (not bash) - they run under
 Synology's BusyBox shell on some architectures, so bashisms will break on real hardware
