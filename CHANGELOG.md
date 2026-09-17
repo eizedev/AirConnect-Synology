@@ -16,6 +16,12 @@ links are included where a change traces back to one, so reports stay findable.
 - Releases now include a `SHA256SUMS` file alongside the `.spk` packages, so a download
   can be checked for corruption or tampering in transit. See the README's Quick start
   section for the verification command.
+- The README now points at
+  [SpotConnect-Synology](https://github.com/eizedev/SpotConnect-Synology), a sibling
+  package that makes the same speakers appear as real Spotify Connect devices. It is a
+  genuinely different thing rather than an alternative - with AirConnect the phone stays
+  in the audio chain, with SpotConnect the NAS holds the stream - and the two run side by
+  side, so the note explains the difference rather than just linking.
 - A release tag ending in `-pre`, `-rc*`, `-beta*` or `-alpha*` is now published as a
   GitHub pre-release automatically. Useful for putting a build in front of people without
   it being picked up as the current version - `/releases/latest`, the release badges and
