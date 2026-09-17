@@ -77,27 +77,12 @@ already used for `shellcheck`. Extracts a `.spk` into a temp dir and checks:
   not asserting unverified specs as fact)
 
 ```sh
-sh tests/validate_spk.sh dist/AirConnect-dsm7-x86_64-1.11.3-20260916.spk
+sh tests/validate_spk.sh dist/AirConnect-dsm7-x86_64-*.spk
 ```
 
-**Real finding from running this against the current 1.8.3 release**: all
-seven lifecycle scripts under `src/dsm7/scripts/` are tracked in Git as
-mode `100644` (non-executable) instead of `100755` - confirmed with
-`git ls-files -s src/dsm7/scripts/` - and the built `.spk` inherits that.
-Flagged for the maintainer to decide on rather than fixed here, since it
-touches tracked file modes rather than adding new files. Verified with a
-synthetic clean copy (`chmod +x` applied before re-tarring) that the
-validator reports a clean `OK` once the scripts are executable, so this
-isn't a false positive in the check itself.
-
-**On real DSM hardware this is confirmed harmless** (DS415+/DS923+, DSM
-7.1.1/7.4.1, `synopkg install`: `preinst`/`postinst` both ran with exit
-code 0 despite the missing +x bit) - DSM clearly invokes these scripts via
-an interpreter rather than executing them directly. **On SRM (RT2600ac)
-this is unconfirmed and currently looks different**: the one real install
-attempt that "succeeded" there never actually populated `airconnect.conf`
-or the log file, meaning `postinst` likely did not run to completion - and
-a second attempt failed the install outright. Not root-caused yet (see the
-project's `start-stop-status-ps-bug` memory for the full, still-open
-finding); until it is, **do not assume the exec-bit finding's "harmless"
-conclusion applies to SRM/routers** - treat it as DSM-specific.
+This check exists because it caught a real bug the first time it ran: every lifecycle
+script under `src/dsm7/scripts/` was tracked in Git as mode `100644` (non-executable),
+and the built `.spk` inherited that. DSM tolerates this (it invokes the scripts via an
+interpreter rather than executing them directly), but SRM does not - it broke
+installation outright on a real router. Fixed and verified end-to-end on real hardware
+(DS415+/DS923+ on DSM, RT2600ac on SRM) - see `CHANGELOG.md`'s `1.11.3-20260916` entry.
