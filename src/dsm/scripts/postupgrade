@@ -3,11 +3,24 @@
 AIRCONNECT_USER="$(echo "${SYNOPKG_PKGNAME}" | awk '{print tolower($0)}')"
 LOG="${SYNOPKG_PKGDEST}/log/${AIRCONNECT_USER}.log"
 AIRCONNECT_CONFIG_FILE="airconnect.conf"
+AIRCONNECT_CONFIG="${SYNOPKG_PKGDEST}/${AIRCONNECT_CONFIG_FILE}"
 
 echo "[$(date +'%T')] #### Start postupgrade... ####" >>"${LOG}"
 
 # restore config file
 /bin/cp -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${AIRCONNECT_CONFIG_FILE}" "${SYNOPKG_PKGDEST}"
+
+# Upgrading from a version that always linked into the shared folder: if
+# that link is already there, this install was relying on it, so keep it
+# working rather than silently taking it away. A fresh-from-this-version
+# install instead defaults to off (see postinst).
+if [ -f "${AIRCONNECT_CONFIG}" ] && ! grep -Fq "AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED" "${AIRCONNECT_CONFIG}"; then
+    if [ -e "${SYNOPKG_PKGDEST_VOL}/airconnect/${AIRCONNECT_CONFIG_FILE}" ]; then
+        echo "AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED=1" >>"${AIRCONNECT_CONFIG}"
+    else
+        echo "AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED=0" >>"${AIRCONNECT_CONFIG}"
+    fi
+fi
 
 echo "[$(date +'%T')] #### Done postupgrade ####" >>"${LOG}"
 

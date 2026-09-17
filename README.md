@@ -208,14 +208,15 @@ If you encounter any problems, please read the [troubleshooting](#troubleshootin
 ### Logfiles
 
 - **AirConnect-Synology and AirConnect Log File**
-  - The _AirConnect application logfile_ is located at `/volume1/airconnect/log/airconnect.log` (default location)
-    - This is a symlink of `/volume1/@appstore/AirConnect/log/airconnect.log`
-  - You can open it using the Synology **FileStation** by navigating to `airconnect` - `log`
-    - You can also open it after login with SSH to your NAS/Router: `sudo /usr/syno/bin/synopkg log AirConnect`
+  - The _AirConnect application logfile_ is located at `/volume1/@appstore/AirConnect/log/airconnect.log`
+    (default location; adjust `/volume1` if your package is installed on a different volume)
+  - You can open it after logging in with SSH to your NAS/Router: `sudo /usr/syno/bin/synopkg log AirConnect`
     - or by using a command-line utility like
-      - **more** (`more /volume1/airconnect/log/airconnect`)
-      - **tail** (`tail -100 /volume1/airconnect/log/airconnect`)
-    - If you get a `permission denied`, you should use the full path, f.e. `more /volume1/@appstore/AirConnect/log/airconnect.log`
+      - **more** (`more /volume1/@appstore/AirConnect/log/airconnect.log`)
+      - **tail** (`tail -100 /volume1/@appstore/AirConnect/log/airconnect.log`)
+  - If you checked **"Enable shared-folder links"** during installation, this file is also linked at
+    `/volume1/airconnect/<packagename-lowercase>.log`, so you can open it via Synology **FileStation** by navigating to
+    `airconnect` (see [Editing airconnect.conf using your PC](#editing-airconnectconf-using-your-pc)).
   - This log file is written by the AirConnect-Synology package.
     - All log entries of the AirConnect application (airupnp + aircast) are also written into this log file.
   - This is the first place to look for errors.
@@ -279,8 +280,16 @@ Configuration options with `Mandatory = Yes` must exist in the configuration. Op
 
 ### Editing airconnect.conf using your PC
 
-If you want to edit your `airconnect.conf` file from your computer using a network share (SMB),
-you need to `allow symlinks` in your SMB configuration on your synology NAS device.
+By default, the package does **not** link its config/log files into any shared folder -
+edit `airconnect.conf` directly in the package directory via SSH, or use File Station on
+the package's own log folder.
+
+If you'd rather edit `airconnect.conf` (and view the log) from your computer over a
+network share (SMB) instead, check **"Enable shared-folder links"** during installation
+(off by default). This links these files into the package's `airconnect` shared folder,
+but to actually browse them over SMB you also need to `allow symlinks` in your SMB
+configuration on your Synology device - a device-wide setting, not specific to this
+package:
 
 `Settings/Control Panel` - `File Services` - `SMB` - `Advanced Settings`
 
@@ -482,8 +491,12 @@ stopped and the resulted configuration will be written to the defined config fil
 
 #### Editing config files using your PC
 
-If you want to edit your `config.xml` or `config-cast.xml` file from your computer using a network share (SMB) you need to
-`allow symlinks` in your SMB configuration on your synology NAS device.
+By default the package does not link `config.xml`/`config-cast.xml` into any shared
+folder - place/edit them directly in the package directory via SSH.
+
+If you checked **"Enable shared-folder links"** during installation, you can instead
+edit them from your computer over a network share (SMB). You'll also need to
+`allow symlinks` in your SMB configuration on your Synology device:
 
 `Settings/Control Panel` - `File Services` - `SMB` - `Advanced Settings`
 

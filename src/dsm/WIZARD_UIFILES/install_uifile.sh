@@ -72,6 +72,25 @@ tee "$SYNOPKG_TEMP_LOGFILE" <<EOF
                 ]
             }
         ]
+    },
+    {
+        "step_title": "Optional: Shared folder for GUI access",
+        "items": [
+            {
+                "type": "multiselect",
+                "desc": "Link config files and the log into a shared folder, so you can view/edit them via File Station or a network share (SMB) without SSH.",
+                "subitems": [
+                    {
+                        "key": "pkgwizard_create_shared_folder",
+                        "desc": "Enable shared-folder links (off by default)",
+                        "defaultValue": false
+                    }
+                ]
+            },
+            {
+                "desc": "<strong style='color:red'>Note:</strong> to actually browse these links over SMB, you also need to enable 'allow symlinks' under <em>Control Panel - File Services - SMB - Advanced Settings</em> on your Synology device - a device-wide setting, not specific to this package. See the <a target='_blank' href='https://github.com/eizedev/AirConnect-Synology#readme'>documentation</a> for details and a screenshot. Leave this off if you're unsure - you can always reach these files via SSH instead."
+            }
+        ]
     }
 ];
 EOF

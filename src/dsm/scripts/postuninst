@@ -1,3 +1,15 @@
 #!/bin/sh
 
+if [ "$SYNOPKG_PKG_STATUS" = "UNINSTALL" ]; then
+    # Off by default (see WIZARD_UIFILES/uninstall_uifile.sh). Uses
+    # synoshare to properly deregister the share (not just delete its
+    # directory) - the same command already documented as the manual
+    # cleanup step under Troubleshooting in the README, so this is a known-
+    # working command for this exact share name, not a guess.
+    # shellcheck disable=SC2154
+    if [ "${pkgwizard_delete_shared_folder}" = "true" ]; then
+        synoshare --del TRUE airconnect
+    fi
+fi
+
 exit 0

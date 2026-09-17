@@ -3,7 +3,7 @@
 if [ "$SYNOPKG_PKG_STATUS" = "INSTALL" ]; then
     AIRCONNECT_CONFIG_FILE="airconnect.conf"
     AIRCONNECT_CONFIG="${SYNOPKG_PKGDEST}/${AIRCONNECT_CONFIG_FILE}"
-    AIRCONNECT_USER="$(echo "${SYNOPKG_PKGNAME}" | awk '{print tolower($_)}')"
+    AIRCONNECT_USER="$(echo "${SYNOPKG_PKGNAME}" | awk '{print tolower($0)}')"
     LOG="${SYNOPKG_PKGDEST}/log/${AIRCONNECT_USER}.log"
 
     echo "[$(date +'%T')] #### Start postinst... ####" >>"${LOG}"
@@ -74,6 +74,28 @@ if [ "$SYNOPKG_PKG_STATUS" = "INSTALL" ]; then
     # shellcheck disable=SC2154
     echo "[$(date +'%T')] Setting SYNO_IP=\"${pkgwizard_ip}\" in \"${AIRCONNECT_CONFIG}\"" >>"$LOG"
     echo "SYNO_IP=\"${pkgwizard_ip}\"" >>"${AIRCONNECT_CONFIG}"
+
+    # Off by default: linking config/log files into the "airconnect" shared
+    # folder requires the user to also enable SMB symlink-following
+    # device-wide, which is a real security tradeoff beyond this one
+    # package - see the wizard step and README. conf/resource's data-share
+    # creates the (empty) shared folder unconditionally regardless of this
+    # choice - Synology has no supported way to make that conditional - so
+    # if the user didn't opt in, deregister it again here (fresh install
+    # only, guaranteed nothing has been placed in it yet). Uses synoshare,
+    # the same command already documented as the manual cleanup step under
+    # Troubleshooting in the README, so this is known-working for this
+    # exact share name, not a guess.
+    # shellcheck disable=SC2154
+    if [ "${pkgwizard_create_shared_folder}" = "true" ]; then
+        echo "[$(date +'%T')] Setting AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED=1 in \"${AIRCONNECT_CONFIG}\" (opted in via wizard)" >>"$LOG"
+        echo "AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED=1" >>"${AIRCONNECT_CONFIG}"
+    else
+        echo "[$(date +'%T')] Setting AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED=0 in \"${AIRCONNECT_CONFIG}\"" >>"$LOG"
+        echo "AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED=0" >>"${AIRCONNECT_CONFIG}"
+        echo "[$(date +'%T')] Removing unused shared folder \"airconnect\" (not opted in)" >>"$LOG"
+        synoshare --del TRUE airconnect >>"$LOG" 2>&1 || true
+    fi
 
     echo "[$(date +'%T')] #### Done postinst ####" >>"${LOG}"
 fi

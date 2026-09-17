@@ -11,6 +11,41 @@ links are included where a change traces back to one, so reports stay findable.
 
 ## [Unreleased]
 
+### Changed
+
+- The `airconnect` shared folder is no longer used by default. Editing
+  `airconnect.conf`/`config.xml`/`config-cast.xml` and viewing the log via File
+  Station/SMB without SSH required enabling "allow symlinks" for SMB device-wide - a
+  security tradeoff that shouldn't be forced on everyone just to install this package.
+  A new install-wizard option, **off by default**, lets you opt in if you want that
+  convenience; the shared folder itself still exists either way (Synology has no
+  supported way to make its creation conditional), but nothing is linked into it unless
+  you check the box. Existing installations that were already using it keep working
+  unchanged on upgrade. Addresses [discussion #132](https://github.com/eizedev/AirConnect-Synology/discussions/132).
+- Replaced the syslog-ng-based log mirror (`etc/airconnect.conf`, a static config that
+  could only ever write to a hardcoded `/volume1/...` path regardless of which volume
+  the package was actually installed on, at world-writable `0666`) with a plain symlink
+  into the shared folder, created only when the option above is enabled and inheriting
+  the real log file's own permissions.
+- Added an uninstall-wizard option, **off by default**, to delete the shared folder and
+  its contents on uninstall. Synology's own packaging system deliberately never does
+  this automatically (a shared folder might hold data worth keeping), so this stays an
+  explicit, opt-in choice - consistent with that.
+
+### Fixed
+
+- `get_pid()` matched bare `airupnp`/`aircast` against the whole process table with no
+  path scoping, so `stop_airconnect()` could in principle kill an unrelated process that
+  merely had one of those strings somewhere in its own command line. Now matches on the
+  full install path instead.
+- `stop_airconnect()` sent SIGTERM, waited 10s, and would then just report "still
+  running" forever if the process ignored it - never escalating, leaving the package
+  stuck unable to stop, uninstall, or upgrade against a hung process. Now sends SIGKILL
+  if anything's still up after the wait.
+- The port-in-use check (`netstat -tln | grep :"$PORT"`) was an unanchored substring
+  match: port `4915` would false-positive against an unrelated listener on `49154` or
+  `49150`, refusing to start over a port that wasn't actually in use.
+
 ## [1.11.3-20260916] - 2026-09-16
 
 Verified end-to-end on real hardware: fresh GUI install on a Synology router

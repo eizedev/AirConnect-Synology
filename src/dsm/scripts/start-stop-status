@@ -47,11 +47,16 @@ get_pid() {
 }
 
 start_airconnect_on_ip() {
-    echo "[$(date +'%T')] Linking airconnect configuration to \"${AIRCONNECT_DESTINATION}/${AIRCONNECT_CONFIG_FILE}\"." >>"$LOG"
-    #if [ -f "${AIRCONNECT_DESTINATION}/${AIRCONNECT_CONFIG_FILE}" ]; then
-    #    rm -f "${AIRCONNECT_DESTINATION}/${AIRCONNECT_CONFIG_FILE}"
-    #fi
-    ln -fs "${AIRCONNECT_CONFIG}" "${AIRCONNECT_DESTINATION}/${AIRCONNECT_CONFIG_FILE}"
+    # Off by default (see postinst/AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED) -
+    # the shared folder exists either way (conf/resource's data-share), but
+    # only gets these links when the user opted in, since browsing them
+    # needs SMB symlink-following enabled device-wide.
+    if [ "${AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED:-0}" = "1" ] && [ -d "${AIRCONNECT_DESTINATION}" ]; then
+        echo "[$(date +'%T')] Linking airconnect configuration to \"${AIRCONNECT_DESTINATION}/${AIRCONNECT_CONFIG_FILE}\"." >>"$LOG"
+        ln -fs "${AIRCONNECT_CONFIG}" "${AIRCONNECT_DESTINATION}/${AIRCONNECT_CONFIG_FILE}"
+        echo "[$(date +'%T')] Linking log to \"${AIRCONNECT_DESTINATION}/${AIRCONNECT_USER}.log\"." >>"$LOG"
+        ln -fs "${LOG}" "${AIRCONNECT_DESTINATION}/${AIRCONNECT_USER}.log"
+    fi
 
     if [ "${AIRUPNP_ENABLED}" = 1 ] && [ "${AIRCAST_ENABLED}" = 1 ]; then
         if [ -n "${AIRUPNP_PORT}" ]; then
@@ -76,8 +81,10 @@ start_airconnect_on_ip() {
             exit 150
         fi
 
-        echo "[$(date +'%T')] Linking airupnp configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}\"." >>"$LOG"
-        ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}" "${CONFIG_UPNP_DESTINATION}"
+        if [ "${AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED:-0}" = "1" ] && [ -d "${AIRCONNECT_DESTINATION}" ]; then
+            echo "[$(date +'%T')] Linking airupnp configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}\"." >>"$LOG"
+            ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}" "${CONFIG_UPNP_DESTINATION}"
+        fi
         echo "[$(date +'%T')] Starting airupnp on ${SYNO_IP}:${AIRUPNP_PORT}" >>"$LOG"
         if [ -n "${FILTER_AIRPLAY2_DEVICES}" ] && [ -n "${AIRUPNP_LATENCY}" ]; then
             "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -l "${AIRUPNP_LATENCY}" -x "${CONFIG_UPNP_DESTINATION}" -o "${FILTER_AIRPLAY2_DEVICES}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
@@ -88,8 +95,10 @@ start_airconnect_on_ip() {
         else
             "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -x "${CONFIG_UPNP_DESTINATION}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
         fi
-        echo "[$(date +'%T')] Linking aircast configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}\"." >>"$LOG"
-        ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}" "${CONFIG_CAST_DESTINATION}"
+        if [ "${AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED:-0}" = "1" ] && [ -d "${AIRCONNECT_DESTINATION}" ]; then
+            echo "[$(date +'%T')] Linking aircast configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}\"." >>"$LOG"
+            ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}" "${CONFIG_CAST_DESTINATION}"
+        fi
         echo "[$(date +'%T')] Starting aircast on ${SYNO_IP}" >>"$LOG"
         if [ -n "${AIRCAST_LATENCY}" ]; then
             "${SYNOPKG_PKGDEST}"/aircast -b "${SYNO_IP}" -l "${AIRCAST_LATENCY}" -x "${CONFIG_CAST_DESTINATION}" -z -f "${LOG}" -d "${AIRCAST_LOGLEVEL}" 2>&1
@@ -119,8 +128,10 @@ start_airconnect_on_ip() {
             exit 150
         fi
 
-        echo "[$(date +'%T')] Linking airupnp configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}\"." >>"$LOG"
-        ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}" "${CONFIG_UPNP_DESTINATION}"
+        if [ "${AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED:-0}" = "1" ] && [ -d "${AIRCONNECT_DESTINATION}" ]; then
+            echo "[$(date +'%T')] Linking airupnp configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}\"." >>"$LOG"
+            ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_UPNP_FILE}" "${CONFIG_UPNP_DESTINATION}"
+        fi
         echo "[$(date +'%T')] Starting airupnp on ${SYNO_IP}:${AIRUPNP_PORT}" >>"$LOG"
         if [ -n "${FILTER_AIRPLAY2_DEVICES}" ] && [ -n "${AIRUPNP_LATENCY}" ]; then
             "${SYNOPKG_PKGDEST}"/airupnp -b "${SYNO_IP}":"${AIRUPNP_PORT}" -l "${AIRUPNP_LATENCY}" -x "${CONFIG_UPNP_DESTINATION}" -o "${FILTER_AIRPLAY2_DEVICES}" -z -f "${LOG}" -d "${AIRUPNP_LOGLEVEL}" 2>&1
@@ -138,8 +149,10 @@ start_airconnect_on_ip() {
             exit 150
         fi
 
-        echo "[$(date +'%T')] Linking aircast configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}\"." >>"$LOG"
-        ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}" "${CONFIG_CAST_DESTINATION}"
+        if [ "${AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED:-0}" = "1" ] && [ -d "${AIRCONNECT_DESTINATION}" ]; then
+            echo "[$(date +'%T')] Linking aircast configuration to \"${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}\"." >>"$LOG"
+            ln -fs "${AIRCONNECT_DESTINATION}/${CONFIG_CAST_FILE}" "${CONFIG_CAST_DESTINATION}"
+        fi
         echo "[$(date +'%T')] Starting aircast on ${SYNO_IP}" >>"$LOG"
         if [ -n "${AIRCAST_LATENCY}" ]; then
             "${SYNOPKG_PKGDEST}"/aircast -b "${SYNO_IP}" -l "${AIRCAST_LATENCY}" -x "${CONFIG_CAST_DESTINATION}" -z -f "${LOG}" -d "${AIRCAST_LOGLEVEL}" 2>&1

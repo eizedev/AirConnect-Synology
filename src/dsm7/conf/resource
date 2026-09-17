@@ -16,8 +16,5 @@
                 }
             }
         ]
-    },
-    "syslog-config": {
-        "patterndb-relpath": "etc/airconnect.conf"
     }
 }
