@@ -1,0 +1,45 @@
+# Standalone SAST scan using Semgrep's public ruleset (`--config auto`) -
+# replaces the previous Codacy integration (codacy-analysis.yml), which
+# bundled Semgrep behind a cloud account/project-token that was never
+# actually configured (100% unmanaged defaults), plus several other tools
+# (Shellcheck, Markdownlint, Pylint, Trivy) already covered by linter.yml's
+# super-linter, and a few (Spectral, a Java-JSON-library linter) irrelevant
+# to this repo's stack entirely. This workflow keeps the one thing Codacy
+# contributed that nothing else here does - SAST pattern matching - without
+# the account overhead. No SEMGREP_APP_TOKEN/cloud account needed.
+
+name: Semgrep
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  schedule:
+    - cron: "0 22 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  semgrep:
+    name: Semgrep SAST scan
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Run Semgrep
+        run: semgrep scan --config auto --sarif --output semgrep.sarif
+
+      - name: Upload SARIF results
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: semgrep.sarif
+        if: always()
