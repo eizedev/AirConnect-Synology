@@ -10,7 +10,7 @@ echo "[$(date +'%T')] #### Start postupgrade... ####" >>"${LOG}"
 # restore config file
 /bin/cp -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${AIRCONNECT_CONFIG_FILE}" "${SYNOPKG_PKGDEST}"
 
-# upgrade_uifile.sh shows this choice on every upgrade (pre-selected with
+# upgrade_uifile.sh shows this choice on every upgrade (preselected with
 # whatever it was already set to), so it can be changed here without a
 # full uninstall/reinstall. Drop any existing line first so re-running
 # this doesn't pile up duplicates, then set it fresh from this upgrade's
