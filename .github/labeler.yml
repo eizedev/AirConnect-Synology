@@ -1,46 +1,32 @@
----
-# Add 'root' label to any root file changes
-# Quotation marks are required for the leading asterisk
-root:
-  - changed-files:
-      - any-glob-to-any-file: "*"
+# See https://github.com/actions/labeler for the config schema.
+#
+# The previous version of this file nested `any-glob-to-any-file` and
+# `all-globs-to-all-files` as two separate list items under `changed-files:`
+# for the same label (meant to express "matches X, except under Y") - but
+# list items under `changed-files:` are OR'd together, not AND'd, so the
+# "all-globs-to-all-files: '!some/excluded/path/*'" branch (true for
+# virtually every PR, since it only requires that path to be untouched)
+# ended up satisfying the label on its own, independent of whether the
+# intended `any-glob-to-any-file` pattern actually matched. Every PR got
+# every label regardless of what it touched. Each label below now uses a
+# single condition instead of trying to express an exclusion.
 
-# Add 'AnyChange' label to any changes within the entire repository
-AnyChange:
-  - changed-files:
-      - any-glob-to-any-file: "**"
-
-# Add 'Documentation' label to any change to .md files within entire repository
-Documentation:
+documentation:
   - changed-files:
       - any-glob-to-any-file: "**/*.md"
 
-# Add 'source' label to any change to src files within the source dir
-# EXCEPT for the docs sub-folder
-source:
-  - changed-files:
-      - any-glob-to-any-file: "src/**/*"
-      - all-globs-to-all-files: "!src/docs/*"
-
-# Add 'dsm7' label to any change to src files within the source dsm7 dir
-# EXCEPT for the docs sub-folder
 dsm7:
   - changed-files:
-      - any-glob-to-any-file: "src/dsm7/**/*"
-      - all-globs-to-all-files: "!src/dsm7/docs/*"
+      - any-glob-to-any-file: "src/dsm7/**"
 
-# Add 'dsm6' label to any change to src files within the source dsm7 dir
-# EXCEPT for the docs sub-folder
 dsm6:
   - changed-files:
-      - any-glob-to-any-file: "src/dsm/**/*"
-      - all-globs-to-all-files: "!src/dsm/docs/*"
+      - any-glob-to-any-file: "src/dsm/**"
 
-# Add 'feature' label to any PR where the head branch name starts with `feature`
-# or has a `feature` section in the name
-feature:
-  - head-branch: ["^feature", "feature"]
+ci:
+  - changed-files:
+      - any-glob-to-any-file: ".github/**"
 
-# Add 'release' label to any PR that is opened against the `main` branch
-release:
-  - base-branch: ["main", "master"]
+tests:
+  - changed-files:
+      - any-glob-to-any-file: "tests/**"
