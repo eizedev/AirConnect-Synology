@@ -83,7 +83,9 @@ check_one() {
             fail "INFO still contains unsubstituted placeholder(s): $(grep -oE '#[A-Z_]+#' "$info" | tr '\n' ' ')"
         fi
 
-        for field in package version description arch maintainer os_min_ver; do
+        # changelog is the "What's New" text Package Center shows for an
+        # update; the Makefile always writes it (at minimum the links).
+        for field in package version description arch maintainer os_min_ver changelog; do
             val=$(info_field "$field" "$info")
             if [ -z "$val" ]; then
                 fail "INFO field '$field' is missing or empty"

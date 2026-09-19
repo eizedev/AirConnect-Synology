@@ -63,7 +63,7 @@ already used for `shellcheck`. Extracts a `.spk` into a temp dir and checks:
   missing is a warning, not a hard fail, since a network hiccup fetching it
   from upstream shouldn't block a release the way a corrupted binary should)
 - `INFO` has every mandatory field (`package`, `version`, `description`,
-  `arch`, `maintainer`, `os_min_ver`) non-empty, and **no leftover
+  `arch`, `maintainer`, `os_min_ver`, `changelog`) non-empty, and **no leftover
   `#VERSION#`/`#INFO_ARCH#`/`#INFO_FIRMWARE#` placeholders** - this is the
   check that would catch a silently-failed `sed` substitution in the
   Makefile, a realistic failure mode nothing previously tested for

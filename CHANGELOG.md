@@ -9,24 +9,43 @@ condensed from the [GitHub Releases](https://github.com/eizedev/AirConnect-Synol
 history, which remains the canonical source for full release notes. Issue/discussion
 links are included where a change traces back to one, so reports stay findable.
 
+The first sentence of each entry in the newest release section becomes the "What's New"
+text Package Center shows for an update (see `src/dsm7/info_changelog.sh`), so lead with
+what changes for the person installing it. Changes that don't affect the installed
+package go under `### Internal`, which is left out of that text.
+
 ## [Unreleased]
+
+## [1.11.3-20260919] - 2026-09-19
 
 ### Added
 
+- Package Center now shows a "What's New" text for this package when an update is
+  available through a package source. It is generated at build time from this file (the
+  first sentence of each entry, leaving out the `Internal` section) plus upstream's
+  CHANGELOG entries for the bundled AirConnect version, followed by links to both full
+  changelogs. Previously the field was simply empty.
 - Releases now include a `SHA256SUMS` file alongside the `.spk` packages, so a download
   can be checked for corruption or tampering in transit. See the README's Quick start
   section for the verification command.
-- The README now points at
-  [SpotConnect-Synology](https://github.com/eizedev/SpotConnect-Synology), a sibling
-  package that makes the same speakers appear as real Spotify Connect devices. It is a
-  genuinely different thing rather than an alternative - with AirConnect the phone stays
-  in the audio chain, with SpotConnect the NAS holds the stream - and the two run side by
-  side, so the note explains the difference rather than just linking.
-- A release tag ending in `-pre`, `-rc*`, `-beta*` or `-alpha*` is now published as a
-  GitHub pre-release automatically. Useful for putting a build in front of people without
-  it being picked up as the current version - `/releases/latest`, the release badges and
-  package-source feeds all skip pre-releases. Existing tags are unaffected: every tag this
-  project has ever used still publishes as a full release.
+
+### Changed
+
+- More Synology models can now find this package in Package Center. The DSM 7
+  architecture matrix was re-verified against SynoCommunity's `spksrc` reference
+  ([#222](https://github.com/eizedev/AirConnect-Synology/issues/222)), adding devices
+  that previously couldn't see it at all: **DS925+, DS1525+, DS1825+, RS2825RP+,
+  RS2423RP+II** (`v1000nk`), **DS725+** (`r1000nk`), **DS425+, DS225+, FS200T**
+  (`geminilakenk`), and the routers **WRX560** (`hawkeye`) and **RT6600ax** (`cypress`).
+  Also fixed a duplicate `ipq806x` entry and normalized casing.
+- The separate `armv6` package is gone; use `armv5` instead (shipped up to and including
+  `1.11.3-20260917`). It wasn't a mistake - upstream added a real `armv6` binary in
+  AirConnect 1.0.9 - but no Synology device is actually ARMv6 (Kirkwood devices are
+  ARMv5), so it declared the same platform codes as `armv5` with no verified
+  guarantee the ARMv6 binary even runs on that hardware. Open an issue if you
+  specifically need `armv6` back.
+- The bundled upstream `CHANGELOG` now comes from the pinned AirConnect release tag
+  rather than upstream's `master` branch, so it always matches the bundled binaries.
 
 ### Fixed
 
@@ -50,30 +69,24 @@ links are included where a change traces back to one, so reports stay findable.
   (DSM 7.4.1), DS415+ (DSM 7.1.1) and RT2600ac: each picks the expected invocation and
   extracts a numeric PID.
 
-## [1.11.3-20260917b] - 2026-09-17
+### Internal
 
-### Changed
+Repository, CI and documentation changes with no effect on the installed package.
 
-- Re-verified the DSM 7 architecture matrix against SynoCommunity's `spksrc` reference
-  ([#222](https://github.com/eizedev/AirConnect-Synology/issues/222)) and added devices
-  that previously couldn't see this package in Package Center at all: **DS925+,
-  DS1525+, DS1825+, RS2825RP+, RS2423RP+II** (`v1000nk`), **DS725+** (`r1000nk`),
-  **DS425+, DS225+, FS200T** (`geminilakenk`), and the routers **WRX560** (`hawkeye`)
-  and **RT6600ax** (`cypress`). Also fixed a duplicate `ipq806x` entry and normalized
-  casing.
-- Removed the separate `armv6` package (shipped up to and including
-  `1.11.3-20260917`). It wasn't a mistake - upstream added a real `armv6` binary in
-  AirConnect 1.0.9 - but no Synology device is actually ARMv6 (Kirkwood devices are
-  ARMv5), so it declared the same platform codes as `armv5` with no verified
-  guarantee the ARMv6 binary even runs on that hardware. Use `armv5` instead; open an
-  issue if you specifically need `armv6` back.
-- Packaging-repo CI hardening, no effect on the shipped packages themselves: replaced
-  Codacy (never actually configured, heavily overlapped with the existing linting
-  workflow) with a standalone, tokenless Semgrep scan; every third-party GitHub Action
-  across all workflows is now pinned to a commit SHA rather than a mutable tag.
-
-### Fixed
-
+- The README now points at
+  [SpotConnect-Synology](https://github.com/eizedev/SpotConnect-Synology), a sibling
+  package that makes the same speakers appear as real Spotify Connect devices. It is a
+  genuinely different thing rather than an alternative - with AirConnect the phone stays
+  in the audio chain, with SpotConnect the NAS holds the stream - and the two run side by
+  side, so the note explains the difference rather than just linking.
+- A release tag ending in `-pre`, `-rc*`, `-beta*` or `-alpha*` is now published as a
+  GitHub pre-release automatically. Useful for putting a build in front of people without
+  it being picked up as the current version - `/releases/latest`, the release badges and
+  package-source feeds all skip pre-releases. Existing tags are unaffected: every tag this
+  project has ever used still publishes as a full release.
+- Replaced Codacy (never actually configured, heavily overlapped with the existing
+  linting workflow) with a standalone, tokenless Semgrep scan; every third-party GitHub
+  Action across all workflows is now pinned to a commit SHA rather than a mutable tag.
 - A release-automation script step interpolated GitHub-provided ref data directly into
   a shell command instead of via an environment variable - not exploitable as written
   (nothing external reaches it), but a real anti-pattern worth closing rather than
