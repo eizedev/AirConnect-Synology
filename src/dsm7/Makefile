@@ -1,8 +1,17 @@
 # Syno package structure: https://help.synology.com/developer-guide/synology_package/package_structure.html
 VERSION=${RELEASE_VERSION}-$(shell date '+%Y%m%d')
 
+# Derived from INFO rather than repeated here: distributor_url is this
+# packaging repo, maintainer_url is upstream. blob/HEAD resolves to each
+# repo's default branch, so no branch name is baked in either.
+PKG_REPO_URL=$(shell sed -n 's/^distributor_url="\(.*\)"$$/\1/p' INFO)
+UPSTREAM_REPO_URL=$(shell sed -n 's/^maintainer_url="\(.*\)"$$/\1/p' INFO)
+PKG_NAME=$(notdir ${PKG_REPO_URL})
+PKG_ID=$(shell sed -n 's/^package="\(.*\)"$$/\1/p' INFO)
+UPSTREAM_NAME=$(notdir ${UPSTREAM_REPO_URL})
+
 LICENSE:
-	curl -s -L https://github.com/philippe44/AirConnect/raw/master/LICENSE -O
+	curl -s -L ${UPSTREAM_REPO_URL}/raw/$(or ${RELEASE_VERSION},HEAD)/LICENSE -O
 
 target:
 	mkdir -p target
@@ -11,7 +20,7 @@ dist:
 	mkdir -p dist
 
 target/package.tgz: target
-	$(if ${RELEASE_VERSION},$(info AirConnect Version: ${RELEASE_VERSION}),$(error Must specify RELEASE_VERSION))
+	$(if ${RELEASE_VERSION},$(info ${UPSTREAM_NAME} Version: ${RELEASE_VERSION}),$(error Must specify RELEASE_VERSION))
 	$(if ${ARCH},$(info Arch: ${ARCH}),$(error Must specify ARCH))
 	cp bin/airupnp-linux-${ARCH} target/airupnp
 	chmod +x target/airupnp
@@ -31,12 +40,12 @@ target/conf: target
 	cp -a conf target
 
 target/LICENSE: target
-	curl -s -L https://github.com/philippe44/AirConnect/raw/master/LICENSE -o target/LICENSE
+	curl -s -L ${UPSTREAM_REPO_URL}/raw/${RELEASE_VERSION}/LICENSE -o target/LICENSE
 
 # From the pinned upstream tag rather than master, so the bundled CHANGELOG
 # (and the "What's New" text built from it below) matches the binaries.
 target/CHANGELOG: target
-	curl -s -L https://github.com/philippe44/AirConnect/raw/${RELEASE_VERSION}/CHANGELOG -o target/CHANGELOG
+	curl -s -L ${UPSTREAM_REPO_URL}/raw/${RELEASE_VERSION}/CHANGELOG -o target/CHANGELOG
 
 target/PACKAGE_ICON.PNG: target
 	cp PACKAGE_ICON.PNG target/PACKAGE_ICON.PNG
@@ -50,17 +59,17 @@ target/INFO: target target/CHANGELOG
 	sed -i.bak -e 's/#INFO_ARCH#/${INFO_ARCH}/' target/INFO
 	sed -i.bak -e 's/#INFO_FIRMWARE#/${INFO_FIRMWARE}/' target/INFO
 	rm target/INFO.bak
+	$(if ${PKG_REPO_URL},,$(error INFO has no distributor_url))
+	$(if ${UPSTREAM_REPO_URL},,$(error INFO has no maintainer_url))
 	printf 'changelog="%s"\n' "$$(./info_changelog.sh \
-		AirConnect-Synology ../../CHANGELOG.md \
-		https://github.com/eizedev/AirConnect-Synology/blob/master/CHANGELOG.md \
-		AirConnect target/CHANGELOG \
-		https://github.com/philippe44/AirConnect/blob/master/CHANGELOG \
+		${PKG_NAME} ../../CHANGELOG.md ${PKG_REPO_URL}/blob/HEAD/CHANGELOG.md \
+		${UPSTREAM_NAME} target/CHANGELOG ${UPSTREAM_REPO_URL}/blob/HEAD/CHANGELOG \
 		${RELEASE_VERSION})" >> target/INFO
 
-dist/AirConnect-dsm7-${ARCH}-${VERSION}.spk: target/package.tgz target/scripts target/WIZARD_UIFILES target/conf target/LICENSE target/CHANGELOG target/INFO target/PACKAGE_ICON.PNG dist
+dist/${PKG_ID}-dsm7-${ARCH}-${VERSION}.spk: target/package.tgz target/scripts target/WIZARD_UIFILES target/conf target/LICENSE target/CHANGELOG target/INFO target/PACKAGE_ICON.PNG dist
 	$(if ${ARCH},$(info dist - Arch: ${ARCH}),$(error dist - Must specify ARCH))
-	cd target && tar -cf AirConnect-dsm7-${ARCH}-${VERSION}.spk *
-	mv target/AirConnect-dsm7-${ARCH}-${VERSION}.spk dist/
+	cd target && tar -cf ${PKG_ID}-dsm7-${ARCH}-${VERSION}.spk *
+	mv target/${PKG_ID}-dsm7-${ARCH}-${VERSION}.spk dist/
 
 .PHONY: arm
 arm:
@@ -135,7 +144,7 @@ x86_64-static:
 	@true
 
 .PHONY: build
-build: ${ARCH} dist/AirConnect-dsm7-${ARCH}-${VERSION}.spk
+build: ${ARCH} dist/${PKG_ID}-dsm7-${ARCH}-${VERSION}.spk
 
 .PHONY: clean
 clean:

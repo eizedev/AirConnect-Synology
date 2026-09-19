@@ -24,6 +24,11 @@ is left out of that text like any other subsection.
   and upstream names and changelog URLs are arguments), and it now includes only an
   allowlist of subsections instead of skipping just `Internal`, so SpotConnect-Synology
   can use the identical file. The generated text for this project is unchanged.
+- The dsm7 Makefile no longer repeats names and URLs that `INFO` already has: the package
+  name, both repo URLs and the upstream name are read from `package`, `distributor_url`
+  and `maintainer_url`, and changelog links use `blob/HEAD` instead of a branch name. The
+  bundled upstream `LICENSE` now comes from the pinned release tag like the `CHANGELOG`
+  does, rather than from upstream's `master`.
 
 ## [1.11.3-20260919] - 2026-09-19
 
