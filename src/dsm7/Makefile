@@ -33,14 +33,16 @@ target/conf: target
 target/LICENSE: target
 	curl -s -L https://github.com/philippe44/AirConnect/raw/master/LICENSE -o target/LICENSE
 
+# From the pinned upstream tag rather than master, so the bundled CHANGELOG
+# (and the "What's New" text built from it below) matches the binaries.
 target/CHANGELOG: target
-	curl -s -L https://github.com/philippe44/AirConnect/raw/master/CHANGELOG -o target/CHANGELOG
+	curl -s -L https://github.com/philippe44/AirConnect/raw/${RELEASE_VERSION}/CHANGELOG -o target/CHANGELOG
 
 target/PACKAGE_ICON.PNG: target
 	cp PACKAGE_ICON.PNG target/PACKAGE_ICON.PNG
 	cp PACKAGE_ICON_256.PNG target/PACKAGE_ICON_256.PNG
 
-target/INFO: target
+target/INFO: target target/CHANGELOG
 	$(if ${INFO_ARCH},$(info INFO_ARCH: ${INFO_ARCH}),$(error Must specify INFO_ARCH))
 	$(if ${INFO_FIRMWARE},$(info INFO_FIRMWARE: ${INFO_FIRMWARE}),$(error Must specify INFO_FIRMWARE))
 	cp INFO target/INFO
@@ -48,6 +50,7 @@ target/INFO: target
 	sed -i.bak -e 's/#INFO_ARCH#/${INFO_ARCH}/' target/INFO
 	sed -i.bak -e 's/#INFO_FIRMWARE#/${INFO_FIRMWARE}/' target/INFO
 	rm target/INFO.bak
+	printf 'changelog="%s"\n' "$$(./info_changelog.sh ../../CHANGELOG.md target/CHANGELOG ${RELEASE_VERSION})" >> target/INFO
 
 dist/AirConnect-dsm7-${ARCH}-${VERSION}.spk: target/package.tgz target/scripts target/WIZARD_UIFILES target/conf target/LICENSE target/CHANGELOG target/INFO target/PACKAGE_ICON.PNG dist
 	$(if ${ARCH},$(info dist - Arch: ${ARCH}),$(error dist - Must specify ARCH))
@@ -147,4 +150,4 @@ build-all: clean-dist
 
 .PHONY: shellcheck
 shellcheck:
-	shellcheck -s sh scripts/* build.sh WIZARD_UIFILES/*
+	shellcheck -s sh scripts/* build.sh info_changelog.sh WIZARD_UIFILES/*
