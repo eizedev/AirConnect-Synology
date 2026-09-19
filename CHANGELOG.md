@@ -11,10 +11,19 @@ links are included where a change traces back to one, so reports stay findable.
 
 The first sentence of each entry in the newest release section becomes the "What's New"
 text Package Center shows for an update (see `src/dsm7/info_changelog.sh`), so lead with
-what changes for the person installing it. Changes that don't affect the installed
-package go under `### Internal`, which is left out of that text.
+what changes for the person installing it. Only the Keep a Changelog categories
+(`Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`) and `Known issues`
+are used; changes that don't affect the installed package go under `### Internal`, which
+is left out of that text like any other subsection.
 
 ## [Unreleased]
+
+### Internal
+
+- `src/dsm7/info_changelog.sh` no longer hardcodes anything AirConnect-specific (package
+  and upstream names and changelog URLs are arguments), and it now includes only an
+  allowlist of subsections instead of skipping just `Internal`, so SpotConnect-Synology
+  can use the identical file. The generated text for this project is unchanged.
 
 ## [1.11.3-20260919] - 2026-09-19
 
