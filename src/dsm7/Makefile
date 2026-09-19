@@ -50,7 +50,12 @@ target/INFO: target target/CHANGELOG
 	sed -i.bak -e 's/#INFO_ARCH#/${INFO_ARCH}/' target/INFO
 	sed -i.bak -e 's/#INFO_FIRMWARE#/${INFO_FIRMWARE}/' target/INFO
 	rm target/INFO.bak
-	printf 'changelog="%s"\n' "$$(./info_changelog.sh ../../CHANGELOG.md target/CHANGELOG ${RELEASE_VERSION})" >> target/INFO
+	printf 'changelog="%s"\n' "$$(./info_changelog.sh \
+		AirConnect-Synology ../../CHANGELOG.md \
+		https://github.com/eizedev/AirConnect-Synology/blob/master/CHANGELOG.md \
+		AirConnect target/CHANGELOG \
+		https://github.com/philippe44/AirConnect/blob/master/CHANGELOG \
+		${RELEASE_VERSION})" >> target/INFO
 
 dist/AirConnect-dsm7-${ARCH}-${VERSION}.spk: target/package.tgz target/scripts target/WIZARD_UIFILES target/conf target/LICENSE target/CHANGELOG target/INFO target/PACKAGE_ICON.PNG dist
 	$(if ${ARCH},$(info dist - Arch: ${ARCH}),$(error dist - Must specify ARCH))
