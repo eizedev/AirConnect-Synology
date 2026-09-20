@@ -18,6 +18,8 @@ is left out of that text like any other subsection.
 
 ## [Unreleased]
 
+## [1.11.3-20260920] - 2026-09-20
+
 ### Fixed
 
 - **Updating could switch off the shared-folder links on its own.** The update wizard
