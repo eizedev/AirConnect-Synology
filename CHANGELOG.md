@@ -47,8 +47,6 @@ is left out of that text like any other subsection.
   If an earlier update already switched this off, see
   [The shared-folder links are gone after an update](doc/TROUBLESHOOTING.md#the-shared-folder-links-are-gone-after-an-update).
 
-### Fixed
-
 - The package version and the release tag are read from the same field of `upstream.json`
   ([#246](https://github.com/eizedev/AirConnect-Synology/issues/246)). The build took the
   version from the pinned `tag` while the release tag is built from `version`; both hold
