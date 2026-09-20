@@ -139,6 +139,14 @@ jobs:
         id: validate_code
         run: cd "${GITHUB_WORKSPACE}"/src/dsm7; make shellcheck
 
+      # Simulates an update of an existing installation, including one
+      # whose config predates today's settings - the case that silently
+      # switched the shared-folder links off for everyone updating from
+      # 1.11.3-20260916 or older.
+      - name: Check what an update does to existing settings
+        id: validate_upgrade_state
+        run: sh tests/upgrade_state.sh
+
       # No RELEASE_VERSION here on purpose: the Makefile reads the version
       # from upstream.json, the same field upstream-check.yml uses for the
       # release tag. Passing the tag instead would make the two disagree the

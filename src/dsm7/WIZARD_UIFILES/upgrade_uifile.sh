@@ -31,6 +31,8 @@ done
 
 if [ -z "${CURRENT_VALUE}" ]; then
     for marker in \
+        "${SYNOPKG_PKGDEST_VOL}/${SHARE_NAME}/${CONFIG_FILE}" \
+        "${SYNOPKG_PKGDEST_VOL}/${SHARE_NAME}/log/${LOG_FILE}" \
         /volume*/"${SHARE_NAME}"/"${CONFIG_FILE}" \
         /volume*/"${SHARE_NAME}"/config.xml \
         /volume*/"${SHARE_NAME}"/config-cast.xml \

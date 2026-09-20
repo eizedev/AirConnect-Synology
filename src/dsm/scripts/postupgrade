@@ -7,6 +7,25 @@ AIRCONNECT_CONFIG="${SYNOPKG_PKGDEST}/${AIRCONNECT_CONFIG_FILE}"
 
 echo "[$(date +'%T')] #### Start postupgrade... ####" >>"${LOG}"
 
+# Is this installation using the shared folder? Decided by what is on
+# the device, not by an environment variable and not by a line in the
+# config: an older package could neither set that line nor guarantee the
+# variable. The links, a custom config placed there, or the logfile all
+# mean the same thing - it is in use.
+shared_folder_in_use() {
+    for marker in \
+        "${SYNOPKG_PKGDEST_VOL}/airconnect/${AIRCONNECT_CONFIG_FILE}" \
+        /volume*/airconnect/"${AIRCONNECT_CONFIG_FILE}" \
+        /volume*/airconnect/config.xml \
+        /volume*/airconnect/config-cast.xml \
+        /volume*/airconnect/log/"${AIRCONNECT_USER}.log"; do
+        if [ -e "${marker}" ] || [ -L "${marker}" ]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
 # restore config file
 /bin/cp -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${AIRCONNECT_CONFIG_FILE}" "${SYNOPKG_PKGDEST}"
 
@@ -21,7 +40,7 @@ if [ -f "${AIRCONNECT_CONFIG}" ]; then
     # The config restored above is the old one, so it still carries the
     # old answer - the fallback for everything below.
     OLD_SHARED_FOLDER_LINKS_ENABLED=$(sed -n 's/^AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED=\(.*\)/\1/p' "${AIRCONNECT_CONFIG}" | tail -n 1)
-    if [ -z "${OLD_SHARED_FOLDER_LINKS_ENABLED}" ] && [ -e "${SYNOPKG_PKGDEST_VOL}/airconnect/${AIRCONNECT_CONFIG_FILE}" ]; then
+    if [ -z "${OLD_SHARED_FOLDER_LINKS_ENABLED}" ] && shared_folder_in_use; then
         # Config predates the setting, but the links are there, so this
         # install is using them.
         OLD_SHARED_FOLDER_LINKS_ENABLED=1

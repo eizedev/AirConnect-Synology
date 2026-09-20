@@ -37,6 +37,13 @@ is left out of that text like any other subsection.
   existing setting is kept. `postupgrade` falls back to the value in the config it just
   restored rather than to `0`, and logs what it decided and why.
 
+  Two more updates of the same kind: an update now refuses, with a message saying to
+  uninstall and install again, when the installed package has no config for its settings
+  to be carried over from; and a config too old to carry `AIRCAST_ENABLED`/`AIRUPNP_ENABLED`
+  gets both enabled rather than an empty value, which would have left the package
+  installed but starting nothing. `tests/upgrade_state.sh` checks all of these against
+  prepared installations, in CI as well.
+
   If an earlier update already switched this off, see
   [The shared-folder links are gone after an update](doc/TROUBLESHOOTING.md#the-shared-folder-links-are-gone-after-an-update).
 
