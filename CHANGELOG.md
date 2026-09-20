@@ -20,6 +20,11 @@ is left out of that text like any other subsection.
 
 ### Internal
 
+- Added [doc/CONVENTIONS.md](doc/CONVENTIONS.md), describing the packaging conventions
+  this repository follows and which of them are deliberately shared with the sibling
+  project SpotConnect-Synology, so a fix found on real hardware in one of them can move
+  to the other without rediscovering how the other is built.
+
 - `src/dsm7/info_changelog.sh` no longer hardcodes anything AirConnect-specific (package
   and upstream names and changelog URLs are arguments), and it now includes only an
   allowlist of subsections instead of skipping just `Internal`, so SpotConnect-Synology

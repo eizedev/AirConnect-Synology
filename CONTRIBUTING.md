@@ -17,6 +17,11 @@ See [doc/BUILD.md](doc/BUILD.md) for the build steps, and [tests/README.md](test
 for what the automated checks (`validate_spk.sh`, `validate_elf.py`) actually verify and
 why each one exists.
 
+[doc/CONVENTIONS.md](doc/CONVENTIONS.md) describes how this repository is laid out and
+why - versioning, upstream pinning, changelog structure, the checks - and which of that
+is deliberately kept the same as in the sibling project
+[SpotConnect-Synology](https://github.com/eizedev/SpotConnect-Synology).
+
 Shell scripts in this repo target portable POSIX `sh` (not bash) - they run under
 Synology's BusyBox shell on some architectures, so bashisms will break on real hardware
 even if they pass locally. `shellcheck -s sh` is the baseline check; testing on real
