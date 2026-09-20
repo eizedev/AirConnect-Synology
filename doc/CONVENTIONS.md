@@ -52,6 +52,27 @@ CHANGELOG.md       packaging changes (upstream has its own)
   tag, never from upstream's default branch, so what ships in the package matches the
   binaries that ship with it.
 
+### Updates
+
+An update has to keep working for an installation that was set up by a much older
+release. Most installations in the field are years behind, so this is the normal case,
+not an edge case.
+
+- **Work out what an installation is actually doing, from the device.** A setting
+  introduced later has no line in an older config, and an absent line says nothing about
+  what that installation wants - so it must never be read as "off" or as any other
+  default. Look at what is on disk instead: the links in the shared folder, the files a
+  feature creates. An environment variable is not a substitute either; an older package
+  cannot guarantee one is set.
+- **Where a wizard cannot determine the current state, it does not offer the choice.**
+  A checkbox that defaults to off is a decision the person never made, and
+  `postupgrade` cannot tell that apart from a real answer. Leaving the checkbox out means
+  nothing is submitted for it and the existing setting stands.
+- **Where an update cannot carry the settings over at all, it refuses** with a message
+  saying to uninstall and install again, rather than continuing with invented ones.
+- `tests/upgrade_state.sh` runs these paths against prepared installations, so this is
+  tested rather than assumed.
+
 ### Versioning and releases
 
 - A package version is `<upstream version>-<build date>`, for example

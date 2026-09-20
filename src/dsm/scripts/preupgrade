@@ -6,6 +6,17 @@ AIRCONNECT_CONFIG_FILE="airconnect.conf"
 
 echo "[$(date +'%T')] #### Start preupgrade... ####" >>"${LOG}"
 
+# An update carries over the settings of the installed package. If they
+# are not there, they cannot be carried over, and guessing them would
+# silently change how the package runs - so refuse, and say what to do.
+# This is deliberately a hard stop: DSM keeps the installed version.
+if [ ! -f "${SYNOPKG_PKGDEST}/${AIRCONNECT_CONFIG_FILE}" ]; then
+    MESSAGE="Cannot update: the installed AirConnect has no ${AIRCONNECT_CONFIG_FILE}, so its settings cannot be carried over. Please uninstall the package and install it again."
+    echo "[$(date +'%T')] ${MESSAGE}" >>"${LOG}"
+    echo "${MESSAGE}" >>"${SYNOPKG_TEMP_LOGFILE}"
+    exit 1
+fi
+
 # backup of config file before upgrade
 /bin/cp -f "${SYNOPKG_PKGDEST}/${AIRCONNECT_CONFIG_FILE}" "${SYNOPKG_TEMP_UPGRADE_FOLDER}"
 
