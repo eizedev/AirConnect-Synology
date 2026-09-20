@@ -24,9 +24,6 @@ is left out of that text like any other subsection.
   ([#247](https://github.com/eizedev/AirConnect-Synology/issues/247)). An issue that waits
   on a fix in philippe44/AirConnect can sit for months through nobody's fault, and the bot
   closes issues 5 days after marking them stale.
-
-### Internal
-
 - Added [doc/CONVENTIONS.md](doc/CONVENTIONS.md), describing the packaging conventions
   this repository follows and which of them are deliberately shared with the sibling
   project SpotConnect-Synology, so a fix found on real hardware in one of them can move
