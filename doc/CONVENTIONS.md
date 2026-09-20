@@ -73,6 +73,24 @@ not an edge case.
 - `tests/upgrade_state.sh` runs these paths against prepared installations, so this is
   tested rather than assumed.
 
+**Before releasing anything that touches installation state** - a lifecycle script, a
+wizard, the config format, the shared folder, file locations or permissions - go through
+this. A released package updates thousands of installations by itself, and most of them
+were set up years ago.
+
+1. Name the oldest release someone could be updating from, and open its `postinst` and
+   `postupgrade`. What is in that installation's config, and what is not?
+2. For every setting the new package reads: what happens when the line is missing? If the
+   answer is a default rather than "find out from the device", it is wrong.
+3. For every wizard checkbox on an update: what does its default do to an installation
+   that already has the feature on? A default that turns something off is not acceptable,
+   because nothing can tell it apart from a deliberate answer afterwards.
+4. Add the case to `tests/upgrade_state.sh` and watch it fail before the fix, so the test
+   is known to cover it.
+5. Update from an old release on real hardware, or simulate it, before tagging. A wizard
+   screenshot is not proof - read the config afterwards and check the files are where the
+   old installation had them.
+
 ### Versioning and releases
 
 - A package version is `<upstream version>-<build date>`, for example
