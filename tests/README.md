@@ -5,12 +5,12 @@ test coverage at all before this - CI only ran `shellcheck` and an `ls`. That
 gap is exactly how issue #107 happened: a corrupted binary from a broken
 unzip step shipped in a release and nobody noticed until users reported it.
 
-| Script            | What it catches                                                                                                                                                                        | Would have caught #107?                                                         |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| `validate_elf.py` | Corrupted/wrong-architecture binaries: ELF magic, machine type, static/dynamic, min-kernel note, glibc symbol versions                                                                 | Yes - a non-ELF file fails immediately                                          |
-| `validate_spk.sh` | Malformed `.spk` structure, missing/invalid `INFO` fields, unsubstituted `#VERSION#`-style placeholders, missing/non-executable payload binaries or lifecycle scripts, corrupted icons | Yes, at the package-structure level (validate_elf.py catches the binary itself) |
-| `qemu_smoke.sh`   | Binaries that can't actually execute on their target architecture/kernel                                                                                                               | planned, not yet written                                                        |
-| `upgrade_state.sh` | What an update does to an existing installation's settings, against a mocked `SYNOPKG_*` environment                                                                                  | n/a - different failure mode (it catches updates changing settings by themselves) |
+| Script             | What it catches                                                                                                                                                                        | Would have caught #107?                                                           |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `validate_elf.py`  | Corrupted/wrong-architecture binaries: ELF magic, machine type, static/dynamic, min-kernel note, glibc symbol versions                                                                 | Yes - a non-ELF file fails immediately                                            |
+| `validate_spk.sh`  | Malformed `.spk` structure, missing/invalid `INFO` fields, unsubstituted `#VERSION#`-style placeholders, missing/non-executable payload binaries or lifecycle scripts, corrupted icons | Yes, at the package-structure level (validate_elf.py catches the binary itself)   |
+| `qemu_smoke.sh`    | Binaries that can't actually execute on their target architecture/kernel                                                                                                               | planned, not yet written                                                          |
+| `upgrade_state.sh` | What an update does to an existing installation's settings, against a mocked `SYNOPKG_*` environment                                                                                   | n/a - different failure mode (it catches updates changing settings by themselves) |
 
 ## `upgrade_state.sh`
 
