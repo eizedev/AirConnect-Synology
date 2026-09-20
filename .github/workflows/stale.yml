@@ -18,7 +18,10 @@ jobs:
           stale-pr-message: "This PR is stale because it has been open 45 days with no activity. Remove stale label or comment to keep it open - stale PRs are not closed automatically."
           close-issue-message: "This issue was closed because it has been stalled for 5 days with no activity."
           stale-issue-label: "no-issue-activity"
-          exempt-issue-labels: "awaiting-approval,work-in-progress,breaking-change"
+          # upstream: waiting on philippe44 is exactly the state that produces
+          # months of silence through nobody's fault, and closing those loses
+          # the thread on the work that takes longest.
+          exempt-issue-labels: "awaiting-approval,work-in-progress,breaking-change,upstream"
           stale-pr-label: "no-pr-activity"
           days-before-stale: 30
           days-before-close: 5
