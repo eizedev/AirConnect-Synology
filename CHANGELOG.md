@@ -18,6 +18,15 @@ is left out of that text like any other subsection.
 
 ## [Unreleased]
 
+### Internal
+
+- `doc/CONVENTIONS.md` now carries the checklist to go through before releasing anything
+  that touches installation state - which release people update from, what happens when a
+  setting's line is missing, what a wizard's default does to an installation that already
+  has the feature on, and updating from an old release before tagging. Written after an
+  update switched the shared-folder links off by itself, which the first of those
+  questions would have caught.
+
 ## [1.11.3-20260920] - 2026-09-20
 
 ### Fixed
