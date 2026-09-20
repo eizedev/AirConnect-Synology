@@ -18,6 +18,21 @@ is left out of that text like any other subsection.
 
 ## [Unreleased]
 
+### Fixed
+
+- The package version and the release tag are read from the same field of `upstream.json`
+  ([#246](https://github.com/eizedev/AirConnect-Synology/issues/246)). The build took the
+  version from the pinned `tag` while the release tag is built from `version`; both hold
+  the same string for every release so far, so no published package is affected, but an
+  upstream tag that differs from its version - as SpotConnect already publishes - would
+  have shipped a package whose version disagreed with its own git tag.
+
+### Internal
+
+- `build.sh` lists the packages it built instead of printing an example filename with the
+  architecture and version typed into it, and declares `sh` rather than `bash`, which is
+  what it is checked as and what it uses.
+
 ### Internal
 
 - Issues labelled `upstream` are exempt from the stale bot
