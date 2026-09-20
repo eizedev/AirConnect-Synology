@@ -27,7 +27,7 @@ most of the shared conventions were arrived at here first.
 
 ### Repository layout
 
-```
+```text
 src/dsm7/          package sources: INFO, Makefile, scripts/, conf/, WIZARD_UIFILES/, icons
 tests/             validate_spk.sh, validate_elf.py, README.md explaining both
 doc/               ARCHITECTURES.md, BUILD.md, CONFIG.md, TROUBLESHOOTING.md
