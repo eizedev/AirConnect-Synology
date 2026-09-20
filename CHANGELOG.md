@@ -20,6 +20,28 @@ is left out of that text like any other subsection.
 
 ### Fixed
 
+- **Updating could switch off the shared-folder links on its own.** The update wizard
+  worked out whether they are currently on by reading
+  `AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED` from the installed config - but an
+  installation older than that setting has no such line, and a missing line was read as
+  "off". The checkbox then came up unticked, and `postupgrade` took that as a decision:
+  it wrote `0` and removed the links from the `airconnect` shared folder. This hit every
+  installation updating from `1.11.3-20260916` or older, which is where the shared folder
+  was created unconditionally, so exactly those installations that were using it.
+  Measured on a DS923+ (DSM 7.4.1) updating `1.11.3-20260916` to `1.11.3-20260919`.
+
+  The wizard now reads the config first, and where the setting is absent looks at the
+  shared folder itself - `airconnect.conf`, `config.xml`, `config-cast.xml` or the
+  logfile being there means the installation is using it. If neither answers the
+  question, the wizard shows no checkbox at all, so nothing is submitted for it and the
+  existing setting is kept. `postupgrade` falls back to the value in the config it just
+  restored rather than to `0`, and logs what it decided and why.
+
+  If an earlier update already switched this off, see
+  [The shared-folder links are gone after an update](doc/TROUBLESHOOTING.md#the-shared-folder-links-are-gone-after-an-update).
+
+### Fixed
+
 - The package version and the release tag are read from the same field of `upstream.json`
   ([#246](https://github.com/eizedev/AirConnect-Synology/issues/246)). The build took the
   version from the pinned `tag` while the release tag is built from `version`; both hold

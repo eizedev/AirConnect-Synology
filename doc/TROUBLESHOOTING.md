@@ -68,6 +68,28 @@ again to 15.3 or later - this was a Sonos-side regression, fixed in a later Sono
 release. See [upstream issue #458](https://github.com/philippe44/AirConnect/issues/458)
 if it's still happening on a current Sonos firmware.
 
+## The shared-folder links are gone after an update
+
+Symptom: the `airconnect` shared folder is still there, but `airconnect.conf` and the
+logfile no longer appear in it, and DSM showed a message during the update saying the
+folder was kept because it still contains something while "this package's own config/log
+links were removed".
+
+This means the setting is off. Check it, over SSH:
+
+```sh
+grep AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED /var/packages/AirConnect/target/airconnect.conf
+```
+
+To switch it back on, tick "Enable shared-folder links" in the update wizard the next
+time the package updates, or set the value to `1` and restart the package in Package
+Center. Your own `config.xml`/`config-cast.xml` are never removed by the package, so a
+custom config placed in the shared folder is still there.
+
+Packages up to and including `1.11.3-20260919` could get this wrong on their own: an
+installation whose config predates the setting was read as "off", which is why an update
+could switch it off without anyone choosing that.
+
 ## General issues
 
 Open an [issue](https://github.com/eizedev/AirConnect-Synology/issues) if you're stuck.

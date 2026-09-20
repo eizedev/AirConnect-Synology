@@ -27,25 +27,34 @@ if [ -f "${AIRCONNECT_CONFIG}" ]; then
     grep -Fq "AIRUPNP_PORTRANGE" "${AIRCONNECT_CONFIG}" || { echo "AIRUPNP_PORTRANGE=\"49155:128\"" >>"${AIRCONNECT_CONFIG}"; }
     grep -Fq "FILTER_AIRPLAY2_DEVICES" "${AIRCONNECT_CONFIG}" || { echo "FILTER_AIRPLAY2_DEVICES=\"<NULL>,S1,S3,S5,S9,S12,ZP80,ZP90,S15,ZP100,ZP120,1.0,LibreWireless,Fitzwilliam,2.2.6,AllShare1.0\"" >>"${AIRCONNECT_CONFIG}"; }
 
-    # upgrade_uifile.sh shows this choice on every upgrade (preselected
-    # with whatever it was already set to), so it can be changed here
-    # without a full uninstall/reinstall. Drop any existing line first so
-    # re-running this doesn't pile up duplicates, then set it fresh from
-    # this upgrade's actual answer.
+    # What this install was doing before the upgrade: the config restored
+    # above is the old one, so it still carries the old answer. It is the
+    # fallback for everything below, because an upgrade must never turn
+    # this off by itself - doing so removes the links and takes away
+    # access the install was relying on.
+    OLD_SHARED_FOLDER_LINKS_ENABLED=$(sed -n 's/^AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED=\(.*\)/\1/p' "${AIRCONNECT_CONFIG}" | tail -n 1)
+    if [ -z "${OLD_SHARED_FOLDER_LINKS_ENABLED}" ] && [ -e "${SYNOPKG_PKGDEST_VOL}/airconnect/${AIRCONNECT_CONFIG_FILE}" ]; then
+        # Config predates the setting, but the links are there, so this
+        # install is using them.
+        OLD_SHARED_FOLDER_LINKS_ENABLED=1
+    fi
+
+    # upgrade_uifile.sh offers this choice on every upgrade, preselected
+    # with the current setting, so it can be changed here without a full
+    # uninstall/reinstall. It leaves the checkbox out entirely when it
+    # cannot read the current setting, and then nothing is submitted for
+    # it - which is why an empty answer keeps the old value instead of
+    # counting as "unchecked".
     grep -v '^AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED=' "${AIRCONNECT_CONFIG}" >"${AIRCONNECT_CONFIG}.tmp" && mv "${AIRCONNECT_CONFIG}.tmp" "${AIRCONNECT_CONFIG}"
     # shellcheck disable=SC2154
     if [ "${pkgwizard_create_shared_folder}" = "true" ]; then
         NEW_SHARED_FOLDER_LINKS_ENABLED=1
     elif [ -n "${pkgwizard_create_shared_folder}" ]; then
         NEW_SHARED_FOLDER_LINKS_ENABLED=0
-    elif [ -e "${SYNOPKG_PKGDEST_VOL}/airconnect/${AIRCONNECT_CONFIG_FILE}" ]; then
-        # upgrade_uifile.sh didn't run for some reason - fall back to
-        # whatever this install was already doing rather than silently
-        # taking away access it was relying on.
-        NEW_SHARED_FOLDER_LINKS_ENABLED=1
     else
-        NEW_SHARED_FOLDER_LINKS_ENABLED=0
+        NEW_SHARED_FOLDER_LINKS_ENABLED=${OLD_SHARED_FOLDER_LINKS_ENABLED:-0}
     fi
+    echo "[$(date +'%T')] Shared-folder links: was \"${OLD_SHARED_FOLDER_LINKS_ENABLED:-unset}\", wizard answered \"${pkgwizard_create_shared_folder:-none}\", now \"${NEW_SHARED_FOLDER_LINKS_ENABLED}\"" >>"${LOG}"
     echo "AIRCONNECT_SHARED_FOLDER_LINKS_ENABLED=${NEW_SHARED_FOLDER_LINKS_ENABLED}" >>"${AIRCONNECT_CONFIG}"
 
     # If shared-folder links are now off, clean up any symlinks left over
