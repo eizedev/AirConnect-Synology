@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 echo "[$(date +%Y-%m-%d" "%H:%M:%S)] #### Start BUILD... ####"
 
@@ -23,6 +23,9 @@ rm -r -f target
 echo
 echo "$(date +%Y-%m-%d" "%H:%M:%S)] #### Build complete, you can find the packages under the dist directory"
 
-echo "how to install new package on synology x86 devices via commandline:"
-echo "sudo synopkg install dist/AirConnect-dsm7-x86-64-XXX.spk"
-# sudo synopkg install dist/AirConnect-x86-64-${VERSION}.spk
+ls -1 dist/*.spk
+
+echo
+echo "To install one on a Synology device from the command line, pick the package"
+echo "matching your model (see doc/ARCHITECTURES.md):"
+echo "  sudo synopkg install <one of the files above>"

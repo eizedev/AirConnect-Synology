@@ -139,10 +139,12 @@ jobs:
         id: validate_code
         run: cd "${GITHUB_WORKSPACE}"/src/dsm7; make shellcheck
 
+      # No RELEASE_VERSION here on purpose: the Makefile reads the version
+      # from upstream.json, the same field upstream-check.yml uses for the
+      # release tag. Passing the tag instead would make the two disagree the
+      # first time upstream ships a tag that is not its version.
       - name: Create packages of ALL architectures
         id: create_packages
-        env:
-          RELEASE_VERSION: ${{ steps.upstream.outputs.tag }}
         run: cd "${GITHUB_WORKSPACE}"/src/dsm7; make build-all
 
       - name: Cleanup target

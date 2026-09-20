@@ -10,35 +10,41 @@ you're changing the packaging scripts themselves.
 
 - `make`
 - `shellcheck`
+- `jq`, for reading the pinned release out of `upstream.json` in step 1
 - a clone of this repository
 
-## 1. Set the AirConnect version to package
+## 1. Download the pinned AirConnect binaries
 
-```bash
-export RELEASE_VERSION=1.11.3
-```
+Which upstream release this package wraps is pinned in
+[`upstream.json`](../upstream.json): `tag` is the release the files come from, `version`
+is the version the package is named after, and `sha256` is the checksum CI verifies the
+download against. The build reads that file, so there is nothing to set.
 
-## 2. Download the AirConnect binaries
-
-Grab the release matching `RELEASE_VERSION` from
+Grab that release from
 [philippe44/AirConnect releases](https://github.com/philippe44/AirConnect/releases) and
 extract it into `src/dsm7/bin`:
 
 ```bash
-wget https://github.com/philippe44/AirConnect/releases/download/${RELEASE_VERSION}/AirConnect-${RELEASE_VERSION}.zip -O src/dsm7/bin/AirConnect.zip
+TAG=$(jq -r .tag upstream.json)
+ASSET=$(jq -r .asset upstream.json)
+wget "https://github.com/philippe44/AirConnect/releases/download/${TAG}/${ASSET}" -O src/dsm7/bin/AirConnect.zip
 cd src/dsm7/bin
 unzip AirConnect.zip
 cd ../../..
 ```
 
-## 3. (Optional) Run shellcheck
+To package an upstream release that is not pinned, put its binaries in `src/dsm7/bin`
+and set `RELEASE_VERSION` to the version you want the package named after - it overrides
+the version from `upstream.json`.
+
+## 2. (Optional) Run shellcheck
 
 ```bash
 cd src/dsm7
 make shellcheck
 ```
 
-## 4. Build
+## 3. Build
 
 For one architecture:
 
@@ -93,13 +99,12 @@ actually produced and compares that against this same derived list's
 length, so a build that silently skips an architecture fails CI instead of
 just validating whatever happened to show up.
 
-**Why this matters**: until 2026-09, both `build.sh` and `release.yml` kept
-their own hand-copied architecture list, separate from the Makefile. When
-the `armv6` target was removed from the Makefile
-([#222](https://github.com/eizedev/AirConnect-Synology/issues/222)),
-`release.yml`'s stale copy still expected an `armv6` package and failed CI
+**Why this matters**: a hand-copied second list goes stale. When the `armv6`
+target was removed from the Makefile
+([#222](https://github.com/eizedev/AirConnect-Synology/issues/222)), a copy
+of the list in `release.yml` still expected an `armv6` package and failed CI
 looking for a file that was never going to exist. Adding or removing an
-architecture now only ever means editing the Makefile - `build.sh` and
+architecture means editing the Makefile and nothing else - `build.sh` and
 `release.yml` pick it up automatically. You'll still want to update this
 file's `ARCH=` list below and
 [doc/ARCHITECTURES.md](ARCHITECTURES.md#architecture-groups-dsm-7) by hand,

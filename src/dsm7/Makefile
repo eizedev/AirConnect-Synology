@@ -1,5 +1,19 @@
 # Syno package structure: https://help.synology.com/developer-guide/synology_package/package_structure.html
-VERSION=${RELEASE_VERSION}-$(shell date '+%Y%m%d')
+
+# Pinned upstream release. The tag is what the files are fetched from; the
+# version is what upstream's own CHANGELOG lists its entries under, and what
+# upstream-check.yml builds the release tag from. They are the same string
+# today, but upstream is free to publish a tag that is not its version.
+UPSTREAM_TAG=$(shell sed -n 's/.*"tag"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' ../../upstream.json)
+UPSTREAM_VERSION=$(shell sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' ../../upstream.json)
+
+# The package version is the upstream version plus the build date, read from
+# the same upstream.json field that upstream-check.yml uses for the release
+# tag, so a release cannot carry a git tag and a package version that
+# disagree. RELEASE_VERSION overrides it for a local build of something that
+# is not pinned here.
+PKG_VERSION=$(or ${RELEASE_VERSION},${UPSTREAM_VERSION})
+VERSION=${PKG_VERSION}-$(shell date '+%Y%m%d')
 
 # Derived from INFO rather than repeated here: distributor_url is this
 # packaging repo, maintainer_url is upstream. blob/HEAD resolves to each
@@ -11,7 +25,7 @@ PKG_ID=$(shell sed -n 's/^package="\(.*\)"$$/\1/p' INFO)
 UPSTREAM_NAME=$(notdir ${UPSTREAM_REPO_URL})
 
 LICENSE:
-	curl -s -L ${UPSTREAM_REPO_URL}/raw/$(or ${RELEASE_VERSION},HEAD)/LICENSE -O
+	curl -s -L ${UPSTREAM_REPO_URL}/raw/$(or ${UPSTREAM_TAG},HEAD)/LICENSE -O
 
 target:
 	mkdir -p target
@@ -20,7 +34,7 @@ dist:
 	mkdir -p dist
 
 target/package.tgz: target
-	$(if ${RELEASE_VERSION},$(info ${UPSTREAM_NAME} Version: ${RELEASE_VERSION}),$(error Must specify RELEASE_VERSION))
+	$(if ${PKG_VERSION},$(info ${UPSTREAM_NAME} Version: ${PKG_VERSION}),$(error No upstream version - is ../../upstream.json readable? Set RELEASE_VERSION to override))
 	$(if ${ARCH},$(info Arch: ${ARCH}),$(error Must specify ARCH))
 	cp bin/airupnp-linux-${ARCH} target/airupnp
 	chmod +x target/airupnp
@@ -40,12 +54,12 @@ target/conf: target
 	cp -a conf target
 
 target/LICENSE: target
-	curl -s -L ${UPSTREAM_REPO_URL}/raw/${RELEASE_VERSION}/LICENSE -o target/LICENSE
+	curl -s -L ${UPSTREAM_REPO_URL}/raw/${UPSTREAM_TAG}/LICENSE -o target/LICENSE
 
 # From the pinned upstream tag rather than master, so the bundled CHANGELOG
 # (and the "What's New" text built from it below) matches the binaries.
 target/CHANGELOG: target
-	curl -s -L ${UPSTREAM_REPO_URL}/raw/${RELEASE_VERSION}/CHANGELOG -o target/CHANGELOG
+	curl -s -L ${UPSTREAM_REPO_URL}/raw/${UPSTREAM_TAG}/CHANGELOG -o target/CHANGELOG
 
 target/PACKAGE_ICON.PNG: target
 	cp PACKAGE_ICON.PNG target/PACKAGE_ICON.PNG
@@ -64,7 +78,7 @@ target/INFO: target target/CHANGELOG
 	printf 'changelog="%s"\n' "$$(./info_changelog.sh \
 		${PKG_NAME} ../../CHANGELOG.md ${PKG_REPO_URL}/blob/HEAD/CHANGELOG.md \
 		${UPSTREAM_NAME} target/CHANGELOG ${UPSTREAM_REPO_URL}/blob/HEAD/CHANGELOG \
-		${RELEASE_VERSION})" >> target/INFO
+		${PKG_VERSION})" >> target/INFO
 
 dist/${PKG_ID}-dsm7-${ARCH}-${VERSION}.spk: target/package.tgz target/scripts target/WIZARD_UIFILES target/conf target/LICENSE target/CHANGELOG target/INFO target/PACKAGE_ICON.PNG dist
 	$(if ${ARCH},$(info dist - Arch: ${ARCH}),$(error dist - Must specify ARCH))
