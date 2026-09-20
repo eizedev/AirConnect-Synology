@@ -32,7 +32,6 @@ is left out of that text like any other subsection.
 - `build.sh` lists the packages it built instead of printing an example filename with the
   architecture and version typed into it, and declares `sh` rather than `bash`, which is
   what it is checked as and what it uses.
-
 ### Internal
 
 - Issues labelled `upstream` are exempt from the stale bot
