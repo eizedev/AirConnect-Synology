@@ -18,6 +18,8 @@ is left out of that text like any other subsection.
 
 ## [Unreleased]
 
+## [1.12.4-20260928] - 2026-09-28
+
 ### Internal
 
 - `doc/CONVENTIONS.md` now carries the checklist to go through before releasing anything
