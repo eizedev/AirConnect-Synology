@@ -100,6 +100,10 @@ were set up years ago.
 - Releases ship every architecture as a separate `.spk` plus a `SHA256SUMS` file.
 - Upstream is pinned in `upstream.json` (version, tag, asset name, SHA256). The release
   workflow re-downloads the asset and refuses to build if the checksum does not match.
+- The upstream check takes `version` from the asset name, not from the tag, because
+  upstream tags do not always match their contents. When tag and asset disagree, or the
+  new version does not sort above the pinned one, the bump pull request opens with a
+  warning instead of proposing a version Package Center would not offer as an update.
 
 ### Traceability
 

@@ -37,6 +37,12 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           path: "."
+          # Called from upstream-check.yml, the run's own commit is the merge
+          # of the bump PR - before the tag job added this release's
+          # CHANGELOG.md section. Building from it would put the previous
+          # release's "What's New" into INFO. Empty for every other trigger,
+          # which keeps checkout's default (the commit that triggered the run).
+          ref: ${{ inputs.release_tag }}
 
       - name: Determine whether this run should publish a release
         id: release_tag
@@ -215,7 +221,7 @@ jobs:
           discussion_category_name: Releases
           body: |
             Packaging changes: see [CHANGELOG.md](https://github.com/eizedev/AirConnect-Synology/blob/master/CHANGELOG.md).
-            Upstream AirConnect ${{ steps.upstream.outputs.tag }} changes: see the [AirConnect CHANGELOG](https://github.com/philippe44/AirConnect/blob/master/CHANGELOG).
+            Upstream AirConnect ${{ steps.upstream.outputs.version }} changes: see the [AirConnect CHANGELOG](https://github.com/philippe44/AirConnect/blob/master/CHANGELOG).
           generate_release_notes: true
         if: steps.release_tag.outputs.is_release == 'true'
 

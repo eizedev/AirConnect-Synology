@@ -18,6 +18,20 @@ is left out of that text like any other subsection.
 
 ## [Unreleased]
 
+### Fixed
+
+- **"What's New" for an automatically published update lists that update's changes.** It
+  showed the previous release's instead, because the build ran on the commit before the
+  release's `CHANGELOG.md` section was added. 1.12.4-20260928 is affected.
+
+### Internal
+
+- The weekly upstream check names the package after the version in the upstream asset
+  name, not the upstream tag, and warns in the bump pull request when the two disagree or
+  the version would not go up
+  ([#256](https://github.com/eizedev/AirConnect-Synology/issues/256)).
+- The GitHub release text names the upstream version rather than its tag.
+
 ## [1.12.4-20260928] - 2026-09-28
 
 ### Internal
