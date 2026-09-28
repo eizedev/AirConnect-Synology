@@ -18,20 +18,24 @@ is left out of that text like any other subsection.
 
 ## [Unreleased]
 
+## [1.12.4-20260928] - 2026-09-28
+
 ### Fixed
 
-- **"What's New" for an automatically published update lists that update's changes.** It
-  showed the previous release's instead, because the build ran on the commit before the
-  release's `CHANGELOG.md` section was added. 1.12.4-20260928 is affected.
+- **"What's New" lists this release's changes.** The first upload of 1.12.4-20260928
+  showed those of 1.11.3-20260920, because an automatically published release was built
+  from the commit before its `CHANGELOG.md` section was added. This release was published
+  again with the fixes below.
 - **An update stops when it cannot save or restore your settings, instead of reporting
   success without them.** It already refused when `airconnect.conf` was missing, but not
   when copying it failed, for example on a full volume. DSM now shows a message asking for
-  an uninstall and reinstall
-  ([#259](https://github.com/eizedev/AirConnect-Synology/issues/259)).
+  an uninstall and reinstall, and the installed version stays. Tested on a DS923+ with
+  DSM 7.4.1 ([#259](https://github.com/eizedev/AirConnect-Synology/issues/259)).
 - **Package Center shows AirConnect as running whenever it runs, and Stop always works.**
   Without its config file the package was shown as stopped while `airupnp` and `aircast`
   kept running, and neither Stop nor Run could do anything about it. An update in that
-  state showed the wrong error. Only starting needs the config now.
+  state showed the wrong error. Only starting needs the config now. Tested on a DS923+
+  with DSM 7.4.1, including Repair, which in that state only retries the start.
 - **Run after a crash of one of the two services no longer starts the other one twice.**
   Whatever is still running is stopped first.
 - The running check no longer counts other processes whose command line merely contains
@@ -49,11 +53,6 @@ is left out of that text like any other subsection.
 - `tests/start_stop_status.sh` runs `status`/`stop`/`start` against broken states in CI.
 - `start-stop-status` read the package name with `awk '{print tolower($_)}'`, which only
   works by accident in gawk, mawk and BusyBox; it uses `$0` like the other scripts.
-
-## [1.12.4-20260928] - 2026-09-28
-
-### Internal
-
 - `doc/CONVENTIONS.md` now carries the checklist to go through before releasing anything
   that touches installation state - which release people update from, what happens when a
   setting's line is missing, what a wizard's default does to an installation that already
