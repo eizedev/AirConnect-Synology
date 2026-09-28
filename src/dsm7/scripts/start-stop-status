@@ -2,7 +2,7 @@
 
 set -eu
 
-AIRCONNECT_USER="$(echo "${SYNOPKG_PKGNAME}" | awk '{print tolower($_)}')"
+AIRCONNECT_USER="$(echo "${SYNOPKG_PKGNAME}" | awk '{print tolower($0)}')"
 CONFIG_UPNP_FILE="config.xml"
 CONFIG_UPNP_DESTINATION="${SYNOPKG_PKGDEST}/${CONFIG_UPNP_FILE}"
 CONFIG_CAST_FILE="config-cast.xml"
@@ -14,16 +14,18 @@ AIRCONNECT_CONFIG="${SYNOPKG_PKGDEST}/${AIRCONNECT_CONFIG_FILE}"
 LOG="${SYNOPKG_PKGDEST}/log/${AIRCONNECT_USER}.log"
 LOGBACKUP="${SYNOPKG_PKGDEST}/log/${AIRCONNECT_USER}.1.log"
 
-# backward compatibility for older packages, airconnect configuration file is needed
-if [ ! -f "${AIRCONNECT_CONFIG}" ]; then
-    echo "[$(date +'%T')] AirConnect config file does not exist! Please uninstall the package and reinstall it again!" >>"$LOG"
-    echo "[$(date +'%T')] AirConnect config file does not exist! Please uninstall the package and reinstall it again!" >>"$SYNOPKG_TEMP_LOGFILE"
-    exit 150
+# Only starting needs the settings. DSM calls "status" every few seconds
+# and "stop" before every update and uninstall, whatever state the
+# installation is in - so both answer from what is actually running, and
+# work without a config. Otherwise Package Center shows "stopped" while
+# airupnp/aircast run, and nothing can stop them.
+CONFIG_MISSING_MESSAGE="AirConnect config file does not exist! Please uninstall the package and reinstall it again!"
+CONFIG_LOADED=0
+if [ -f "${AIRCONNECT_CONFIG}" ]; then
+    # shellcheck source=/dev/null
+    . "${AIRCONNECT_CONFIG}"
+    CONFIG_LOADED=1
 fi
-
-# import config file
-# shellcheck source=/dev/null
-. "${AIRCONNECT_CONFIG}"
 
 # pgrep not available by default on synology devices. Which `ps` invocation
 # lists ALL processes (not just ones with a controlling terminal) differs
@@ -62,7 +64,16 @@ fi
 # "aircast" as a substring somewhere in its own command line.
 # shellcheck disable=SC2009,SC2086
 get_pid() {
-    PID=$($PS_ALL_CMD | grep -E "${SYNOPKG_PKGDEST}/(airupnp|aircast)" | grep -v grep | awk -v col="${PS_PID_COL}" '{print $col}')
+    PID=$($PS_ALL_CMD | grep -E "${SYNOPKG_PKGDEST}/(airupnp|aircast)([[:space:]]|\$)" | grep -v grep | awk -v col="${PS_PID_COL}" '{print $col}')
+}
+
+# is_running <airupnp|aircast>: is this package's binary running? Same
+# path-anchored match as get_pid(), never a bare name - a grep for
+# "aircast" would also find someone's "tail -f .../aircast.log", or
+# another package's binary.
+# shellcheck disable=SC2009
+is_running() {
+    $PS_ALL_CMD | grep -E "${SYNOPKG_PKGDEST}/$1([[:space:]]|\$)" | grep -v -q grep
 }
 
 start_airconnect_on_ip() {
@@ -249,83 +260,61 @@ stop_airconnect() {
         sleep 1
     fi
 
-    if [ "${AIRUPNP_ENABLED}" = 1 ] && [ "${AIRCAST_ENABLED}" = 1 ]; then
-        # pgrep not available by default on synology devices
-        # shellcheck disable=SC2009
-        if ! $PS_ALL_CMD | grep -E 'airupnp' | grep -v -q grep && ! $PS_ALL_CMD | grep -E 'aircast' | grep -v -q grep; then
-            return 0
-        elif $PS_ALL_CMD | grep -E 'airupnp' | grep -v -q grep && $PS_ALL_CMD | grep -E 'aircast' | grep -v -q grep; then
-            echo "[$(date +'%T')] Stop: airupnp & aircast are still running!" >>"$LOG"
-            echo "[$(date +'%T')] Stop: airupnp & aircast are still running" >>"$SYNOPKG_TEMP_LOGFILE"
-            return 1
-        elif ! $PS_ALL_CMD | grep -E 'airupnp' | grep -v -q grep && $PS_ALL_CMD | grep -E 'aircast' | grep -v -q grep; then
-            echo "[$(date +'%T')] Stop: aircast is still running!" >>"$LOG"
-            echo "[$(date +'%T')] Stop: aircast is still running!" >>"$SYNOPKG_TEMP_LOGFILE"
-            return 1
-        elif $PS_ALL_CMD | grep -E 'airupnp' | grep -v -q grep && ! $PS_ALL_CMD | grep -E 'aircast' | grep -v -q grep; then
-            echo "[$(date +'%T')] Stop: airupnp is still running!" >>"$LOG"
-            echo "[$(date +'%T')] Stop: airupnp is still running!" >>"$SYNOPKG_TEMP_LOGFILE"
-            return 1
-        fi
-    elif [ "${AIRUPNP_ENABLED}" = 1 ]; then
-        # pgrep not available by default on synology devices
-        # shellcheck disable=SC2009
-        if ! $PS_ALL_CMD | grep -E 'airupnp' | grep -v -q grep; then
-            return 0
-        else
-            echo "[$(date +'%T')] Stop: airupnp is still running!" >>"$LOG"
-            echo "[$(date +'%T')] Stop: airupnp is still running!" >>"$SYNOPKG_TEMP_LOGFILE"
-            return 1
-        fi
-    elif [ "${AIRCAST_ENABLED}" = 1 ]; then
-        # pgrep not available by default on synology devices
-        # shellcheck disable=SC2009
-        if ! $PS_ALL_CMD | grep -E 'aircast' | grep -v -q grep; then
-            return 0
-        else
-            echo "[$(date +'%T')] Stop: aircast is still running!" >>"$LOG"
-            echo "[$(date +'%T')] Stop: aircast is still running!" >>"$SYNOPKG_TEMP_LOGFILE"
-            return 1
-        fi
+    # Whatever is still running is what failed to stop - no need to know
+    # from the config which binaries were meant to run.
+    STILL_RUNNING=""
+    for binary in airupnp aircast; do
+        is_running "${binary}" && STILL_RUNNING="${STILL_RUNNING}${binary} "
+    done
+    if [ -z "${STILL_RUNNING}" ]; then
+        return 0
     fi
+    echo "[$(date +'%T')] Stop: ${STILL_RUNNING}still running!" >>"$LOG"
+    echo "[$(date +'%T')] Stop: ${STILL_RUNNING}still running!" >>"$SYNOPKG_TEMP_LOGFILE"
     return 1
 }
 
 airconnect_status() {
-    if [ "${AIRUPNP_ENABLED}" = 1 ] && [ "${AIRCAST_ENABLED}" = 1 ]; then
-        # pgrep not available by default on synology devices
-        # shellcheck disable=SC2009
-        if $PS_ALL_CMD | grep -E 'airupnp' | grep -v -q grep && $PS_ALL_CMD | grep -E 'aircast' | grep -v -q grep; then
+    UPNP_RUNNING=0
+    CAST_RUNNING=0
+    is_running airupnp && UPNP_RUNNING=1
+    is_running aircast && CAST_RUNNING=1
+
+    # Without a config nothing says which binaries should run, so what runs
+    # is the answer. Nothing running and nothing to start from means the
+    # installation is broken (150): Package Center then offers Repair, and
+    # starting explains the missing config.
+    if [ "${CONFIG_LOADED}" = 0 ]; then
+        if [ "${UPNP_RUNNING}" = 1 ] || [ "${CAST_RUNNING}" = 1 ]; then
             return 0
-        elif ! $PS_ALL_CMD | grep -E 'airupnp' | grep -v -q grep && ! $PS_ALL_CMD | grep -E 'aircast' | grep -v -q grep; then
+        fi
+        return 150
+    fi
+
+    if [ "${AIRUPNP_ENABLED:-}" = 1 ] && [ "${AIRCAST_ENABLED:-}" = 1 ]; then
+        if [ "${UPNP_RUNNING}" = 1 ] && [ "${CAST_RUNNING}" = 1 ]; then
+            return 0
+        elif [ "${UPNP_RUNNING}" = 0 ] && [ "${CAST_RUNNING}" = 0 ]; then
             return 3
-        elif ! $PS_ALL_CMD | grep -E 'airupnp' | grep -v -q grep && $PS_ALL_CMD | grep -E 'aircast' | grep -v -q grep; then
+        elif [ "${UPNP_RUNNING}" = 0 ]; then
             echo "[$(date +'%T')] Status: airupnp not running!" >>"$LOG"
             return 3
-        elif $PS_ALL_CMD | grep -E 'airupnp' | grep -v -q grep && ! $PS_ALL_CMD | grep -E 'aircast' | grep -v -q grep; then
-            echo "[$(date +'%T')] Status: aircast not running!" >>"$LOG"
-            return 3
-        else
-            return 4
-        fi
-    elif [ "${AIRUPNP_ENABLED}" = 1 ]; then
-        # pgrep not available by default on synology devices
-        # shellcheck disable=SC2009
-        if $PS_ALL_CMD | grep -E 'airupnp' | grep -v -q grep; then
-            return 0
-        else
-            echo "[$(date +'%T')] Status: airupnp not running!" >>"$LOG"
-            return 3
-        fi
-    elif [ "${AIRCAST_ENABLED}" = 1 ]; then
-        # pgrep not available by default on synology devices
-        # shellcheck disable=SC2009
-        if $PS_ALL_CMD | grep -E 'aircast' | grep -v -q grep; then
-            return 0
         else
             echo "[$(date +'%T')] Status: aircast not running!" >>"$LOG"
             return 3
         fi
+    elif [ "${AIRUPNP_ENABLED:-}" = 1 ]; then
+        if [ "${UPNP_RUNNING}" = 1 ]; then
+            return 0
+        fi
+        echo "[$(date +'%T')] Status: airupnp not running!" >>"$LOG"
+        return 3
+    elif [ "${AIRCAST_ENABLED:-}" = 1 ]; then
+        if [ "${CAST_RUNNING}" = 1 ]; then
+            return 0
+        fi
+        echo "[$(date +'%T')] Status: aircast not running!" >>"$LOG"
+        return 3
     fi
     # return unknown if nothing matched
     return 4
@@ -333,6 +322,19 @@ airconnect_status() {
 
 case $1 in
 start)
+    if [ "${CONFIG_LOADED}" = 0 ]; then
+        echo "[$(date +'%T')] ${CONFIG_MISSING_MESSAGE}" >>"$LOG"
+        echo "[$(date +'%T')] ${CONFIG_MISSING_MESSAGE}" >>"$SYNOPKG_TEMP_LOGFILE"
+        exit 150
+    fi
+    # "status" reports the package stopped as soon as one of two enabled
+    # binaries has died, so Package Center offers Run while the other one
+    # still runs. Starting over it would run that one twice.
+    get_pid
+    if [ -n "${PID}" ]; then
+        echo "[$(date +'%T')] Stopping what is still running (pid(s): ${PID}) before starting." >>"$LOG"
+        stop_airconnect || exit 1
+    fi
     echo "[$(date +'%T')] Starting AirConnect ..." >>"$LOG"
     start_airconnect
     exit $?
@@ -343,13 +345,17 @@ stop)
     exit $?
     ;;
 status)
-    if airconnect_status; then
-        echo "[$(date +'%T')] AirConnect is running"
-        exit 0
-    else
+    STATUS=0
+    airconnect_status || STATUS=$?
+    case ${STATUS} in
+    0) echo "[$(date +'%T')] AirConnect is running" ;;
+    150) echo "[$(date +'%T')] ${CONFIG_MISSING_MESSAGE}" ;;
+    *)
         echo "[$(date +'%T')] AirConnect is not running"
-        exit 3
-    fi
+        STATUS=3
+        ;;
+    esac
+    exit "${STATUS}"
     ;;
 log)
     echo "${LOG}"
