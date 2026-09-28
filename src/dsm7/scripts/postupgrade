@@ -26,8 +26,15 @@ shared_folder_in_use() {
     return 1
 }
 
-# restore config file
-/bin/cp -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${AIRCONNECT_CONFIG_FILE}" "${SYNOPKG_PKGDEST}"
+# Restore the config. preupgrade only lets an update through once it is
+# saved, so a restore that fails is a real fault. Say so rather than leave
+# a package without its settings behind a successful update.
+if ! /bin/cp -f "${SYNOPKG_TEMP_UPGRADE_FOLDER}/${AIRCONNECT_CONFIG_FILE}" "${SYNOPKG_PKGDEST}" 2>>"${LOG}"; then
+    MESSAGE="The update could not restore ${AIRCONNECT_CONFIG_FILE}, so the package is running without its previous settings. Please uninstall the package and install it again."
+    echo "[$(date +'%T')] ${MESSAGE}" >>"${LOG}"
+    echo "${MESSAGE}" >>"${SYNOPKG_TEMP_LOGFILE}"
+    exit 1
+fi
 
 if [ -f "${AIRCONNECT_CONFIG}" ]; then
     # shellcheck disable=SC2154

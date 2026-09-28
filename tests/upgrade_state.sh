@@ -11,7 +11,10 @@
 # than assumed.
 #
 # The wizard (WIZARD_UIFILES/upgrade_uifile.sh) is exercised too, since
-# what it preselects is what postupgrade receives.
+# what it preselects is what postupgrade receives. Between preupgrade and
+# postupgrade the package directory is emptied, as DSM does when it swaps in
+# the new package - otherwise a config preupgrade failed to save would still
+# be in place and look carried over.
 #
 # Usage: tests/upgrade_state.sh [src/dsm7 | src/dsm]   (default: both)
 # Exit status: 0 if every scenario behaves as expected.
@@ -48,6 +51,7 @@ setup() {
 }
 
 teardown() {
+    chmod -R u+w "$WORK" 2>/dev/null || true
     rm -rf "$WORK"
 }
 
@@ -85,8 +89,15 @@ wizard_answer() {
     echo "${answer:-none}"
 }
 
+# preupgrade, DSM swapping in the new package's files, postupgrade.
+replace_package() {
+    rm -rf "$SYNOPKG_PKGDEST"
+    mkdir -p "$SYNOPKG_PKGDEST/log"
+}
+
 run_upgrade() {
     sh "$TREE/scripts/preupgrade" || return $?
+    replace_package
     sh "$TREE/scripts/postupgrade" || return $?
 }
 
@@ -194,6 +205,42 @@ check_tree() {
         fi
     fi
     teardown
+
+    # The config is there but cannot be saved, or saved but not put back.
+    # Both must stop the update with a message rather than end in a package
+    # without its settings. File permissions do not stop root, so these are
+    # skipped when running as root.
+    if [ "$(id -u)" -ne 0 ]; then
+        setup
+        config_with_setting 1
+        chmod 500 "$SYNOPKG_TEMP_UPGRADE_FOLDER"
+        RUN=$((RUN + 1))
+        if sh "$TREE/scripts/preupgrade" 2>/dev/null; then
+            fail "update continued although the config could not be saved"
+        elif grep -q "uninstall\|could not be saved" "$SYNOPKG_TEMP_LOGFILE"; then
+            pass "config cannot be saved: update refused, with a message for DSM"
+        else
+            fail "config cannot be saved: update refused, but DSM gets no message"
+        fi
+        teardown
+
+        setup
+        config_with_setting 1
+        sh "$TREE/scripts/preupgrade"
+        replace_package
+        chmod 555 "$SYNOPKG_PKGDEST"
+        RUN=$((RUN + 1))
+        if sh "$TREE/scripts/postupgrade" 2>/dev/null; then
+            fail "update reported success although the config could not be restored"
+        elif grep -q "uninstall" "$SYNOPKG_TEMP_LOGFILE"; then
+            pass "config cannot be restored: update fails, and DSM is told what to do"
+        else
+            fail "config cannot be restored: update fails, but the message doesn't say what to do"
+        fi
+        teardown
+    else
+        echo "  skip: config cannot be saved or restored (running as root)"
+    fi
 }
 
 if [ $# -gt 0 ]; then
