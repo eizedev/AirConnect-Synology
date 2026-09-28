@@ -5,12 +5,29 @@ test coverage at all before this - CI only ran `shellcheck` and an `ls`. That
 gap is exactly how issue #107 happened: a corrupted binary from a broken
 unzip step shipped in a release and nobody noticed until users reported it.
 
-| Script             | What it catches                                                                                                                                                                        | Would have caught #107?                                                           |
-| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `validate_elf.py`  | Corrupted/wrong-architecture binaries: ELF magic, machine type, static/dynamic, min-kernel note, glibc symbol versions                                                                 | Yes - a non-ELF file fails immediately                                            |
-| `validate_spk.sh`  | Malformed `.spk` structure, missing/invalid `INFO` fields, unsubstituted `#VERSION#`-style placeholders, missing/non-executable payload binaries or lifecycle scripts, corrupted icons | Yes, at the package-structure level (validate_elf.py catches the binary itself)   |
-| `qemu_smoke.sh`    | Binaries that can't actually execute on their target architecture/kernel                                                                                                               | planned, not yet written                                                          |
-| `upgrade_state.sh` | What an update does to an existing installation's settings, against a mocked `SYNOPKG_*` environment                                                                                   | n/a - different failure mode (it catches updates changing settings by themselves) |
+| Script                 | What it catches                                                                                                                                                                        | Would have caught #107?                                                           |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `validate_elf.py`      | Corrupted/wrong-architecture binaries: ELF magic, machine type, static/dynamic, min-kernel note, glibc symbol versions                                                                 | Yes - a non-ELF file fails immediately                                            |
+| `validate_spk.sh`      | Malformed `.spk` structure, missing/invalid `INFO` fields, unsubstituted `#VERSION#`-style placeholders, missing/non-executable payload binaries or lifecycle scripts, corrupted icons | Yes, at the package-structure level (validate_elf.py catches the binary itself)   |
+| `qemu_smoke.sh`        | Binaries that can't actually execute on their target architecture/kernel                                                                                                               | planned, not yet written                                                          |
+| `upgrade_state.sh`     | What an update does to an existing installation's settings, against a mocked `SYNOPKG_*` environment                                                                                   | n/a - different failure mode (it catches updates changing settings by themselves) |
+| `start_stop_status.sh` | What `status`/`stop`/`start` report and do when the config is missing, one binary died, or a foreign process has the same name                                                         | n/a - different failure mode (it catches Package Center showing the wrong state)  |
+
+## `start_stop_status.sh`
+
+Runs `start-stop-status` against the states an installation can really be in, for both
+the `dsm7` and the legacy `dsm` tree: healthy, one of two binaries dead, config missing
+while the binaries run, config missing with nothing running, and processes with the same
+names that belong to something else. Stand-in processes are small scripts named
+`airupnp`/`aircast` in a throwaway package directory, so they match the path-based process
+lookup exactly as the real binaries do. Checked: what `status` reports (0 running, 3
+stopped, 150 broken), that `stop` works without a config, that `start` without a config
+refuses with a message, and that `start` first stops a binary left over from a partial
+crash.
+
+Run it with `sh tests/start_stop_status.sh`, or for one tree with
+`sh tests/start_stop_status.sh src/dsm7`. Each `stop` waits the script's own 10 seconds,
+so a full run takes a little over a minute.
 
 ## `upgrade_state.sh`
 

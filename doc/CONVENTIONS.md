@@ -70,8 +70,14 @@ not an edge case.
   nothing is submitted for it and the existing setting stands.
 - **Where an update cannot carry the settings over at all, it refuses** with a message
   saying to uninstall and install again, rather than continuing with invented ones.
-- `tests/upgrade_state.sh` runs these paths against prepared installations, so this is
-  tested rather than assumed.
+- **Only `start` may need the settings.** DSM calls `start-stop-status status` every few
+  seconds and `stop` before every update and uninstall, in whatever state the installation
+  is. Both answer from the processes actually running, found by their path in the package
+  directory, never by bare name. Otherwise Package Center shows "stopped" while the
+  binaries run, and nothing can stop them. DSM continues an update even when `stop`
+  fails.
+- `tests/upgrade_state.sh` and `tests/start_stop_status.sh` run these paths against
+  prepared installations, so this is tested rather than assumed.
 
 **Before releasing anything that touches installation state** - a lifecycle script, a
 wizard, the config format, the shared folder, file locations or permissions - go through

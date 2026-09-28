@@ -28,6 +28,14 @@ is left out of that text like any other subsection.
   when copying it failed, for example on a full volume. DSM now shows a message asking for
   an uninstall and reinstall
   ([#259](https://github.com/eizedev/AirConnect-Synology/issues/259)).
+- **Package Center shows AirConnect as running whenever it runs, and Stop always works.**
+  Without its config file the package was shown as stopped while `airupnp` and `aircast`
+  kept running, and neither Stop nor Run could do anything about it. An update in that
+  state showed the wrong error. Only starting needs the config now.
+- **Run after a crash of one of the two services no longer starts the other one twice.**
+  Whatever is still running is stopped first.
+- The running check no longer counts other processes whose command line merely contains
+  `airupnp` or `aircast`, for example someone viewing a log file of that name.
 
 ### Internal
 
@@ -38,6 +46,9 @@ is left out of that text like any other subsection.
 - The GitHub release text names the upstream version rather than its tag.
 - `tests/upgrade_state.sh` empties the package directory between `preupgrade` and
   `postupgrade`, as DSM does, and covers a config that cannot be saved or restored.
+- `tests/start_stop_status.sh` runs `status`/`stop`/`start` against broken states in CI.
+- `start-stop-status` read the package name with `awk '{print tolower($_)}'`, which only
+  works by accident in gawk, mawk and BusyBox; it uses `$0` like the other scripts.
 
 ## [1.12.4-20260928] - 2026-09-28
 

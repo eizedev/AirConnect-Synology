@@ -153,6 +153,13 @@ jobs:
         id: validate_upgrade_state
         run: sh tests/upgrade_state.sh
 
+      # status/stop/start in broken states: config missing while running,
+      # one binary dead, foreign processes with the same name. DSM calls
+      # these at any time, so they must answer from what really runs.
+      - name: Check start-stop-status in the states an installation can be in
+        id: validate_start_stop_status
+        run: sh tests/start_stop_status.sh
+
       # No RELEASE_VERSION here on purpose: the Makefile reads the version
       # from upstream.json, the same field upstream-check.yml uses for the
       # release tag. Passing the tag instead would make the two disagree the
