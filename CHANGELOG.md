@@ -23,6 +23,11 @@ is left out of that text like any other subsection.
 - **"What's New" for an automatically published update lists that update's changes.** It
   showed the previous release's instead, because the build ran on the commit before the
   release's `CHANGELOG.md` section was added. 1.12.4-20260928 is affected.
+- **An update stops when it cannot save or restore your settings, instead of reporting
+  success without them.** It already refused when `airconnect.conf` was missing, but not
+  when copying it failed, for example on a full volume. DSM now shows a message asking for
+  an uninstall and reinstall
+  ([#259](https://github.com/eizedev/AirConnect-Synology/issues/259)).
 
 ### Internal
 
@@ -31,6 +36,8 @@ is left out of that text like any other subsection.
   the version would not go up
   ([#256](https://github.com/eizedev/AirConnect-Synology/issues/256)).
 - The GitHub release text names the upstream version rather than its tag.
+- `tests/upgrade_state.sh` empties the package directory between `preupgrade` and
+  `postupgrade`, as DSM does, and covers a config that cannot be saved or restored.
 
 ## [1.12.4-20260928] - 2026-09-28
 

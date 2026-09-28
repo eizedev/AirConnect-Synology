@@ -17,14 +17,18 @@ unzip step shipped in a release and nobody noticed until users reported it.
 Simulates an update of an installed package and checks what it does to that
 installation's settings, for both the `dsm7` and the legacy `dsm` tree. It
 prepares a throwaway installation, sets the `SYNOPKG_*` variables DSM sets,
-then runs `preupgrade`, the upgrade wizard and `postupgrade` against it.
+then runs `preupgrade`, the upgrade wizard and `postupgrade` against it. In
+between it empties the package directory, as DSM does when it swaps in the new
+package, so a config `preupgrade` failed to save shows up as lost.
 
 Covered: a config old enough not to carry the shared-folder setting while the
 shared folder is in use (the state most existing installations are in - it must
 stay on), the same without the shared folder, an explicit setting in either
 direction, the user changing it in the wizard, and an installation with no
 config at all, where the update must refuse and ask for a clean reinstall
-rather than continue with invented settings.
+rather than continue with invented settings. The same goes for a config that
+cannot be saved or put back; those two cases work through file permissions and
+are skipped when running as root.
 
 Run it with `sh tests/upgrade_state.sh`, or for one tree with
 `sh tests/upgrade_state.sh src/dsm7`. It needs nothing but a POSIX shell.
