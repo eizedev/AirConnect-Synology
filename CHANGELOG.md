@@ -18,6 +18,10 @@ is left out of that text like any other subsection.
 
 ## [Unreleased]
 
+## [1.12.4-20261017] - 2026-10-17
+
+Upstream AirConnect updated to 1.12.4. See the [upstream CHANGELOG](https://github.com/philippe44/AirConnect/blob/master/CHANGELOG) for details.
+
 ## [1.12.4-20260928] - 2026-09-28
 
 ### Fixed
