@@ -7,7 +7,8 @@ name: Upstream AirConnect version bump
 #      newer, computes the new checksum and opens a PR - never merges it.
 #   2. tag: runs when a PR that touched upstream.json is merged to master
 #      (by a human, reviewing and clicking merge on GitHub). Creates and
-#      pushes the next release tag.
+#      pushes the next release tag - unless the merge left version and
+#      checksum unchanged, which only moves the pin.
 #   3. release: invokes release.yml directly as a reusable workflow (NOT by
 #      relying on the tag push above to trigger it) in the same run, so it
 #      builds, validates, and publishes. A tag pushed with the default
@@ -53,6 +54,7 @@ jobs:
         run: |
           CURRENT_TAG=$(jq -r .tag upstream.json)
           CURRENT_VERSION=$(jq -r .version upstream.json)
+          CURRENT_SHA256=$(jq -r .sha256 upstream.json)
           LATEST=$(curl -sL -H "Authorization: Bearer ${GH_TOKEN}" \
             "https://api.github.com/repos/philippe44/AirConnect/releases/latest")
           LATEST_TAG=$(echo "$LATEST" | jq -r .tag_name)
@@ -90,8 +92,25 @@ jobs:
           elif [ "$NEW_VERSION" != "$LATEST_TAG" ]; then
             NOTICES="${NOTICES}- Upstream tagged this release \`${LATEST_TAG}\`, but its asset is \`${ASSET_NAME}\`. \`version\` is \`${NEW_VERSION}\` (the package name), \`tag\` stays \`${LATEST_TAG}\` (where the files come from). Check which one upstream meant."$'\n'
           fi
+          # Same version means the upstream tag moved. Whether that is a release
+          # depends on the contents: an unchanged checksum only changes where
+          # the files come from, and the tag job then updates the pin without
+          # publishing anything. If the old tag no longer has a release, every
+          # build fails until this is merged, so say so instead of suggesting
+          # the PR can be closed.
+          RELEASE_ON_MERGE=true
           if [ "$NEW_VERSION" = "$CURRENT_VERSION" ]; then
-            NOTICES="${NOTICES}- \`${NEW_VERSION}\` is the version already pinned, only the tag changes. Merging publishes a release with the same upstream contents - closing this PR is usually right."$'\n'
+            if [ "$SHA256" = "$CURRENT_SHA256" ]; then
+              RELEASE_ON_MERGE=false
+              NOTICES="${NOTICES}- Only the upstream tag changes (\`${CURRENT_TAG}\` -> \`${LATEST_TAG}\`); version and checksum stay the same. Merging updates the pin and publishes no release."$'\n'
+              OLD_TAG_STATUS=$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer ${GH_TOKEN}" \
+                "https://api.github.com/repos/philippe44/AirConnect/releases/tags/${CURRENT_TAG}")
+              if [ "$OLD_TAG_STATUS" = "404" ]; then
+                NOTICES="${NOTICES}- The pinned tag \`${CURRENT_TAG}\` no longer has a release upstream, so every build fails until this is merged."$'\n'
+              fi
+            else
+              NOTICES="${NOTICES}- \`${NEW_VERSION}\` is the version already pinned, but the asset's checksum changed. Merging publishes a release with the same upstream version - check what upstream changed."$'\n'
+            fi
           elif [ "$(printf '%s\n%s\n' "$CURRENT_VERSION" "$NEW_VERSION" | sort -V | tail -n 1)" != "$NEW_VERSION" ]; then
             NOTICES="${NOTICES}- \`${NEW_VERSION}\` does not sort above the pinned \`${CURRENT_VERSION}\`. Package Center would not offer it as an update. Fix \`version\` before merging."$'\n'
           fi
@@ -118,9 +137,13 @@ jobs:
             echo "\`${CURRENT_VERSION}\` to \`${NEW_VERSION}\` (upstream tag \`${LATEST_TAG}\`)"
             echo "in \`upstream.json\` (new SHA256 verified against the downloaded release asset)."
             echo
-            echo "**This PR does not auto-merge.** Review the upstream changes below, merge"
-            echo "manually when ready - merging will automatically tag and publish a new"
-            echo "AirConnect-Synology release."
+            if [ "$RELEASE_ON_MERGE" = true ]; then
+              echo "**This PR does not auto-merge.** Review the upstream changes below, merge"
+              echo "manually when ready - merging will automatically tag and publish a new"
+              echo "AirConnect-Synology release."
+            else
+              echo "**This PR does not auto-merge.** Merging only updates the pin; no release is published."
+            fi
             echo
             echo "<details>"
             echo "<summary>Upstream release notes for ${LATEST_TAG}</summary>"
@@ -166,7 +189,22 @@ jobs:
 
       - name: Update CHANGELOG.md and push the next release tag
         id: create_tag
+        env:
+          MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
         run: |
+          # Any merged PR that touches upstream.json lands here, not only the
+          # bump PR. One that leaves version and checksum alone - a fix for
+          # an upstream tag that moved, say - changes where the files come
+          # from, not what they are, and a release would offer Package Center
+          # users an update with identical contents. Compared at the merge
+          # commit, since master may have moved on since.
+          BEFORE=$(git show "${MERGE_SHA}^1:upstream.json" | jq -c '{version, sha256}')
+          AFTER=$(git show "${MERGE_SHA}:upstream.json" | jq -c '{version, sha256}')
+          if [ "$BEFORE" = "$AFTER" ]; then
+            echo "::notice::upstream.json changed, but version and checksum did not ($AFTER) - no release."
+            exit 0
+          fi
+
           VERSION=$(jq -r .version upstream.json)
           TAG="${VERSION}-$(date +%Y%m%d)"
           RELEASE_DATE=$(date +%Y-%m-%d)
@@ -222,6 +260,7 @@ jobs:
   # silently never fire. This call happens in the same overall run instead.
   release:
     needs: tag
+    if: needs.tag.outputs.tag != ''
     uses: ./.github/workflows/release.yml
     with:
       release_tag: ${{ needs.tag.outputs.tag }}

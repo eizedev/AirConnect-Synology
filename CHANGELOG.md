@@ -18,9 +18,13 @@ is left out of that text like any other subsection.
 
 ## [Unreleased]
 
-## [1.12.4-20261017] - 2026-10-17
+### Internal
 
-Upstream AirConnect updated to 1.12.4. See the [upstream CHANGELOG](https://github.com/philippe44/AirConnect/blob/master/CHANGELOG) for details.
+- A merged pull request that changes `upstream.json` without changing the upstream version
+  or checksum - such as a fix for an upstream tag that moved - updates the pin without
+  publishing a release. The upstream bump pull request says when only the tag changes and
+  when the pinned tag has no release any more, which breaks every build until it is merged
+  ([#271](https://github.com/eizedev/AirConnect-Synology/issues/271)).
 
 ## [1.12.4-20260928] - 2026-09-28
 
