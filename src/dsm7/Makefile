@@ -15,6 +15,18 @@ UPSTREAM_VERSION=$(shell sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\
 PKG_VERSION=$(or ${RELEASE_VERSION},${UPSTREAM_VERSION})
 VERSION=${PKG_VERSION}-$(shell date '+%Y%m%d')
 
+# A srm-<arch> target builds the Synology Router (SRM) package from the same
+# binaries as <arch>; only INFO differs (router platforms, SRM minimum
+# version) and the file name. SRM versions are 1.x, so a package that
+# declares the DSM minimum 7.0 is never offered to a router by anything that
+# compares versions, such as a package source.
+PLATFORM=$(if $(filter srm-%,${ARCH}),srm,dsm7)
+BIN_ARCH=$(patsubst srm-%,%,${ARCH})
+SPK=${PKG_ID}-${PLATFORM}-${BIN_ARCH}-${VERSION}.spk
+# First SRM 1.3 release, the oldest SRM the DSM 7 package format has been
+# tested on (RT2600ac, SRM 1.3.2).
+SRM_FIRMWARE=1.3-9193
+
 # Derived from INFO rather than repeated here: distributor_url is this
 # packaging repo, maintainer_url is upstream. blob/HEAD resolves to each
 # repo's default branch, so no branch name is baked in either.
@@ -36,9 +48,9 @@ dist:
 target/package.tgz: target
 	$(if ${PKG_VERSION},$(info ${UPSTREAM_NAME} Version: ${PKG_VERSION}),$(error No upstream version - is ../../upstream.json readable? Set RELEASE_VERSION to override))
 	$(if ${ARCH},$(info Arch: ${ARCH}),$(error Must specify ARCH))
-	cp bin/airupnp-linux-${ARCH} target/airupnp
+	cp bin/airupnp-linux-${BIN_ARCH} target/airupnp
 	chmod +x target/airupnp
-	cp bin/aircast-linux-${ARCH} target/aircast
+	cp bin/aircast-linux-${BIN_ARCH} target/aircast
 	chmod +x target/aircast
 	cp -a log target/log
 	cd target && tar czf package.tgz airupnp aircast log/
@@ -80,20 +92,20 @@ target/INFO: target target/CHANGELOG
 		${UPSTREAM_NAME} target/CHANGELOG ${UPSTREAM_REPO_URL}/blob/HEAD/CHANGELOG \
 		${PKG_VERSION})" >> target/INFO
 
-dist/${PKG_ID}-dsm7-${ARCH}-${VERSION}.spk: target/package.tgz target/scripts target/WIZARD_UIFILES target/conf target/LICENSE target/CHANGELOG target/INFO target/PACKAGE_ICON.PNG dist
+dist/${SPK}: target/package.tgz target/scripts target/WIZARD_UIFILES target/conf target/LICENSE target/CHANGELOG target/INFO target/PACKAGE_ICON.PNG dist
 	$(if ${ARCH},$(info dist - Arch: ${ARCH}),$(error dist - Must specify ARCH))
-	cd target && tar -cf ${PKG_ID}-dsm7-${ARCH}-${VERSION}.spk *
-	mv target/${PKG_ID}-dsm7-${ARCH}-${VERSION}.spk dist/
+	cd target && tar -cf ${SPK} *
+	mv target/${SPK} dist/
 
 .PHONY: arm
 arm:
-	$(eval export INFO_ARCH=ipq806x armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k hi3535 dakota northstarplus hawkeye)
+	$(eval export INFO_ARCH=armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k hi3535)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
 .PHONY: arm-static
 arm-static:
-	$(eval export INFO_ARCH=ipq806x armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k hi3535 dakota northstarplus hawkeye noarch)
+	$(eval export INFO_ARCH=armada370 armadaxp armada375 armada38x alpine alpine4k monaco comcerto2k hi3535 noarch)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
@@ -111,13 +123,13 @@ armv5-static:
 
 .PHONY: aarch64
 aarch64:
-	$(eval export INFO_ARCH=rtd1296 rtd1619b armada37xx cypress)
+	$(eval export INFO_ARCH=rtd1296 rtd1619b armada37xx)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
 .PHONY: aarch64-static
 aarch64-static:
-	$(eval export INFO_ARCH=rtd1296 rtd1619b armada37xx cypress noarch)
+	$(eval export INFO_ARCH=rtd1296 rtd1619b armada37xx noarch)
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
@@ -157,8 +169,33 @@ x86_64-static:
 	$(eval export INFO_FIRMWARE=7.0-40000)
 	@true
 
+# Synology Routers, see SRM_FIRMWARE above.
+.PHONY: srm-arm
+srm-arm:
+	$(eval export INFO_ARCH=ipq806x dakota northstarplus hawkeye)
+	$(eval export INFO_FIRMWARE=${SRM_FIRMWARE})
+	@true
+
+.PHONY: srm-arm-static
+srm-arm-static:
+	$(eval export INFO_ARCH=ipq806x dakota northstarplus hawkeye)
+	$(eval export INFO_FIRMWARE=${SRM_FIRMWARE})
+	@true
+
+.PHONY: srm-aarch64
+srm-aarch64:
+	$(eval export INFO_ARCH=cypress)
+	$(eval export INFO_FIRMWARE=${SRM_FIRMWARE})
+	@true
+
+.PHONY: srm-aarch64-static
+srm-aarch64-static:
+	$(eval export INFO_ARCH=cypress)
+	$(eval export INFO_FIRMWARE=${SRM_FIRMWARE})
+	@true
+
 .PHONY: build
-build: ${ARCH} dist/${PKG_ID}-dsm7-${ARCH}-${VERSION}.spk
+build: ${ARCH} dist/${SPK}
 
 .PHONY: clean
 clean:

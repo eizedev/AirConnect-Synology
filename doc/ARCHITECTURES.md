@@ -32,15 +32,18 @@ copy that can drift.
 | Architecture group | Synology platform codes                                                                                                                                                                                                                                                                 | Package                              |
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
 | ARMv5              | `88f6282`, `88f6281`, `88f628x`                                                                                                                                                                                                                                                         | `AirConnect-dsm7-armv5-${VERSION}`   |
-| ARMv7              | `ipq806x`, `armada370`, `armadaxp`, `armada375`, `armada38x`, `alpine`, `alpine4k`, `monaco`, `comcerto2k`, `hi3535`, `dakota`, `northstarplus`, `hawkeye`                                                                                                                              | `AirConnect-dsm7-arm-${VERSION}`     |
-| ARMv8 / AArch64    | `rtd1296`, `rtd1619b`, `armada37xx`, `cypress`                                                                                                                                                                                                                                          | `AirConnect-dsm7-aarch64-${VERSION}` |
+| ARMv7              | `armada370`, `armadaxp`, `armada375`, `armada38x`, `alpine`, `alpine4k`, `monaco`, `comcerto2k`, `hi3535`                                                                                                                                                                               | `AirConnect-dsm7-arm-${VERSION}`     |
+| ARMv8 / AArch64    | `rtd1296`, `rtd1619b`, `armada37xx`                                                                                                                                                                                                                                                     | `AirConnect-dsm7-aarch64-${VERSION}` |
 | PowerPC            | `qoriq`, `ppc853x`                                                                                                                                                                                                                                                                      | `AirConnect-dsm7-powerpc-${VERSION}` |
 | Intel/AMD 32-bit   | `x86`, `cedarview`, `bromolow`, `evansport`, `braswell`, `broadwell`, `dockerx64`, `kvmx64`, `denverton`, `grantley`, `broadwellnk`, `broadwellntbap`                                                                                                                                   | `AirConnect-dsm7-x86-${VERSION}`     |
 | Intel/AMD 64-bit   | `x86_64`, `x64`, `cedarview`, `bromolow`, `avoton`, `braswell`, `broadwell`, `apollolake`, `dockerx64`, `epyc7002`, `r1000`, `r1000nk`, `kvmx64`, `denverton`, `grantley`, `broadwellnk`, `broadwellnkv2`, `broadwellntbap`, `v1000`, `v1000nk`, `geminilake`, `geminilakenk`, `purley` | `AirConnect-dsm7-x86_64-${VERSION}`  |
+| SRM ARMv7          | `ipq806x`, `dakota`, `northstarplus`, `hawkeye`                                                                                                                                                                                                                                         | `AirConnect-srm-arm-${VERSION}`      |
+| SRM ARMv8          | `cypress`                                                                                                                                                                                                                                                                               | `AirConnect-srm-aarch64-${VERSION}`  |
 
 Every group above also has a `-static` variant with the identical platform list - see
-[Static packages](#static-packages) for when to use it. `hawkeye`/`cypress` are Synology
-router (SRM) platforms; the rest are NAS.
+[Static packages](#static-packages) for when to use it. The two SRM rows are Synology
+Routers; the rest are NAS. NAS packages require DSM 7.0-40000, SRM packages SRM 1.3-9193
+(the first SRM 1.3 release).
 
 Cross-checked 2026-09-17 against SynoCommunity's actively-maintained
 [`spksrc` architecture reference](https://raw.githubusercontent.com/SynoCommunity/spksrc/master/mk/spksrc.common/archs.mk),
@@ -67,13 +70,17 @@ ships new models.
 
 ## Synology Router (SRM)
 
-Most routers running Synology SRM use the **ARMv7** package
-(`AirConnect-dsm7-arm-${VERSION}`, covers `northstarplus`/`ipq806x`/`dakota` and the
-WRX560's `hawkeye`). If that doesn't work, try `arm-static`. The RT6600ax's `cypress`
-platform is ARMv8 instead - use the **aarch64** package for that one.
+Synology Routers have their own packages, `AirConnect-srm-*`. Most use the **ARMv7** one
+(`AirConnect-srm-arm-${VERSION}`, covers `northstarplus`/`ipq806x`/`dakota` and the
+WRX560's `hawkeye`); if that doesn't work, try `srm-arm-static`. The RT6600ax's `cypress`
+platform is ARMv8 - use `AirConnect-srm-aarch64-${VERSION}` for that one. They need SRM 1.3
+or later.
 
-The packages are named `dsm7-*`, but the same package works on SRM as well as DSM 7 -
-confirmed on a real router (RT2600ac, SRM 1.3.2-9366 Update 2), install through to a
+They contain the same binaries as the NAS packages of the same architecture; only the
+package metadata differs. SRM versions are numbered 1.x, so a package that requires DSM 7.0
+is never offered to a router by a package source that compares versions.
+
+Confirmed on a real router (RT2600ac, SRM 1.3.2-9366 Update 2), install through to a
 running `airupnp`/`aircast`. Not independently re-confirmed on a second router model, so
 treat this as "works on the tested unit," not a blanket guarantee across every SRM device
 and patch level.

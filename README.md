@@ -65,8 +65,8 @@ Almost everyone wants the **DSM 7** line:
 
 That's it for most people - the defaults just work, no configuration needed.
 
-**Running a Synology Router (SRM), not a NAS?** Use the `arm` package - confirmed working
-on a real RT2600ac.
+**Running a Synology Router (SRM), not a NAS?** Use the `srm-arm` package (RT6600ax:
+`srm-aarch64`), SRM 1.3 or later - confirmed working on a real RT2600ac.
 
 **Full architecture matrix, static-package fallback, and the older DSM 5/6 line:** see
 [doc/ARCHITECTURES.md](doc/ARCHITECTURES.md).
