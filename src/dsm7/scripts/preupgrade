@@ -3,6 +3,11 @@
 AIRCONNECT_USER="$(echo "${SYNOPKG_PKGNAME}" | awk '{print tolower($0)}')"
 LOG="${SYNOPKG_PKGDEST}/log/${AIRCONNECT_USER}.log"
 AIRCONNECT_CONFIG_FILE="airconnect.conf"
+# Where the config is parked during the update. SRM sets neither
+# SYNOPKG_TEMP_UPGRADE_FOLDER nor SYNOPKG_PKGVAR (measured on SRM 1.3.2);
+# /tmp survives from preupgrade to postupgrade there. Same expression in
+# preupgrade and postupgrade.
+UPGRADE_DIR="${SYNOPKG_TEMP_UPGRADE_FOLDER:-/tmp/${SYNOPKG_PKGNAME}-upgrade}"
 
 echo "[$(date +'%T')] #### Start preupgrade... ####" >>"${LOG}"
 
@@ -24,7 +29,8 @@ fi
 # The update replaces the package directory, so the config has to be parked
 # first. A copy that fails stops the update for the same reason as a missing
 # config: continuing would leave the package without its settings.
-/bin/cp -f "${SYNOPKG_PKGDEST}/${AIRCONNECT_CONFIG_FILE}" "${SYNOPKG_TEMP_UPGRADE_FOLDER}" 2>>"${LOG}" ||
+{ { [ -n "${SYNOPKG_TEMP_UPGRADE_FOLDER}" ] || mkdir -p -m 700 "${UPGRADE_DIR}"; } &&
+    /bin/cp -f "${SYNOPKG_PKGDEST}/${AIRCONNECT_CONFIG_FILE}" "${UPGRADE_DIR}"; } 2>>"${LOG}" ||
     refuse "Cannot update: ${AIRCONNECT_CONFIG_FILE} could not be saved for the update. The package log has the details."
 
 echo "[$(date +'%T')] #### Done preupgrade ####" >>"${LOG}"

@@ -206,6 +206,31 @@ check_tree() {
     fi
     teardown
 
+    # SRM sets no SYNOPKG_TEMP_UPGRADE_FOLDER (measured on SRM 1.3.2). The
+    # config still has to arrive, through the /tmp fallback, and the
+    # fallback must not be left behind.
+    # Only the DSM 7 package runs on SRM; the frozen DSM 5/6 tree is skipped.
+    case "$TREE" in */dsm7) srm_tree=1 ;; *) srm_tree=0 ;; esac
+    if [ "$srm_tree" -eq 1 ]; then
+    setup
+    config_with_setting 1
+    unset SYNOPKG_TEMP_UPGRADE_FOLDER
+    export SYNOPKG_PKGNAME="AirConnectTest$$"
+    fallback="/tmp/${SYNOPKG_PKGNAME}-upgrade"
+    RUN=$((RUN + 1))
+    if ! run_upgrade >/dev/null 2>&1; then
+        fail "SRM (no upgrade folder): update failed"
+    elif ! grep -qx 'SYNO_IP="192.168.1.2"' "$SYNOPKG_PKGDEST/airconnect.conf" 2>/dev/null; then
+        fail "SRM (no upgrade folder): config not carried over"
+    elif [ -e "$fallback" ]; then
+        fail "SRM (no upgrade folder): $fallback left behind"
+    else
+        pass "SRM (no upgrade folder): config carried over through /tmp, nothing left behind"
+    fi
+    rm -rf "$fallback"
+    teardown
+    fi
+
     # The config is there but cannot be saved, or saved but not put back.
     # Both must stop the update with a message rather than end in a package
     # without its settings. File permissions do not stop root, so these are
