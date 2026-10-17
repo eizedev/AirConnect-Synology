@@ -18,6 +18,16 @@ is left out of that text like any other subsection.
 
 ## [Unreleased]
 
+### Added
+
+- **Separate packages for Synology Routers.** `AirConnect-srm-arm` (and `srm-arm-static`) for
+  RT2600ac, MR2200ac, RT1900ac and WRX560, and `AirConnect-srm-aarch64` (and
+  `srm-aarch64-static`) for RT6600ax, requiring SRM 1.3 or later. The NAS packages required
+  DSM 7.0, which an SRM 1.x router never meets, so package sources that compare versions did
+  not offer AirConnect on routers ([#275](https://github.com/eizedev/AirConnect-Synology/issues/275)).
+  On a router, install the `srm-*` package from now on; the NAS packages no longer list the
+  router platforms.
+
 ### Internal
 
 - A merged pull request that changes `upstream.json` without changing the upstream version

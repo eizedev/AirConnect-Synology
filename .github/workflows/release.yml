@@ -183,11 +183,13 @@ jobs:
           # what broke CI when armv6 was removed from the Makefile but this
           # list still expected it. Arch is derived from the filename (the
           # trailing -[0-9] marks where the date-suffixed version starts).
-          for spk in src/dsm7/dist/AirConnect-dsm7-*.spk; do
+          # Names are AirConnect-<dsm7|srm>-<arch>-<version>.spk; the SRM
+          # packages carry the same binaries as their DSM counterpart.
+          for spk in src/dsm7/dist/AirConnect-*.spk; do
             [ -e "$spk" ] || continue
             COUNT=$((COUNT + 1))
             base=$(basename "$spk" .spk)
-            arch=${base#AirConnect-dsm7-}
+            arch=${base#AirConnect-*-}
             arch=${arch%%-[0-9]*}
             echo "::group::Validating ${spk} (arch=${arch})"
             sh tests/validate_spk.sh "$spk" || FAIL=1
