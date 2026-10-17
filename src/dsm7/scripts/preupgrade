@@ -29,7 +29,7 @@ fi
 # The update replaces the package directory, so the config has to be parked
 # first. A copy that fails stops the update for the same reason as a missing
 # config: continuing would leave the package without its settings.
-{ { [ -n "${SYNOPKG_TEMP_UPGRADE_FOLDER}" ] || mkdir -p -m 700 "${UPGRADE_DIR}"; } &&
+{ { [ -n "${SYNOPKG_TEMP_UPGRADE_FOLDER}" ] || [ -d "${UPGRADE_DIR}" ] || mkdir -m 700 "${UPGRADE_DIR}"; } &&
     /bin/cp -f "${SYNOPKG_PKGDEST}/${AIRCONNECT_CONFIG_FILE}" "${UPGRADE_DIR}"; } 2>>"${LOG}" ||
     refuse "Cannot update: ${AIRCONNECT_CONFIG_FILE} could not be saved for the update. The package log has the details."
 
