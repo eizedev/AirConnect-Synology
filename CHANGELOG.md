@@ -28,6 +28,13 @@ is left out of that text like any other subsection.
   On a router, install the `srm-*` package from now on; the NAS packages no longer list the
   router platforms.
 
+### Fixed
+
+- **Updates work on Synology Routers again.** An update on SRM stopped with "airconnect.conf
+  could not be saved for the update", because SRM does not provide the folder DSM offers for
+  that; the config is now parked in `/tmp` there. Routers on 1.12.4-20260928 can update
+  directly, no reinstall needed ([#277](https://github.com/eizedev/AirConnect-Synology/issues/277)).
+
 ### Internal
 
 - A merged pull request that changes `upstream.json` without changing the upstream version
