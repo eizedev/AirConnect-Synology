@@ -18,6 +18,13 @@ is left out of that text like any other subsection.
 
 ## [Unreleased]
 
+## [1.12.4-20261017] - 2026-10-17
+
+**Synology Routers get their own packages:** `AirConnect-srm-arm-*.spk` (RT2600ac, MR2200ac,
+RT1900ac, WRX560) and `AirConnect-srm-aarch64-*.spk` (RT6600ax), for SRM 1.3 or later. On a
+router, use these instead of the `dsm7-*` packages; see
+[doc/ARCHITECTURES.md](doc/ARCHITECTURES.md#synology-router-srm).
+
 ### Added
 
 - **Separate packages for Synology Routers.** `AirConnect-srm-arm` (and `srm-arm-static`) for
