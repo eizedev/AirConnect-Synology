@@ -16,7 +16,8 @@ the underlying binaries' own behavior belongs at
 Please report security issues in this repository's packaging privately via GitHub's
 [Report a vulnerability](https://github.com/eizedev/AirConnect-Synology/security/advisories/new)
 feature (`Security` tab → `Advisories` → `Report a vulnerability`), not a public issue -
-this opens a private discussion until a fix is ready.
+this opens a private discussion until a fix is ready. If you cannot use GitHub, email
+`oss@eize.dev` instead.
 
 Please include:
 
