@@ -10,4 +10,5 @@ src/dsm/bin/**
 CLAUDE.md
 CLAUDE.local.md
 AGENTS.md
-.claude/
+.claude/*
+!.claude/settings.json
