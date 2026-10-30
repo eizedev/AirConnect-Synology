@@ -18,6 +18,15 @@ is left out of that text like any other subsection.
 
 ## [Unreleased]
 
+### Internal
+
+- Issues labelled `deferred` are exempt from the stale bot
+  ([#262](https://github.com/eizedev/AirConnect-Synology/issues/262),
+  [#263](https://github.com/eizedev/AirConnect-Synology/issues/263),
+  [#266](https://github.com/eizedev/AirConnect-Synology/issues/266)). These are known
+  defects parked on purpose, and the bot would otherwise close them 5 days after marking
+  them stale.
+
 ## [1.12.4-20261017] - 2026-10-17
 
 **Synology Routers get their own packages:** `AirConnect-srm-arm-*.spk` (RT2600ac, MR2200ac,

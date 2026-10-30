@@ -21,7 +21,9 @@ jobs:
           # upstream: waiting on philippe44 is exactly the state that produces
           # months of silence through nobody's fault, and closing those loses
           # the thread on the work that takes longest.
-          exempt-issue-labels: "awaiting-approval,work-in-progress,breaking-change,upstream"
+          # deferred: known defects parked on purpose. Silence is the expected
+          # state for them, and closing them would lose the record.
+          exempt-issue-labels: "awaiting-approval,work-in-progress,breaking-change,upstream,deferred"
           stale-pr-label: "no-pr-activity"
           days-before-stale: 30
           days-before-close: 5
